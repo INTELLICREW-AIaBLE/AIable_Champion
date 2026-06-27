@@ -11,6 +11,10 @@
     "noEmit": true,
     "incremental": true,
     "module": "esnext",
+    "types": [
+      "node",
+      "axios"
+    ],
     "esModuleInterop": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
