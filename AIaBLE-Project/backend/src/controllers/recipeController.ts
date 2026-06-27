@@ -58,7 +58,7 @@ export const getRecipeById = (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi lấy recipe'
+      message: 'False to get recipe'
     });
   }
 };
