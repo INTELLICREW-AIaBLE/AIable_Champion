@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "install:backend": "npm install --prefix AIable_Champion/AIaBLE-Project/backend",
-    "install:frontend": "npm install --prefix AIable_Champion/AIaBLE-Project/frontend",
+    "install:backend": "npm install --prefix AIaBLE-Project/backend",
+    "install:frontend": "npm install --prefix AIaBLE-Project/frontend",
     "install:all": "npm run install:backend && npm run install:frontend",
-    "dev:backend": "npm run dev --prefix AIable_Champion/AIaBLE-Project/backend",
-    "dev:frontend": "npm run dev --prefix AIable_Champion/AIaBLE-Project/frontend",
+    "dev:backend": "npm run dev --prefix AIaBLE-Project/backend",
+    "dev:frontend": "npm run dev --prefix AIaBLE-Project/frontend",
     "dev": "npx concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+
 
 
   },
