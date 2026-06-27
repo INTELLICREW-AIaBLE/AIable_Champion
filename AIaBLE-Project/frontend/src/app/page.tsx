@@ -111,7 +111,7 @@ export default function LandingPage() {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-xs font-bold text-violet-600 uppercase tracking-widest mb-3">6 Core Capabilities</h2>
           <h3 className="text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight">
-            Comprehensive workflow management built for FPT & University tasks
+            Comprehensive workflow management built for academic tasks
           </h3>
         </div>
 

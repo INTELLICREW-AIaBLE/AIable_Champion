@@ -90,12 +90,14 @@ export function Navbar() {
             <ChevronDown className="w-3 h-3 text-slate-400" />
           </button>
 
-          {/* User Avatar */}
-          <div className="relative cursor-pointer">
-            <div className="h-8 w-8 rounded-full bg-slate-700 flex items-center justify-center text-white text-sm font-semibold hover:bg-slate-800 transition">
-              U
-            </div>
-            <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 border-2 border-white" />
+          {/* Auth Buttons */}
+          <div className="flex items-center gap-2">
+            <button className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-md hover:bg-slate-50 transition">
+              Login
+            </button>
+            <button className="text-xs font-semibold bg-violet-600 hover:bg-violet-700 text-white px-3 py-1.5 rounded-md transition shadow-sm">
+              Register
+            </button>
           </div>
         </div>
       </div>
