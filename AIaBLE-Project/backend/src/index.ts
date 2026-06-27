@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { errorHandler } from './middleware/errorHandler';
 import { callGemini } from './services/gemini';
-
+import recipeRoutes from './routes/recipeRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -18,6 +18,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
+
+// Recipe Library routes
+app.use('/api/recipes', recipeRoutes);
 
 // Basic health check route
 app.get('/api/health', (req, res) => {

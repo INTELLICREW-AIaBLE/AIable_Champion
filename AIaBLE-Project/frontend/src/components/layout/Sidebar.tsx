@@ -6,13 +6,16 @@ import { cn } from '@/lib/utils';
 import { Home, FolderOpen, Settings } from 'lucide-react';
 
 const navItems = [
-  { href: '/', label: 'Home', icon: Home },
+  { href: '/home', label: 'Home', icon: Home },
   { href: '/projects', label: 'Projects', icon: FolderOpen },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
   const pathname = usePathname();
+
+  // Hide sidebar on the landing page
+  if (pathname === '/') return null;
 
   return (
     <div className={cn('pb-12 border-r min-h-[calc(100vh-3.5rem)] w-56 hidden md:block bg-white shrink-0', className)}>
