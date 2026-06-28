@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Copy, Wand2 } from 'lucide-react';
 
 import {
   BookOpen,
@@ -25,7 +27,11 @@ type Recipe = {
 const RECIPES: Recipe[] = [];
 const CATEGORIES = ['All', 'Coding', 'Report', 'Presentation', 'Writing', 'Summary', 'Planning'];
 
-function RecipeCard({ recipe }: { recipe: Recipe }) {
+function RecipeCard({ recipe, onApply,
+}: {
+  recipe: Recipe;
+  onApply: (recipe: Recipe) => void;
+}) {
   return (
     <article className="group bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:shadow-lg hover:shadow-violet-100 transition-all duration-300">
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -71,9 +77,12 @@ function RecipeCard({ recipe }: { recipe: Recipe }) {
         ))}
       </div>
 
-      <button className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-purple-700 text-sm font-bold text-white hover:from-violet-700 hover:to-purple-800 transition-all shadow-md shadow-violet-200 active:scale-95">
-        Use Template
-        <ArrowRight className="w-4 h-4" />
+      <button
+        onClick={() => onApply(recipe)}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-50 text-violet-700 text-xs font-bold hover:bg-violet-100 transition"
+      >
+        <Wand2 className="w-3.5 h-3.5" />
+        Apply Recipe
       </button>
     </article>
   );
@@ -82,6 +91,7 @@ function RecipeCard({ recipe }: { recipe: Recipe }) {
 export default function RecipeLibraryPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchRecipes() {
@@ -99,6 +109,12 @@ export default function RecipeLibraryPage() {
 
     fetchRecipes();
   }, []);
+
+  const handleApplyRecipe = (recipe: Recipe) => {
+    sessionStorage.setItem('optimizer_prefill', recipe.prompt);
+    router.push('/optimizer');
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
@@ -111,14 +127,14 @@ export default function RecipeLibraryPage() {
           </div>
 
           <p className="text-sm text-slate-500">
-            Browse curated recipes by meal type, difficulty, cooking time, and nutrition.
+            Thư viện prompt chất lượng cao - được tuyển chọn, thử nghiệm và phân loại theo chuyên ngành.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-slate-100 shadow-sm text-sm text-slate-400">
             <Search className="w-4 h-4" />
-            Search recipes
+            Tìm recipe...
           </div>
 
           <button className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition">
@@ -153,7 +169,7 @@ export default function RecipeLibraryPage() {
           <p className="text-sm text-slate-500">Loading recipes...</p>
         ) : (
           recipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
+            <RecipeCard key={recipe.id} recipe={recipe} onApply={handleApplyRecipe} />
           )))}
       </section>
     </div>
