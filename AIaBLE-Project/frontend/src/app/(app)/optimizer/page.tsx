@@ -196,11 +196,32 @@ export default function OptimizerPage() {
     if (!canOptimize) return;
     setLoading(true);
     setResult(null);
-    await new Promise((r) => setTimeout(r, 1800)); // mock delay
-    const res = mockOptimize(raw, model, tone);
-    setResult(res);
-    setLoading(false);
-    if (res.ethicsFlag) setShowEthics(true);
+    try {
+      const res = await fetch('http://localhost:5001/api/optimizer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: raw,
+          model,
+          tone
+        })
+      });
+      const json = await res.json();
+      if (res.ok) {
+        setResult(json);
+        if (json.ethicsFlag) setShowEthics(true);
+      } else {
+        console.error('Failed to optimize prompt:', json.message);
+        alert(json.message || 'Có lỗi xảy ra khi tối ưu prompt.');
+      }
+    } catch (error) {
+      console.error('Error optimizing prompt:', error);
+      alert('Không thể kết nối đến server backend.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleReset = () => {
