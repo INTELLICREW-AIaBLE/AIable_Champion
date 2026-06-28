@@ -12,6 +12,7 @@ const quickAccessItems = [
     iconBg: 'bg-violet-100',
     iconColor: 'text-violet-600',
     decorColor: 'text-violet-400',
+    href: '/optimizer',
   },
   {
     title: 'Match Task',
@@ -21,6 +22,7 @@ const quickAccessItems = [
     iconBg: 'bg-blue-100',
     iconColor: 'text-blue-600',
     decorColor: 'text-blue-400',
+    href: '/task-matcher',
   },
   {
     title: 'Browse Recipes',
@@ -30,6 +32,7 @@ const quickAccessItems = [
     iconBg: 'bg-purple-100',
     iconColor: 'text-purple-600',
     decorColor: 'text-purple-400',
+    href: '/recipes',
   },
   {
     title: 'Verify Output',
@@ -39,6 +42,17 @@ const quickAccessItems = [
     iconBg: 'bg-indigo-100',
     iconColor: 'text-indigo-600',
     decorColor: 'text-indigo-400',
+    href: '/validator',
+  },
+  {
+    title: 'AI Sandbox',
+    description: 'Compare outputs from Claude, GPT-4, and Gemini.',
+    icon: <Sparkles className="w-5 h-5" />,
+    decorIcon: <Sparkles className="w-10 h-10" />,
+    iconBg: 'bg-fuchsia-100',
+    iconColor: 'text-fuchsia-600',
+    decorColor: 'text-fuchsia-400',
+    href: '/sandbox',
   },
 ];
 

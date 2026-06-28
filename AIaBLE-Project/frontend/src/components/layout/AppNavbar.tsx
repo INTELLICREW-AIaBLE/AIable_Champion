@@ -33,6 +33,7 @@ const SEARCH_DATA: SearchItem[] = [
   { id: 'optimizer',    category: 'tool',   label: 'Optimize Prompt',  description: 'Tối ưu hoá raw prompts của bạn',    href: '/optimizer',    icon: Wand2 },
   { id: 'task-matcher', category: 'tool',   label: 'Match Task',       description: 'Ghép task với AI workflow phù hợp', href: '/task-matcher', icon: GitBranch },
   { id: 'validator',    category: 'tool',   label: 'Verify Output',    description: 'Kiểm tra kết quả AI với nguồn',     href: '/validator',    icon: ShieldCheck },
+  { id: 'sandbox',      category: 'tool',   label: 'AI Sandbox',       description: 'So sánh kết quả từ nhiều model AI', href: '/sandbox',      icon: Sparkles },
   { id: 'recipes-all',  category: 'tool',   label: 'Browse Recipes',   description: 'Khám phá thư viện AI Recipe',       href: '/recipes',      icon: BookOpen },
   // Recipes
   { id: 'r1', category: 'recipe', label: 'Debug code Python step-by-step', description: 'Coding · Best: Claude', href: '/recipes', icon: Code2,        tag: 'CODING' },

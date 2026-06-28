@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import {
   Home,
   Wand2, GitBranch, BookOpen, ShieldCheck,
-  FolderOpen, Bookmark, Clock,
+  FolderOpen, Bookmark, Clock, Sparkles,
 } from 'lucide-react';
 
 const NAV_GROUPS = [
@@ -23,6 +23,7 @@ const NAV_GROUPS = [
       { href: '/task-matcher', label: 'Match Task',       icon: GitBranch },
       { href: '/recipes',      label: 'Browse Recipes',   icon: BookOpen },
       { href: '/validator',    label: 'Verify Output',    icon: ShieldCheck },
+      { href: '/sandbox',      label: 'AI Sandbox',       icon: Sparkles },
     ],
   },
   {
