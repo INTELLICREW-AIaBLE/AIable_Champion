@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Wand2, Copy, Check, AlertTriangle, ChevronDown,
   Sparkles, ArrowRight, RotateCcw, Info, X,
@@ -22,16 +22,16 @@ interface OptimizeResult {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const AI_MODELS: { id: AIModel; label: string; badge: string; color: string; logo: string }[] = [
-  { id: 'Claude',  label: 'Claude',  badge: 'Best for writing',  color: 'from-orange-400 to-amber-500', logo: '/claude.png' },
-  { id: 'GPT-4',   label: 'GPT-4',   badge: 'Best for coding',   color: 'from-emerald-400 to-teal-500', logo: '/chatgpt.png' },
-  { id: 'Gemini',  label: 'Gemini',  badge: 'Best for analysis', color: 'from-blue-400 to-cyan-500',    logo: '/gemini.png' },
+  { id: 'Claude', label: 'Claude', badge: 'Best for writing', color: 'from-orange-400 to-amber-500', logo: '/claude.png' },
+  { id: 'GPT-4', label: 'GPT-4', badge: 'Best for coding', color: 'from-emerald-400 to-teal-500', logo: '/chatgpt.png' },
+  { id: 'Gemini', label: 'Gemini', badge: 'Best for analysis', color: 'from-blue-400 to-cyan-500', logo: '/gemini.png' },
 ];
 
 const TONES: { id: ToneType; label: string; icon: React.ElementType; desc: string }[] = [
-  { id: 'academic',  label: 'Academic',  icon: BookOpen,    desc: 'Formal, citation-ready'  },
-  { id: 'technical', label: 'Technical', icon: Target,      desc: 'Precise, structured'     },
-  { id: 'creative',  label: 'Creative',  icon: Sparkles,    desc: 'Vivid, engaging'         },
-  { id: 'concise',   label: 'Concise',   icon: Zap,         desc: 'Brief, to the point'     },
+  { id: 'academic', label: 'Academic', icon: BookOpen, desc: 'Formal, citation-ready' },
+  { id: 'technical', label: 'Technical', icon: Target, desc: 'Precise, structured' },
+  { id: 'creative', label: 'Creative', icon: Sparkles, desc: 'Vivid, engaging' },
+  { id: 'concise', label: 'Concise', icon: Zap, desc: 'Brief, to the point' },
 ];
 
 const EXAMPLE_PROMPTS = [
@@ -40,6 +40,7 @@ const EXAMPLE_PROMPTS = [
   'Tóm tắt chương 3 sách giáo trình',
   'Giải bài toán tích phân này cho tôi',
 ];
+
 
 // ─── Mock optimize function ────────────────────────────────────────────────────
 function mockOptimize(raw: string, model: AIModel, tone: ToneType): OptimizeResult {
@@ -59,8 +60,8 @@ Yêu cầu output:
     optimized,
     improvements: [
       { label: 'Clarity Score', before: 42, after: 91, unit: '%' },
-      { label: 'Word Count',    before: raw.split(' ').length, after: optimized.split(' ').length, unit: 'w' },
-      { label: 'Structure',     before: 20, after: 88, unit: '%' },
+      { label: 'Word Count', before: raw.split(' ').length, after: optimized.split(' ').length, unit: 'w' },
+      { label: 'Structure', before: 20, after: 88, unit: '%' },
     ],
     suggestions: [
       'Thêm ngữ cảnh cụ thể về mức độ hiểu biết của bạn',
@@ -83,11 +84,10 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={copy}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
-        copied
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${copied
           ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
           : 'bg-white border border-slate-200 text-slate-600 hover:border-violet-300 hover:text-violet-700 hover:bg-violet-50'
-      }`}
+        }`}
     >
       {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
       {copied ? 'Copied!' : 'Copy'}
@@ -98,7 +98,7 @@ function CopyButton({ text }: { text: string }) {
 function ImprovementBar({ label, before, after, unit }: { label: string; before: number; after: number; unit: string }) {
   const max = unit === '%' ? 100 : Math.max(before, after) * 1.2;
   const pctBefore = Math.min((before / max) * 100, 100);
-  const pctAfter  = Math.min((after  / max) * 100, 100);
+  const pctAfter = Math.min((after / max) * 100, 100);
   const gain = after - before;
 
   return (
@@ -170,17 +170,26 @@ function EthicsDialog({ reason, onDismiss }: { reason: string; onDismiss: () => 
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function OptimizerPage() {
-  const [raw,        setRaw]        = useState('');
-  const [model,      setModel]      = useState<AIModel>('Claude');
-  const [tone,       setTone]       = useState<ToneType>('academic');
-  const [loading,    setLoading]    = useState(false);
-  const [result,     setResult]     = useState<OptimizeResult | null>(null);
+  const [raw, setRaw] = useState('');
+  const [model, setModel] = useState<AIModel>('Claude');
+  const [tone, setTone] = useState<ToneType>('academic');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<OptimizeResult | null>(null);
   const [showEthics, setShowEthics] = useState(false);
   const [activeView, setActiveView] = useState<'split' | 'before' | 'after'>('split');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const charCount  = raw.length;
-  const wordCount  = raw.trim() ? raw.trim().split(/\s+/).length : 0;
+  useEffect(() => {
+    const prefill = sessionStorage.getItem('optimizer_prefill');
+
+    if (prefill) {
+      setRaw(prefill);
+      sessionStorage.removeItem('optimizer_prefill');
+    }
+  }, []);
+
+  const charCount = raw.length;
+  const wordCount = raw.trim() ? raw.trim().split(/\s+/).length : 0;
   const canOptimize = raw.trim().length >= 10 && !loading;
 
   const handleOptimize = async () => {
@@ -237,11 +246,10 @@ export default function OptimizerPage() {
               <button
                 key={m.id}
                 onClick={() => setModel(m.id)}
-                className={`flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl border-2 text-xs font-semibold transition-all ${
-                  model === m.id
+                className={`flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl border-2 text-xs font-semibold transition-all ${model === m.id
                     ? 'border-violet-500 bg-violet-50 text-violet-700'
                     : 'border-slate-100 text-slate-500 hover:border-slate-200 hover:bg-slate-50'
-                }`}
+                  }`}
               >
                 <div className="w-6 h-6 rounded-lg overflow-hidden border border-slate-200 shrink-0">
                   <Image src={m.logo} alt={m.label} width={24} height={24} className="object-cover" />
@@ -261,11 +269,10 @@ export default function OptimizerPage() {
               <button
                 key={id}
                 onClick={() => setTone(id)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl border-2 text-left transition-all ${
-                  tone === id
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl border-2 text-left transition-all ${tone === id
                     ? 'border-violet-500 bg-violet-50'
                     : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50'
-                }`}
+                  }`}
               >
                 <Icon className={`w-3.5 h-3.5 shrink-0 ${tone === id ? 'text-violet-600' : 'text-slate-400'}`} />
                 <div>
@@ -374,11 +381,10 @@ export default function OptimizerPage() {
               <button
                 key={v}
                 onClick={() => setActiveView(v)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                  activeView === v
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${activeView === v
                     ? 'bg-violet-600 text-white'
                     : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
-                }`}
+                  }`}
               >
                 {v === 'split' ? '⊟ Split' : v === 'before' ? '← Before' : '→ After'}
               </button>
