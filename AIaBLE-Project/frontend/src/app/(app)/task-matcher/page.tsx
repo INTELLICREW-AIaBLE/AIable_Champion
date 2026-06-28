@@ -1,100 +1,58 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  Sparkles,
-  Clock,
-  ChevronRight,
-  X,
-  BookOpen,
-  FileText,
-  PenLine,
-  Presentation,
   Bot,
+  ChevronRight,
   Layers,
+  Sparkles,
+  X,
 } from 'lucide-react';
 
 type TimelineStep = {
-  id: number;
-  title: string;
+  stepName: string;
   description: string;
-  tool: string;
-  toolDesc: string;
-  estimate: string;
-  icon: React.ElementType;
-  color: string;
-  bg: string;
+  suggestedTool: string;
+  reason: string;
+  suggestedPrompt: string;
 };
 
 const MOCK_STEPS: TimelineStep[] = [
   {
-    id: 1,
-    title: 'Nghiên cứu & thu thập tài liệu',
+    stepName: 'Phân tích yêu cầu',
     description:
-      'Tìm hiểu khái niệm microservices, so sánh với monolithic, tìm case study thực tế từ Netflix, Amazon, Uber.',
-    tool: 'Dùng Claude',
-    toolDesc: 'mạnh về phân tích ngữ cảnh sâu',
-    estimate: '1 ngày',
-    icon: BookOpen,
-    color: 'text-violet-600',
-    bg: 'bg-violet-50 border-violet-100',
-  },
-  {
-    id: 2,
-    title: 'Tổng hợp & xây dựng outline báo cáo',
-    description:
-      'Tổng hợp thông tin đã nghiên cứu, xây dựng cấu trúc báo cáo chuẩn học thuật gồm: Giới thiệu, Cơ sở lý thuyết, Phân tích, Kết luận.',
-    tool: 'Dùng Gemini',
-    toolDesc: 'free tier ổn định, tốt cho tổng hợp',
-    estimate: '1 ngày',
-    icon: FileText,
-    color: 'text-cyan-600',
-    bg: 'bg-cyan-50 border-cyan-100',
-  },
-  {
-    id: 3,
-    title: 'Viết nội dung chính từng chương',
-    description:
-      'Viết chi tiết từng phần dựa trên outline, đảm bảo ngôn ngữ học thuật, có trích dẫn nguồn đúng format APA/IEEE.',
-    tool: 'Dùng ChatGPT',
-    toolDesc: 'tốt cho viết lách và diễn đạt',
-    estimate: '1–2 ngày',
-    icon: PenLine,
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50 border-emerald-100',
-  },
-  {
-    id: 4,
-    title: 'Thiết kế slide thuyết trình',
-    description:
-      'Chuyển nội dung báo cáo thành slide trực quan với sơ đồ kiến trúc, biểu đồ so sánh và storytelling logic.',
-    tool: 'Dùng Canva AI',
-    toolDesc: 'thiết kế đẹp, nhanh, template sẵn',
-    estimate: '1 ngày',
-    icon: Presentation,
-    color: 'text-amber-600',
-    bg: 'bg-amber-50 border-amber-100',
+      'Xác định bài toán, đối tượng sử dụng, chức năng chính của hệ thống.',
+    suggestedTool: 'Gemini',
+    reason: 'Gemini giúp brainstorm nhanh các use case và yêu cầu hệ thống.',
+    suggestedPrompt:
+      'Phân tích yêu cầu hệ thống cho dự án [TÊN_DỰ_ÁN]...',
   },
 ];
 
 export default function TaskMatcherPage() {
   const [selectedStep, setSelectedStep] = useState<TimelineStep | null>(null);
 
-  /*
-  // API template later, babe:
-  const [steps, setSteps] = useState<TimelineStep[]>([]);
+  const [taskDescription, setTaskDescription] = useState(
+    'Làm báo cáo môn Software Engineering về kiến trúc microservices'
+  );
+
+  const [subject, setSubject] = useState('software engineering');
+  const [steps, setSteps] = useState<TimelineStep[]>(MOCK_STEPS);
   const [loading, setLoading] = useState(false);
+  const [source, setSource] = useState('');
 
   useEffect(() => {
     async function fetchWorkflow() {
       try {
         setLoading(true);
+
         const res = await fetch('http://localhost:5000/api/task-matcher');
         const json = await res.json();
 
-        setSteps(Array.isArray(json.data) ? json.data : []);
+        setSteps(Array.isArray(json.data) ? json.data : MOCK_STEPS);
       } catch (error) {
         console.error('Failed to fetch task workflow:', error);
+        setSteps(MOCK_STEPS);
       } finally {
         setLoading(false);
       }
@@ -102,9 +60,36 @@ export default function TaskMatcherPage() {
 
     fetchWorkflow();
   }, []);
-  */
 
-  const steps = MOCK_STEPS;
+  const handleMatchTask = async () => {
+    try {
+      setLoading(true);
+
+      const res = await fetch('http://localhost:5000/api/task-matcher', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subject,
+          description: taskDescription,
+        }),
+      });
+
+      const json = await res.json();
+
+      if (!json.success) {
+        throw new Error(json.message || 'Task matcher failed');
+      }
+
+      setSteps(Array.isArray(json.steps) ? json.steps : []);
+      setSource(json.source || '');
+    } catch (error) {
+      console.error('Failed to match task:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto space-y-5 pb-12">
@@ -114,30 +99,44 @@ export default function TaskMatcherPage() {
             <Sparkles className="w-4 h-4 text-white" />
           </div>
 
-          <h1 className="text-2xl font-black text-slate-900">AI Task-Matcher</h1>
+          <h1 className="text-2xl font-black text-slate-900">
+            AI Task-Matcher
+          </h1>
         </div>
 
         <p className="text-sm text-slate-500">
-          Mô tả bài tập lớn — hệ thống phân rã thành từng bước và gợi ý công cụ AI phù hợp nhất.
+          Mô tả bài tập lớn — hệ thống phân rã thành từng bước và gợi ý công cụ
+          AI phù hợp nhất.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_220px_150px] gap-3">
         <input
-          defaultValue="Làm báo cáo môn Software Engineering về kiến trúc microservices"
+          value={taskDescription}
+          onChange={(e) => setTaskDescription(e.target.value)}
           className="px-4 py-2.5 rounded-xl bg-white border border-slate-100 shadow-sm text-sm text-slate-700 focus:outline-none focus:border-violet-300"
         />
 
-        <select className="px-4 py-2.5 rounded-xl bg-white border border-slate-100 shadow-sm text-sm font-medium text-slate-600 focus:outline-none">
-          <option>Software Engineering</option>
-          <option>Database</option>
-          <option>Web Development</option>
-          <option>Presentation</option>
+        <select
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          className="px-4 py-2.5 rounded-xl bg-white border border-slate-100 shadow-sm text-sm font-medium text-slate-600 focus:outline-none"
+        >
+          <option value="software engineering">Software Engineering</option>
+          <option value="marketing">Marketing</option>
+          <option value="business administration">
+            Business Administration
+          </option>
+          <option value="data science">Data Science</option>
         </select>
 
-        <button className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-purple-700 text-sm font-bold text-white shadow-md shadow-violet-200 hover:from-violet-700 hover:to-purple-800 active:scale-95 transition">
+        <button
+          onClick={handleMatchTask}
+          disabled={loading}
+          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-purple-700 text-sm font-bold text-white shadow-md shadow-violet-200 hover:from-violet-700 hover:to-purple-800 active:scale-95 transition disabled:opacity-70 disabled:cursor-not-allowed"
+        >
           <Bot className="w-4 h-4" />
-          Phân tích nhiệm vụ
+          {loading ? 'Đang phân tích...' : 'Phân tích nhiệm vụ'}
         </button>
       </div>
 
@@ -148,60 +147,57 @@ export default function TaskMatcherPage() {
             Báo cáo SE — Kiến trúc Microservices
           </span>
           <span className="text-violet-400">•</span>
-          <span className="font-semibold text-violet-600">Estimated: 3–4 ngày</span>
+          <span className="font-semibold text-violet-600">
+            Estimated: 3–4 ngày
+          </span>
+
+          {source && (
+            <>
+              <span className="text-violet-400">•</span>
+              <span className="font-semibold text-violet-600">
+                Source: {source}
+              </span>
+            </>
+          )}
         </div>
       </div>
 
       <section className="space-y-3">
-        {steps.map((step) => {
-          const Icon = step.icon;
+        {steps.map((step, index) => (
+          <button
+            key={`${step.stepName}-${index}`}
+            onClick={() => setSelectedStep(step)}
+            className="w-full group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:shadow-violet-100 transition-all duration-300 p-4 text-left"
+          >
+            <div className="flex items-start gap-4">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-sm font-black text-slate-800">
+                      {index + 1}. {step.stepName}
+                    </h2>
 
-          return (
-            <button
-              key={step.id}
-              onClick={() => setSelectedStep(step)}
-              className="w-full group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:shadow-violet-100 transition-all duration-300 p-4 text-left"
-            >
-              <div className="flex items-start gap-4">
-                <div className={`w-8 h-8 rounded-full border flex items-center justify-center text-xs font-black shrink-0 ${step.bg} ${step.color}`}>
-                  {step.id}
+                    <p className="text-xs text-slate-500 leading-relaxed mt-1 line-clamp-2">
+                      {step.description}
+                    </p>
+                  </div>
+
+                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-violet-500 shrink-0 mt-1" />
                 </div>
 
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h2 className="text-sm font-black text-slate-900 group-hover:text-violet-700 transition">
-                        {step.title}
-                      </h2>
+                <div className="flex flex-wrap items-center gap-2 mt-3">
+                  <span className="text-[11px] font-bold px-2 py-1 rounded-full bg-violet-50 text-violet-600">
+                    {step.suggestedTool}
+                  </span>
 
-                      <p className="text-xs text-slate-500 leading-relaxed mt-1 line-clamp-2">
-                        {step.description}
-                      </p>
-                    </div>
-
-                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-violet-500 shrink-0 mt-1" />
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2 mt-3">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold ${step.bg} ${step.color}`}>
-                      <Icon className="w-3.5 h-3.5" />
-                      {step.tool} — {step.toolDesc}
-                    </span>
-
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-100 text-[11px] font-semibold text-slate-500">
-                      <Clock className="w-3.5 h-3.5" />
-                      {step.estimate}
-                    </span>
-
-                    <span className="ml-auto text-[11px] font-bold text-violet-600 group-hover:underline">
-                      Xem prompt mẫu →
-                    </span>
-                  </div>
+                  <span className="ml-auto text-[11px] font-bold text-violet-600 group-hover:underline">
+                    Xem prompt mẫu →
+                  </span>
                 </div>
               </div>
-            </button>
-          );
-        })}
+            </div>
+          </button>
+        ))}
       </section>
 
       {selectedStep && (
@@ -214,12 +210,11 @@ export default function TaskMatcherPage() {
           <aside className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl p-6 overflow-y-auto">
             <div className="flex items-start justify-between gap-4 mb-5">
               <div>
-                <p className="text-xs font-bold text-violet-600 uppercase tracking-wide mb-1">
-                  Step {selectedStep.id}
+                <p className="text-xs font-bold text-violet-600 uppercase tracking-wide">
+                  Chi tiết bước
                 </p>
-
-                <h2 className="text-xl font-black text-slate-900">
-                  {selectedStep.title}
+                <h2 className="text-xl font-black text-slate-900 mt-1">
+                  {selectedStep.stepName}
                 </h2>
               </div>
 
@@ -241,15 +236,17 @@ export default function TaskMatcherPage() {
                 </p>
               </div>
 
-              <div className={`rounded-2xl border p-4 ${selectedStep.bg}`}>
-                <p className="text-xs font-bold uppercase tracking-wide mb-2">
+              <div className="rounded-2xl border border-purple-100 bg-purple-50 p-4">
+                <p className="text-xs font-bold text-purple-600 uppercase tracking-wide mb-2">
                   Công cụ đề xuất
                 </p>
-                <p className={`text-sm font-black ${selectedStep.color}`}>
-                  {selectedStep.tool}
+
+                <p className="text-sm font-black text-purple-800">
+                  {selectedStep.suggestedTool}
                 </p>
-                <p className="text-sm text-slate-600 mt-1">
-                  {selectedStep.toolDesc}
+
+                <p className="text-sm text-slate-700 leading-relaxed mt-2">
+                  {selectedStep.reason}
                 </p>
               </div>
 
@@ -259,10 +256,11 @@ export default function TaskMatcherPage() {
                 </p>
 
                 <pre className="whitespace-pre-wrap text-sm text-slate-700 leading-relaxed font-mono">
-                  {`Bạn là trợ lý học thuật.
+                  {selectedStep.suggestedPrompt ||
+                    `Bạn là trợ lý học thuật.
 
 Nhiệm vụ:
-${selectedStep.title}
+${selectedStep.stepName}
 
 Ngữ cảnh:
 Tôi đang làm bài tập lớn môn Software Engineering về kiến trúc microservices.
