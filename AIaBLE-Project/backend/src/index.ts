@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { errorHandler } from './middleware/errorHandler';
 import { callGemini } from './services/gemini';
 import recipeRoutes from './routes/recipeRoutes';
+import matcherRoutes from './routes/matcher';
 
 // Load environment variables
 dotenv.config();
@@ -21,6 +22,9 @@ app.use(express.json());
 
 // Recipe Library routes
 app.use('/api/recipes', recipeRoutes);
+
+// Task Matcher routes
+app.use('/api/task-matcher', matcherRoutes);
 
 // Basic health check route
 app.get('/api/health', (req, res) => {
