@@ -51,3 +51,21 @@ export const getDefaultWorkflowController = (req: Request, res: Response) => {
     ]
   });
 };
+
+// GET /api/task-matcher/subjects - get all available subjects
+export const getSubjects = (req: Request, res: Response) => {
+  const subjects = [
+    { value: 'software engineering', label: 'Software Engineering' },
+    { value: 'marketing', label: 'Marketing' },
+    { value: 'business administration', label: 'Business Administration' },
+    { value: 'data science', label: 'Data Science' },
+    { value: 'english', label: 'English' },
+    { value: 'economics', label: 'Economics' },
+    { value: 'accounting', label: 'Accounting' },
+    { value: 'project management', label: 'Project Management' },
+    { value: 'human resource management', label: 'Human Resource Management' },
+    { value: 'law', label: 'Law' }
+  ];
+
+  res.json({ success: true, total: subjects.length, data: subjects });
+};

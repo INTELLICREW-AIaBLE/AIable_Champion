@@ -4,5 +4,11 @@
     "fullName": "Nguyen Van Minh",
     "email": "minhnv",
     "password": "123456"
+  },
+  {
+    "id": "1782664434646",
+    "fullName": "Lê Duy Hưng",
+    "email": "hung@gmail.com",
+    "password": "123456"
   }
 ]
