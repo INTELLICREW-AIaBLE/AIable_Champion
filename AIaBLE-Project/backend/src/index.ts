@@ -7,6 +7,7 @@ import recipeRoutes from './routes/recipeRoutes';
 import matcherRoutes from './routes/matcher';
 import optimizerRoutes from './routes/optimizer';
 import sandboxRoutes from './routes/sandbox';
+import authRoutes from './routes/auth';
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +31,9 @@ app.use('/api/task-matcher', matcherRoutes);
 
 // Prompt Optimizer routes
 app.use('/api/optimizer', optimizerRoutes);
+
+// Auth routes
+app.use('/api/auth', authRoutes);
 
 // Sandbox routes
 app.use('/api/sandbox', sandboxRoutes);

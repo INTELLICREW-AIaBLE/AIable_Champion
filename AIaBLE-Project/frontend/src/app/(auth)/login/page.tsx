@@ -13,14 +13,39 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const [error, setError] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // TODO: connect to backend auth
-    await new Promise((r) => setTimeout(r, 1400));
-    setLoading(false);
-    // Redirect to home after successful login
-    router.push('/home');
+    setError('');
+
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: username, password })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setError(data.message || 'Đăng nhập thất bại.');
+        setLoading(false);
+        return;
+      }
+
+      // Lưu token vào localStorage (nếu cần dùng sau này)
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
+
+      // Redirect to home after successful login
+      router.push('/home');
+    } catch (err) {
+      setError('Không thể kết nối đến server.');
+      setLoading(false);
+    }
   };
 
   return (
@@ -99,6 +124,13 @@ export default function LoginPage() {
               </button>
             </div>
           </div>
+
+          {/* Error message */}
+          {error && (
+            <p className="text-sm text-red-500 font-medium text-center bg-red-50 border border-red-200 rounded-xl px-4 py-2">
+              {error}
+            </p>
+          )}
 
           {/* Submit */}
           <button
