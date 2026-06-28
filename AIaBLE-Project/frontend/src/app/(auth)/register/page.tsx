@@ -192,12 +192,8 @@ export default function RegisterPage() {
             </div>
             <span className="text-sm text-slate-600 leading-snug">
               Tôi đồng ý với các{' '}
-              <Link href="#" className="text-violet-600 font-semibold hover:underline">
-                Điều khoản
-              </Link>{' '}
-              và{' '}
-              <Link href="#" className="text-violet-600 font-semibold hover:underline">
-                Điều kiện
+              <Link href="/terms" target="_blank" className="text-violet-600 font-semibold hover:underline">
+                Điều khoản & Điều kiện
               </Link>
               .
             </span>

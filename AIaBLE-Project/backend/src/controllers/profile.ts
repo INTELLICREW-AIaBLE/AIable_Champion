@@ -36,7 +36,12 @@ export const getProfile = (req: Request, res: Response) => {
       website: user.website || 'github.com',
       avatar: user.avatar || '',
       cover: user.cover || '',
-      birthday: user.birthday || '01/01/2000'
+      birthday: user.birthday || '01/01/2000',
+      apiKeys: user.apiKeys || {
+        openai: process.env.OPENAI_API_KEY || '',
+        anthropic: process.env.ANTHROPIC_API_KEY || '',
+        gemini: process.env.GEMINI_API_KEY || ''
+      }
     };
 
     res.json({ success: true, data: profile });
@@ -74,6 +79,10 @@ export const updateProfile = (req: Request, res: Response) => {
         return res.status(400).json({ success: false, message: 'Email đã được sử dụng bởi người khác' });
       }
       users[userIndex].email = updates.email;
+    }
+
+    if (updates.apiKeys !== undefined) {
+      users[userIndex].apiKeys = updates.apiKeys;
     }
 
     writeUsers(users);

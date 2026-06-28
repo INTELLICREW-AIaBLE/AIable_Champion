@@ -17,11 +17,13 @@ export interface OptimizeResult {
 export const optimizePrompt = async (
   rawPrompt: string,
   modelName: string,
-  tone: string
+  tone: string,
+  userKey?: string
 ): Promise<OptimizeResult> => {
   try {
-    if (!process.env.GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY is missing from environment variables.');
+    const activeKey = userKey || process.env.GEMINI_API_KEY;
+    if (!activeKey) {
+      throw new Error('GEMINI_API_KEY is missing from environment variables and user settings.');
     }
 
     // System instructions for Prompt Optimizer
@@ -72,7 +74,8 @@ Return ONLY a valid JSON object matching this schema:
 }
 `;
 
-    const model = genAI.getGenerativeModel({
+    const dynamicGenAI = new GoogleGenerativeAI(activeKey);
+    const model = dynamicGenAI.getGenerativeModel({
       model: 'gemini-2.0-flash',
       generationConfig: {
         responseMimeType: 'application/json',

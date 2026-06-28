@@ -57,3 +57,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+html.dark-mode-active {
+  filter: invert(1) hue-rotate(180deg);
+  background-color: #111 !important;
+}
+
+html.dark-mode-active img,
+html.dark-mode-active video,
+html.dark-mode-active .ignore-dark-mode {
+  filter: invert(1) hue-rotate(180deg);
+}

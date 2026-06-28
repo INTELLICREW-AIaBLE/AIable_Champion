@@ -15,13 +15,15 @@ const genAI = new GoogleGenerativeAI(apiKey || 'temporary-placeholder');
  * Basic helper to invoke Google Gemini model
  * @param prompt User instruction
  */
-export const callGemini = async (prompt: string): Promise<string> => {
+export const callGemini = async (prompt: string, userKey?: string): Promise<string> => {
   try {
-    if (!process.env.GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY is missing from environment variables.');
+    const activeKey = userKey || process.env.GEMINI_API_KEY;
+    if (!activeKey) {
+      throw new Error('GEMINI_API_KEY is missing from environment variables and user settings.');
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const dynamicGenAI = new GoogleGenerativeAI(activeKey);
+    const model = dynamicGenAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
 
     const result = await model.generateContent(prompt);

@@ -205,7 +205,8 @@ export default function OptimizerPage() {
         body: JSON.stringify({
           prompt: raw,
           model,
-          tone
+          tone,
+          geminiKey: localStorage.getItem('geminiKey')
         })
       });
       const json = await res.json();
