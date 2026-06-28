@@ -1,9 +1,4 @@
-import Link from "next/link";
+// AppShell — placeholder for global app shell / quick-nav links
+// TODO: implement when needed
 
-<>
-  <Link href="/optimizer">Optimizer</Link>
-  <Link href="/task-matcher">Task Matcher</Link>
-  <Link href="/recipes">Recipes</Link>
-  <Link href="/validator">Validator</Link>
-  <Link href="/sandbox">Sandbox</Link>
-</>
+export {};

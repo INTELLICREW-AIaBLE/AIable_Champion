@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import api from "../../lib/axios";
+import api from "@/lib/axios";
 
 export default function RecipesPage() {
   useEffect(() => {

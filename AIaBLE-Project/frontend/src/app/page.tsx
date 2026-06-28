@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Navbar } from '@/components/layout/Navbar';
 import { 
   ArrowRight, 
   Wand2, 
@@ -22,7 +23,8 @@ import {
 
 export default function LandingPage() {
   return (
-    <div className="bg-slate-50 min-h-screen -mt-8 -mx-4 md:-mx-8 overflow-hidden pb-16">
+    <div className="bg-slate-50 min-h-screen overflow-hidden pb-16">
+      <Navbar />
       {/* Decorative Gradients & Grid Background */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] bg-gradient-to-b from-violet-100/50 via-indigo-50/20 to-transparent rounded-full blur-3xl pointer-events-none" />
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-35 pointer-events-none" />
@@ -49,7 +51,7 @@ export default function LandingPage() {
         {/* CTA Actions */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
           <Link
-            href="/home"
+            href="/login"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-8 py-4 text-base font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-lg shadow-violet-200 hover:-translate-y-0.5"
           >
             Get Started Now (Free)
