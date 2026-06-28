@@ -4,149 +4,77 @@ import { useEffect, useState } from 'react';
 
 import {
   BookOpen,
-  Clock,
-  Flame,
-  Star,
-  ChefHat,
+  Target,
+  Languages,
   Search,
   Filter,
   ArrowRight,
 } from 'lucide-react';
 
 type Recipe = {
-  id: number;
+  id: string;
   title: string;
-  desc: string;
   category: string;
-  time: string;
-  calories: string;
+  description: string;
+  prompt: string;
   difficulty: string;
-  rating: number;
-  image: string;
+  language: string;
+  tags: string[];
 };
 
-const RECIPES: Recipe[] = [
-  {
-    id: 1,
-    title: 'Grilled Chicken Salad',
-    desc: 'Fresh greens, tender grilled chicken, and a light citrus dressing.',
-    category: 'Healthy',
-    time: '25 min',
-    calories: '420 kcal',
-    difficulty: 'Easy',
-    rating: 4.8,
-    image: '/recipes/chicken-salad.jpg',
-  },
-  {
-    id: 2,
-    title: 'Creamy Mushroom Pasta',
-    desc: 'Comforting pasta with garlic, mushrooms, cream, and parmesan.',
-    category: 'Dinner',
-    time: '30 min',
-    calories: '610 kcal',
-    difficulty: 'Medium',
-    rating: 4.7,
-    image: '/recipes/mushroom-pasta.jpg',
-  },
-  {
-    id: 3,
-    title: 'Vietnamese Spring Rolls',
-    desc: 'Light rice paper rolls filled with shrimp, herbs, and vegetables.',
-    category: 'Vietnamese',
-    time: '35 min',
-    calories: '330 kcal',
-    difficulty: 'Medium',
-    rating: 4.9,
-    image: '/recipes/spring-rolls.jpg',
-  },
-  {
-    id: 4,
-    title: 'Beef Rice Bowl',
-    desc: 'Savory beef slices over warm rice with vegetables and sesame.',
-    category: 'Lunch',
-    time: '20 min',
-    calories: '560 kcal',
-    difficulty: 'Easy',
-    rating: 4.6,
-    image: '/recipes/beef-bowl.jpg',
-  },
-  {
-    id: 5,
-    title: 'Berry Yogurt Parfait',
-    desc: 'Layers of yogurt, berries, honey, and crunchy granola.',
-    category: 'Breakfast',
-    time: '10 min',
-    calories: '280 kcal',
-    difficulty: 'Easy',
-    rating: 4.5,
-    image: '/recipes/parfait.jpg',
-  },
-  {
-    id: 6,
-    title: 'Spicy Tomato Soup',
-    desc: 'Warm tomato soup with chili, basil, and crispy bread.',
-    category: 'Soup',
-    time: '40 min',
-    calories: '350 kcal',
-    difficulty: 'Easy',
-    rating: 4.4,
-    image: '/recipes/tomato-soup.jpg',
-  },
-];
-
-const CATEGORIES = ['All', 'Healthy', 'Dinner', 'Vietnamese', 'Lunch'];
+const RECIPES: Recipe[] = [];
+const CATEGORIES = ['All', 'Coding', 'Report', 'Presentation', 'Writing', 'Summary', 'Planning'];
 
 function RecipeCard({ recipe }: { recipe: Recipe }) {
   return (
-    <article className="group bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-lg hover:shadow-violet-100 transition-all duration-300">
-      <div className="relative h-44 bg-gradient-to-br from-violet-100 to-purple-100 overflow-hidden">
-        <img
-          src={recipe.image}
-          alt={recipe.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+    <article className="group bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:shadow-lg hover:shadow-violet-100 transition-all duration-300">
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className="w-8 h-8 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center shrink-0">
+              <BookOpen className="w-4 h-4 text-violet-600" />
+            </div>
 
-        <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/90 backdrop-blur text-xs font-bold text-violet-700 border border-violet-100">
+            <h2 className="text-base font-black text-slate-900 group-hover:text-violet-700 transition truncate">
+              {recipe.title}
+            </h2>
+          </div>
+
+          <p className="text-sm text-slate-500 leading-relaxed line-clamp-2">
+            {recipe.description}
+          </p>
+        </div>
+
+        <span className="px-2.5 py-1 rounded-full bg-violet-50 border border-violet-100 text-[11px] font-bold text-violet-700 shrink-0">
           {recipe.category}
-        </div>
-
-        <div className="absolute top-3 right-3 flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur text-xs font-bold text-amber-600 border border-amber-100">
-          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-          {recipe.rating}
-        </div>
+        </span>
       </div>
 
-      <div className="p-5">
-        <h2 className="text-base font-black text-slate-900 mb-1 group-hover:text-violet-700 transition">
-          {recipe.title}
-        </h2>
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-100 text-[11px] font-semibold text-slate-600">
+          <Target className="w-3.5 h-3.5 text-violet-500" />
+          {recipe.difficulty}
+        </span>
 
-        <p className="text-sm text-slate-500 leading-relaxed mb-4">
-          {recipe.desc}
-        </p>
+        <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-100 text-[11px] font-semibold text-slate-600">
+          <Languages className="w-3.5 h-3.5 text-violet-500" />
+          {recipe.language}
+        </span>
 
-        <div className="grid grid-cols-3 gap-2 mb-4">
-          <div className="rounded-xl bg-slate-50 border border-slate-100 p-2">
-            <Clock className="w-3.5 h-3.5 text-violet-500 mb-1" />
-            <p className="text-[11px] font-semibold text-slate-600">{recipe.time}</p>
-          </div>
-
-          <div className="rounded-xl bg-slate-50 border border-slate-100 p-2">
-            <Flame className="w-3.5 h-3.5 text-violet-500 mb-1" />
-            <p className="text-[11px] font-semibold text-slate-600">{recipe.calories}</p>
-          </div>
-
-          <div className="rounded-xl bg-slate-50 border border-slate-100 p-2">
-            <ChefHat className="w-3.5 h-3.5 text-violet-500 mb-1" />
-            <p className="text-[11px] font-semibold text-slate-600">{recipe.difficulty}</p>
-          </div>
-        </div>
-
-        <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-purple-700 text-sm font-bold text-white hover:from-violet-700 hover:to-purple-800 transition-all shadow-md shadow-violet-200 active:scale-95">
-          View Recipe
-          <ArrowRight className="w-4 h-4" />
-        </button>
+        {recipe.tags.slice(0, 2).map((tag) => (
+          <span
+            key={tag}
+            className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-100 text-[11px] font-semibold text-slate-500"
+          >
+            #{tag}
+          </span>
+        ))}
       </div>
+
+      <button className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-purple-700 text-sm font-bold text-white hover:from-violet-700 hover:to-purple-800 transition-all shadow-md shadow-violet-200 active:scale-95">
+        Use Template
+        <ArrowRight className="w-4 h-4" />
+      </button>
     </article>
   );
 }
@@ -159,9 +87,9 @@ export default function RecipeLibraryPage() {
     async function fetchRecipes() {
       try {
         const res = await fetch('http://localhost:5000/api/recipes');
-        const data = await res.json();
+        const json = await res.json();
 
-        setRecipes(data);
+        setRecipes(json.data);
       } catch (error) {
         console.error('Failed to fetch recipes:', error);
       } finally {
