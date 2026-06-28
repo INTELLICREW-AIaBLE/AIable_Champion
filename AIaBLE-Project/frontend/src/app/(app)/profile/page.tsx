@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+// ... (imports remain mostly same but I am doing exact replace so I must be careful)
 import {
   Camera, Edit3, Check, X, MapPin, Mail, Calendar, Link2,
   Wand2, GitBranch, BookOpen, ShieldCheck, Star, Zap, Award,
@@ -36,17 +37,12 @@ const ACTIVITY = [
   { icon: FileText,   color: 'bg-pink-100 text-pink-600',     title: 'Generated "Báo cáo môn học theo chuẩn APA"', time: '3 ngày trước', tag: 'Recipe' },
 ];
 
-// ─── EditableField ────────────────────────────────────────────────────────────
 function EditableField({
-  value, onSave, multiline = false,
+  value, onChange, multiline = false, type = "text"
 }: {
-  value: string; onSave: (v: string) => void; multiline?: boolean;
+  value: string; onChange: (v: string) => void; multiline?: boolean; type?: string;
 }) {
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft]     = useState(value);
-
-  const save = () => { onSave(draft); setEditing(false); };
-  const cancel = () => { setDraft(value); setEditing(false); };
 
   if (!editing) {
     return (
@@ -62,26 +58,109 @@ function EditableField({
   }
 
   return (
-    <span className="inline-flex items-center gap-1">
+    <span className="inline-flex items-center gap-1 flex-1">
       {multiline ? (
         <textarea
           autoFocus
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={() => setEditing(false)}
           className="text-sm border border-violet-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-violet-400 resize-none w-full"
           rows={3}
         />
       ) : (
         <input
+          type={type}
           autoFocus
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={() => setEditing(false)}
           className="text-sm border border-violet-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-violet-400"
         />
       )}
-      <button onClick={save}   className="p-1 rounded-full bg-emerald-500 text-white hover:bg-emerald-600 transition"><Check className="w-3 h-3" /></button>
-      <button onClick={cancel} className="p-1 rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 transition"><X className="w-3 h-3" /></button>
     </span>
+  );
+}
+
+// ─── Location Selector Modal ──────────────────────────────────────────────────
+function LocationSelector({ value, onSave }: { value: string; onSave: (v: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const [mapQuery, setMapQuery] = useState(value);
+
+  const handleSearch = () => setMapQuery(draft);
+
+  return (
+    <>
+      <span
+        className="group/loc relative cursor-pointer hover:text-violet-600 transition"
+        onClick={() => { setDraft(value); setMapQuery(value); setIsOpen(true); }}
+        title="Chọn địa điểm trên bản đồ"
+      >
+        {value}
+        <Edit3 className="inline-block ml-1.5 w-3 h-3 text-slate-400 opacity-0 group-hover/loc:opacity-100 transition -mt-0.5" />
+      </span>
+
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-violet-600" /> Tìm kiếm địa điểm
+              </h3>
+              <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-4 space-y-4">
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  placeholder="Nhập thành phố, quốc gia..."
+                  className="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                />
+                <button 
+                  onClick={handleSearch}
+                  className="px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 text-sm font-semibold transition"
+                >
+                  Tìm
+                </button>
+              </div>
+
+              <div className="w-full h-64 rounded-xl overflow-hidden border border-slate-100 bg-slate-50 relative">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  allowFullScreen
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(mapQuery || 'Vietnam')}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                />
+              </div>
+            </div>
+
+            <div className="px-5 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+              <button 
+                onClick={() => setIsOpen(false)}
+                className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition"
+              >
+                Hủy
+              </button>
+              <button 
+                onClick={() => { onSave(draft); setIsOpen(false); }}
+                className="px-6 py-2 bg-violet-600 text-white text-sm font-bold rounded-xl hover:bg-violet-700 transition shadow-md shadow-violet-200"
+              >
+                Lưu địa điểm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -92,6 +171,80 @@ export default function ProfilePage() {
   const [bio,      setBio]      = useState('AI enthusiast & Computer Science student. Đam mê prompt engineering và ứng dụng AI trong học tập.');
   const [location, setLocation] = useState('Ho Chi Minh City, Vietnam');
   const [website,  setWebsite]  = useState('github.com/nguyenvana');
+  const [avatar,   setAvatar]   = useState('');
+  const [cover,    setCover]    = useState('');
+  const [email,    setEmail]    = useState('user@alable.edu.vn');
+  const [birthday, setBirthday] = useState('2000-01-01');
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      try {
+        const res = await fetch('http://localhost:5000/api/profile', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && data.data) {
+          setName(data.data.name);
+          setUsername(data.data.username);
+          setBio(data.data.bio);
+          setLocation(data.data.location);
+          setWebsite(data.data.website);
+          setAvatar(data.data.avatar || '');
+          setCover(data.data.cover || '');
+          setEmail(data.data.email || '');
+          setBirthday(data.data.birthday || 'Chưa cập nhật');
+        }
+      } catch (err) {
+        console.error('Lỗi khi tải profile:', err);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const handleSaveAll = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const res = await fetch('http://localhost:5000/api/profile', {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name, username, bio, location, website, email, birthday, avatar, cover })
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.dispatchEvent(new Event('profileUpdated'));
+        alert('🎉 Lưu thay đổi thành công! Dữ liệu đã được cập nhật.');
+      } else {
+        alert(data.message || 'Lưu thất bại.');
+      }
+    } catch (err) {
+      console.error('Lỗi khi lưu profile:', err);
+      alert('Không thể kết nối đến server.');
+    }
+  };
+
+  const handleImageUpload = (field: 'avatar' | 'cover') => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e: any) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        if (field === 'avatar') setAvatar(base64);
+        else setCover(base64);
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
 
   const initials = name.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase();
 
@@ -101,17 +254,23 @@ export default function ProfilePage() {
       {/* ── Hero Banner ─────────────────────────────────────────────────────── */}
       <div className="relative rounded-2xl overflow-hidden shadow-lg">
         {/* Gradient banner */}
-        <div className="h-44 bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 relative">
+        <div 
+          className={`h-44 relative bg-cover bg-center ${!cover ? 'bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700' : ''}`}
+          style={cover ? { backgroundImage: `url(${cover})` } : {}}
+        >
           {/* Decorative blobs */}
-          <div className="absolute -top-8 -right-8 w-48 h-48 bg-white/10 rounded-full blur-2xl" />
-          <div className="absolute bottom-0 left-16 w-32 h-32 bg-violet-400/20 rounded-full blur-xl" />
+          <div className="absolute -top-8 -right-8 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute bottom-0 left-16 w-32 h-32 bg-violet-400/20 rounded-full blur-xl pointer-events-none" />
           {/* Grid pattern */}
           <div
-            className="absolute inset-0 opacity-10"
+            className="absolute inset-0 opacity-10 pointer-events-none"
             style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }}
           />
           {/* Change banner button */}
-          <button className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white text-xs font-medium backdrop-blur-sm transition">
+          <button 
+            onClick={() => handleImageUpload('cover')}
+            className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/40 hover:bg-black/60 text-white text-xs font-medium backdrop-blur-md transition z-10"
+          >
             <Camera className="w-3.5 h-3.5" />
             Đổi ảnh bìa
           </button>
@@ -119,13 +278,18 @@ export default function ProfilePage() {
 
         {/* Profile info row */}
         <div className="bg-white px-6 pb-5">
-          <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-14 mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-4">
             {/* Avatar */}
-            <div className="relative shrink-0">
-              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-white text-3xl font-black shadow-xl ring-4 ring-white">
-                {initials}
+            <div className="relative shrink-0 -mt-14">
+              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-white text-3xl font-black shadow-xl ring-4 ring-white overflow-hidden bg-cover bg-center"
+                   style={avatar ? { backgroundImage: `url(${avatar})` } : {}}>
+                {!avatar && initials}
               </div>
-              <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-violet-600 text-white flex items-center justify-center shadow-md hover:bg-violet-700 transition">
+              <button 
+                onClick={() => handleImageUpload('avatar')}
+                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-violet-600 text-white flex items-center justify-center shadow-md hover:bg-violet-700 transition"
+                title="Đổi ảnh đại diện"
+              >
                 <Camera className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -134,16 +298,19 @@ export default function ProfilePage() {
             <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
               <div>
                 <h1 className="text-xl font-black text-slate-900 leading-tight">
-                  <EditableField value={name} onSave={setName} />
+                  <EditableField value={name} onChange={setName} />
                 </h1>
                 <p className="text-sm text-slate-500 mt-0.5">
-                  @<EditableField value={username} onSave={setUsername} />
+                  @<EditableField value={username} onChange={setUsername} />
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <button className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-semibold hover:bg-violet-700 transition shadow-md shadow-violet-200">
-                  <Edit3 className="w-3.5 h-3.5" />
-                  Chỉnh sửa hồ sơ
+                <button 
+                  onClick={handleSaveAll}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-semibold hover:bg-violet-700 transition shadow-md shadow-violet-200"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  Lưu thay đổi
                 </button>
               </div>
             </div>
@@ -151,28 +318,28 @@ export default function ProfilePage() {
 
           {/* Bio */}
           <p className="text-sm text-slate-600 leading-relaxed mb-4 max-w-2xl">
-            <EditableField value={bio} onSave={setBio} multiline />
+            <EditableField value={bio} onChange={setBio} multiline />
           </p>
 
           {/* Meta info */}
           <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
             <span className="flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-slate-400" />
-              <EditableField value={location} onSave={setLocation} />
+              <LocationSelector value={location} onSave={setLocation} />
             </span>
             <span className="flex items-center gap-1.5">
               <Mail className="w-3.5 h-3.5 text-slate-400" />
-              user@alable.edu.vn
+              <EditableField value={email} onChange={setEmail} />
             </span>
             <span className="flex items-center gap-1.5">
               <Link2 className="w-3.5 h-3.5 text-slate-400" />
               <span className="text-violet-600 hover:underline cursor-pointer">
-                <EditableField value={website} onSave={setWebsite} />
+                <EditableField value={website} onChange={setWebsite} />
               </span>
             </span>
             <span className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-slate-400" />
-              Tham gia tháng 6, 2026
+              <EditableField value={birthday} onChange={setBirthday} type="date" />
             </span>
           </div>
         </div>

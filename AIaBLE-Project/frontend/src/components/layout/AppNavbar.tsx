@@ -113,6 +113,41 @@ export function AppNavbar() {
   const [avatarOpen, setAvatarOpen] = useState(false);
   const avatarRef = useRef<HTMLDivElement>(null);
 
+  // User Profile
+  const [userProfile, setUserProfile] = useState({
+    name: 'User',
+    email: 'user@alable.edu.vn',
+    avatar: ''
+  });
+
+  const fetchProfile = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const res = await fetch('http://localhost:5000/api/profile', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        setUserProfile({
+          name: data.data.name || 'User',
+          email: data.data.email || 'user@alable.edu.vn',
+          avatar: data.data.avatar || ''
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProfile();
+    window.addEventListener('profileUpdated', fetchProfile);
+    return () => window.removeEventListener('profileUpdated', fetchProfile);
+  }, [fetchProfile]);
+
+  const initials = userProfile.name.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase() || 'U';
+
   // Search
   const [query, setQuery]           = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
@@ -307,8 +342,9 @@ export function AppNavbar() {
               aria-haspopup="true"
               aria-expanded={avatarOpen}
             >
-              <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-violet-200 ring-2 ring-white group-hover:ring-violet-200 transition">
-                U
+              <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-violet-200 ring-2 ring-white group-hover:ring-violet-200 transition overflow-hidden bg-cover bg-center"
+                   style={userProfile.avatar ? { backgroundImage: `url(${userProfile.avatar})` } : {}}>
+                {!userProfile.avatar && initials}
               </div>
               <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${avatarOpen ? 'rotate-180' : ''}`} />
             </button>
@@ -317,10 +353,13 @@ export function AppNavbar() {
               <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-100 bg-white shadow-xl shadow-slate-200/60 py-2 z-50">
                 <div className="px-4 py-3 border-b border-slate-100 mb-1">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-bold shrink-0">U</div>
+                    <div className="w-9 h-9 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden bg-cover bg-center"
+                         style={userProfile.avatar ? { backgroundImage: `url(${userProfile.avatar})` } : {}}>
+                      {!userProfile.avatar && initials}
+                    </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-900 truncate">User</p>
-                      <p className="text-xs text-slate-500 truncate">user@alable.edu.vn</p>
+                      <p className="text-sm font-semibold text-slate-900 truncate">{userProfile.name}</p>
+                      <p className="text-xs text-slate-500 truncate">{userProfile.email}</p>
                     </div>
                   </div>
                 </div>

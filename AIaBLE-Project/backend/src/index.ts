@@ -8,6 +8,7 @@ import matcherRoutes from './routes/matcher';
 import optimizerRoutes from './routes/optimizer';
 import sandboxRoutes from './routes/sandbox';
 import authRoutes from './routes/auth';
+import profileRoutes from './routes/profile';
 
 // Load environment variables
 dotenv.config();
@@ -21,7 +22,8 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Recipe Library routes
 app.use('/api/recipes', recipeRoutes);
@@ -34,6 +36,9 @@ app.use('/api/optimizer', optimizerRoutes);
 
 // Auth routes
 app.use('/api/auth', authRoutes);
+
+// Profile routes
+app.use('/api/profile', profileRoutes);
 
 // Sandbox routes
 app.use('/api/sandbox', sandboxRoutes);
