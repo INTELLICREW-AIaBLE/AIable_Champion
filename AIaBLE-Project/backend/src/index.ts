@@ -6,6 +6,7 @@ import { callGemini } from './services/gemini';
 import recipeRoutes from './routes/recipeRoutes';
 import matcherRoutes from './routes/matcher';
 import optimizerRoutes from './routes/optimizer';
+import sandboxRoutes from './routes/sandbox';
 
 // Load environment variables
 dotenv.config();
@@ -29,6 +30,9 @@ app.use('/api/task-matcher', matcherRoutes);
 
 // Prompt Optimizer routes
 app.use('/api/optimizer', optimizerRoutes);
+
+// Sandbox routes
+app.use('/api/sandbox', sandboxRoutes);
 
 // Basic health check route
 app.get('/api/health', (req, res) => {

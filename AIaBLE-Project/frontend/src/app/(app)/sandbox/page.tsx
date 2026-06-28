@@ -91,29 +91,51 @@ export default function SandboxPage() {
     // Set all to loading
     setResults(prev => prev.map(m => ({ ...m, status: 'loading', content: '', timeMs: undefined })));
     
-    // Mock independent API calls with different response times
-    const runModel = async (index: number, delayMs: number, mockResponse: string) => {
-      const startTime = Date.now();
-      await new Promise(r => setTimeout(r, delayMs));
-      const endTime = Date.now();
+    // Real API calls
+    const runModel = async (index: number, modelName: string, delayMs: number) => {
+      // Đợi một khoảng thời gian trước khi gọi API để tránh lỗi 429 Too Many Requests của Gemini Free Tier
+      if (delayMs > 0) {
+        await new Promise(r => setTimeout(r, delayMs));
+      }
       
-      setResults(prev => {
-        const newResults = [...prev];
-        newResults[index] = { 
-          ...newResults[index], 
-          status: 'success', 
-          content: mockResponse,
-          timeMs: endTime - startTime
-        };
-        return newResults;
-      });
+      const startTime = Date.now();
+      try {
+        const res = await fetch('http://localhost:5000/api/sandbox', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, model: modelName })
+        });
+        const data = await res.json();
+        
+        const endTime = Date.now();
+        setResults(prev => {
+          const newResults = [...prev];
+          newResults[index] = { 
+            ...newResults[index], 
+            status: data.success ? 'success' : 'error', 
+            content: data.success ? data.data : data.message,
+            timeMs: endTime - startTime
+          };
+          return newResults;
+        });
+      } catch (error: any) {
+        setResults(prev => {
+          const newResults = [...prev];
+          newResults[index] = { 
+            ...newResults[index], 
+            status: 'error', 
+            content: 'Không thể kết nối đến server.',
+          };
+          return newResults;
+        });
+      }
     };
 
-    // Trigger all independently
+    // Chạy tuần tự cách nhau 1.5s để Google không chặn do gọi quá nhiều request cùng 1 lúc (Rate Limit)
     Promise.all([
-      runModel(0, 1500, `Đây là kết quả phản hồi từ Claude.\n\nClaude thường có xu hướng viết dài, chi tiết và có văn phong tự nhiên hơn.\n\n${prompt}`),
-      runModel(1, 2200, `Kết quả từ GPT-4.\n\nGPT-4 thường cấu trúc rõ ràng, logic, tập trung thẳng vào vấn đề và có khả năng suy luận tốt.\n\n${prompt}`),
-      runModel(2, 1200, `Gemini phản hồi:\n\nGemini phản hồi rất nhanh, thường đưa ra thông tin ngắn gọn, có gạch đầu dòng rõ ràng.\n\n- Nhanh chóng\n- Trực quan\n- Tích hợp tốt`)
+      runModel(0, 'Claude', 0),
+      runModel(1, 'GPT-4', 1500),
+      runModel(2, 'Gemini', 3000)
     ]).then(() => {
       setIsRunning(false);
     });
@@ -270,6 +292,18 @@ export default function SandboxPage() {
               {res.status === 'success' && (
                 <div className="prose prose-sm prose-slate max-w-none text-slate-700 text-sm whitespace-pre-wrap leading-relaxed animate-in fade-in slide-in-from-bottom-2 duration-500">
                   {res.content}
+                </div>
+              )}
+
+              {res.status === 'error' && (
+                <div className="flex flex-col items-center justify-center text-center h-full text-red-500 gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-red-50 text-red-500 flex items-center justify-center">
+                    <Zap className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold">Lỗi kết nối API</p>
+                    <p className="text-xs mt-1 max-w-[200px] text-red-400 leading-relaxed">{res.content}</p>
+                  </div>
                 </div>
               )}
             </div>

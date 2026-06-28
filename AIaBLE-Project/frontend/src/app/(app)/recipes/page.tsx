@@ -91,12 +91,13 @@ function RecipeCard({ recipe, onApply,
 export default function RecipeLibraryPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('All');
   const router = useRouter();
 
   useEffect(() => {
     async function fetchRecipes() {
       try {
-        const res = await fetch('http://localhost:5001/api/recipes');
+        const res = await fetch('http://localhost:5000/api/recipes');
         const json = await res.json();
 
         setRecipes(json.data);
@@ -114,6 +115,10 @@ export default function RecipeLibraryPage() {
     sessionStorage.setItem('optimizer_prefill', recipe.prompt);
     router.push('/optimizer');
   };
+
+  const filteredRecipes = activeCategory === 'All' 
+    ? recipes 
+    : recipes.filter(r => r.category.toLowerCase() === activeCategory.toLowerCase());
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
@@ -150,10 +155,11 @@ export default function RecipeLibraryPage() {
         </p>
 
         <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((category, index) => (
+          {CATEGORIES.map((category) => (
             <button
               key={category}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition ${index === 0
+              onClick={() => setActiveCategory(category)}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition ${activeCategory === category
                 ? 'bg-violet-600 text-white shadow-md shadow-violet-200'
                 : 'bg-slate-50 border border-slate-100 text-slate-600 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700'
                 }`}
@@ -168,7 +174,7 @@ export default function RecipeLibraryPage() {
         {loading ? (
           <p className="text-sm text-slate-500">Loading recipes...</p>
         ) : (
-          recipes.map((recipe) => (
+          filteredRecipes.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} onApply={handleApplyRecipe} />
           )))}
       </section>

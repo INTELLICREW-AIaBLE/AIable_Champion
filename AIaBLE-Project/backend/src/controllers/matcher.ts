@@ -34,3 +34,20 @@ export const matchTaskController = async (req: Request, res: Response) => {
     });
   }
 };
+
+// GET /api/task-matcher
+// Return a default workflow for initial load
+export const getDefaultWorkflowController = (req: Request, res: Response) => {
+  res.json({
+    success: true,
+    data: [
+      {
+        stepName: 'Phân tích yêu cầu',
+        description: 'Xác định bài toán, đối tượng sử dụng, chức năng chính của hệ thống.',
+        suggestedTool: 'Gemini',
+        reason: 'Gemini giúp brainstorm nhanh các use case và yêu cầu hệ thống.',
+        suggestedPrompt: 'Phân tích yêu cầu hệ thống cho dự án [TÊN_DỰ_ÁN]...'
+      }
+    ]
+  });
+};

@@ -205,20 +205,22 @@ const generateWorkflowWithGemini = async (
   description: string
 ): Promise<WorkflowStep[]> => {
   const prompt = `
-You are an academic assistant helping university students break down their assignments.
+You are an academic assistant helping university students break down their complex assignments.
 
 Subject: "${subject}"
 Task description: "${description}"
 
-Generate a workflow with exactly 5 steps to complete this assignment.
-Return ONLY a valid JSON array (no markdown, no explanation) in this exact format:
+Generate a comprehensive Workflow Combo with exactly 5 steps to complete this complex assignment.
+For each step, you MUST suggest a specific, highly suitable AI tool (e.g., Claude for deep research, Gemini for synthesis/brainstorming, Canva AI for slides/design, GitHub Copilot for coding, ChatGPT for general writing) and explain exactly why that tool is the best fit.
+
+Return ONLY a valid JSON array (no markdown formatting, no code blocks, no explanation text) in this exact format:
 [
   {
     "stepName": "Step name here",
-    "description": "What to do in this step",
-    "suggestedTool": "Tool name (e.g. Gemini, Canva, Python, Word)",
-    "reason": "Why this tool is recommended",
-    "suggestedPrompt": "A sample prompt the student can use for this step"
+    "description": "Detailed description of what to do in this step",
+    "suggestedTool": "Specific AI Tool Name (e.g. Claude 3.5, Gemini 2.0, Canva AI)",
+    "reason": "Specific reason why this AI tool is best for this task",
+    "suggestedPrompt": "A highly effective sample prompt the student can copy and use for this tool"
   }
 ]
 `;
@@ -259,25 +261,45 @@ export const matchTask = async (
   subject: string,
   description: string
 ): Promise<TaskMatcherResponse> => {
-  // Try rule-based first
-  const ruleSteps = findRuleBasedWorkflow(subject);
+  const isGeneric = !description || description.trim().length < 5;
 
-  if (ruleSteps) {
+  // If description is very short or missing, just use rule-based
+  if (isGeneric) {
+    const ruleSteps = findRuleBasedWorkflow(subject);
+    if (ruleSteps) {
+      return {
+        success: true,
+        subject,
+        source: 'rule-based',
+        steps: ruleSteps
+      };
+    }
+  }
+
+  // If description is provided, we ALWAYS want to use LLM to analyze the specific complex task
+  try {
+    const geminiSteps = await generateWorkflowWithGemini(subject, description);
     return {
       success: true,
       subject,
-      source: 'rule-based',
-      steps: ruleSteps
+      source: 'gemini',
+      steps: geminiSteps
     };
+  } catch (error: any) {
+    console.error('LLM Fallback failed:', error.message);
+    
+    // If Gemini fails (e.g. Quota Exceeded), fallback to Rule-based!
+    const ruleSteps = findRuleBasedWorkflow(subject);
+    if (ruleSteps) {
+      return {
+        success: true,
+        subject,
+        source: 'rule-based (LLM failed)',
+        steps: ruleSteps
+      };
+    }
+
+    // If both fail, throw error
+    throw error;
   }
-
-  // Fallback to Gemini for unknown subjects
-  const geminiSteps = await generateWorkflowWithGemini(subject, description);
-
-  return {
-    success: true,
-    subject,
-    source: 'gemini',
-    steps: geminiSteps
-  };
 };
