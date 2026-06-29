@@ -342,7 +342,7 @@ export function AppNavbar() {
               aria-haspopup="true"
               aria-expanded={avatarOpen}
             >
-              <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-violet-200 ring-2 ring-white group-hover:ring-violet-200 transition overflow-hidden bg-cover bg-center"
+              <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-violet-200 ring-2 ring-white group-hover:ring-violet-200 transition overflow-hidden bg-cover bg-center ignore-dark-mode"
                    style={userProfile.avatar ? { backgroundImage: `url(${userProfile.avatar})` } : {}}>
                 {!userProfile.avatar && initials}
               </div>
@@ -353,7 +353,7 @@ export function AppNavbar() {
               <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-100 bg-white shadow-xl shadow-slate-200/60 py-2 z-50">
                 <div className="px-4 py-3 border-b border-slate-100 mb-1">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden bg-cover bg-center"
+                    <div className="w-9 h-9 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden bg-cover bg-center ignore-dark-mode"
                          style={userProfile.avatar ? { backgroundImage: `url(${userProfile.avatar})` } : {}}>
                       {!userProfile.avatar && initials}
                     </div>

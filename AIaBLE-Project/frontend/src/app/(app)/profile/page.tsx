@@ -255,7 +255,7 @@ export default function ProfilePage() {
       <div className="relative rounded-2xl overflow-hidden shadow-lg">
         {/* Gradient banner */}
         <div 
-          className={`h-44 relative bg-cover bg-center ${!cover ? 'bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700' : ''}`}
+          className={`h-44 relative bg-cover bg-center ignore-dark-mode ${!cover ? 'bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700' : ''}`}
           style={cover ? { backgroundImage: `url(${cover})` } : {}}
         >
           {/* Decorative blobs */}
@@ -281,7 +281,7 @@ export default function ProfilePage() {
           <div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-4">
             {/* Avatar */}
             <div className="relative shrink-0 -mt-14">
-              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-white text-3xl font-black shadow-xl ring-4 ring-white overflow-hidden bg-cover bg-center"
+              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-white text-3xl font-black shadow-xl ring-4 ring-white overflow-hidden bg-cover bg-center ignore-dark-mode"
                    style={avatar ? { backgroundImage: `url(${avatar})` } : {}}>
                 {!avatar && initials}
               </div>
