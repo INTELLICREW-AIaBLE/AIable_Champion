@@ -129,7 +129,7 @@ export default function LandingPage() {
             <p className="text-xs text-slate-500 leading-relaxed flex-1 mb-4">
               Input rough prompts. AI transforms them into structured prompts following the framework: **Role + Context + Task + Format + Constraints** with a Before/After comparison.
             </p>
-            <Link href="/home" className="inline-flex items-center gap-1 text-xs font-bold text-violet-600 group-hover:gap-2 transition-all">
+            <Link href="/login" className="inline-flex items-center gap-1 text-xs font-bold text-violet-600 group-hover:gap-2 transition-all">
               Try Optimizer <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -144,7 +144,7 @@ export default function LandingPage() {
             <p className="text-xs text-slate-500 leading-relaxed flex-1 mb-4">
               Enter a large task brief. Our system decomposes it into logical workflow steps, and matches each step to the most suitable AI tool with reasoning.
             </p>
-            <Link href="/home" className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 group-hover:gap-2 transition-all">
+            <Link href="/login" className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 group-hover:gap-2 transition-all">
               Try Task-Matcher <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -159,7 +159,7 @@ export default function LandingPage() {
             <p className="text-xs text-slate-500 leading-relaxed flex-1 mb-4">
               Access 15+ curated prompt formulas designed specifically for students: Coding, Report writing, Presentation layouts, and Research.
             </p>
-            <Link href="/home" className="inline-flex items-center gap-1 text-xs font-bold text-purple-600 group-hover:gap-2 transition-all">
+            <Link href="/login" className="inline-flex items-center gap-1 text-xs font-bold text-purple-600 group-hover:gap-2 transition-all">
               Browse Recipes <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -174,7 +174,7 @@ export default function LandingPage() {
             <p className="text-xs text-slate-500 leading-relaxed flex-1 mb-4">
               Promotes responsible AI use by appending a **Critical Thinking Card** with 3-5 reflection questions under every prompt suggestion to prevent blind copying.
             </p>
-            <Link href="/home" className="inline-flex items-center gap-1 text-xs font-bold text-amber-600 group-hover:gap-2 transition-all">
+            <Link href="/login" className="inline-flex items-center gap-1 text-xs font-bold text-amber-600 group-hover:gap-2 transition-all">
               Learn Ethics <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -189,7 +189,7 @@ export default function LandingPage() {
             <p className="text-xs text-slate-500 leading-relaxed flex-1 mb-4">
               Combat AI hallucinations. Paste AI text output to verify citations, statistics, and references using web APIs, presenting color-coded reliability.
             </p>
-            <Link href="/home" className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 group-hover:gap-2 transition-all">
+            <Link href="/login" className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 group-hover:gap-2 transition-all">
               Try Validator <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -204,7 +204,7 @@ export default function LandingPage() {
             <p className="text-xs text-slate-500 leading-relaxed flex-1 mb-4">
               A multi-model playground. Run a single optimized prompt across **Claude, Gemini, and GPT-4** side-by-side to compare output quality.
             </p>
-            <Link href="/home" className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 group-hover:gap-2 transition-all">
+            <Link href="/login" className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 group-hover:gap-2 transition-all">
               Try Sandbox <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -273,7 +273,7 @@ export default function LandingPage() {
           No more blind copying. Build prompt engineering skills and ensure your assignments match academic standards with AIaBLE.
         </p>
         <Link
-          href="/home"
+          href="/login"
           className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-8 py-4 text-base font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-lg shadow-violet-200"
         >
           Enter AIaBLE Workspace

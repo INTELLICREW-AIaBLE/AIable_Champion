@@ -97,7 +97,7 @@ export default function RecipeLibraryPage() {
   useEffect(() => {
     async function fetchRecipes() {
       try {
-        const res = await fetch('http://localhost:5000/api/recipes');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/recipes`);
         const json = await res.json();
 
         setRecipes(json.data);

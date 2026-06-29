@@ -100,7 +100,7 @@ export default function SandboxPage() {
       
       const startTime = Date.now();
       try {
-        const res = await fetch('http://localhost:5000/api/sandbox', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/sandbox`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt, model: modelName })
