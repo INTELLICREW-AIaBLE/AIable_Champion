@@ -9,6 +9,7 @@ import optimizerRoutes from './routes/optimizer';
 import sandboxRoutes from './routes/sandbox';
 import authRoutes from './routes/auth';
 import profileRoutes from './routes/profile';
+import validatorRoutes from './routes/validator';
 
 // Load environment variables
 dotenv.config();
@@ -42,6 +43,9 @@ app.use('/api/profile', profileRoutes);
 
 // Sandbox routes
 app.use('/api/sandbox', sandboxRoutes);
+
+// Validator routes
+app.use('/api/validator', validatorRoutes);
 
 // Basic health check route
 app.get('/api/health', (req, res) => {
