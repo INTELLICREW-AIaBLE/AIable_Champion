@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Eye, EyeOff } from 'lucide-react';
+import { useGoogleLogin } from '@react-oauth/google';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,6 +15,35 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const [error, setError] = useState('');
+
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setLoading(true);
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/google`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken: tokenResponse.access_token }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          setError(data.message || 'Đăng nhập Google thất bại.');
+          return;
+        }
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+        router.push('/home');
+      } catch (err) {
+        setError('Không thể kết nối server.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => {
+      setError('Đăng nhập Google bị hủy hoặc thất bại.');
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,6 +193,7 @@ export default function LoginPage() {
         {/* Google */}
         <button
           type="button"
+          onClick={() => loginWithGoogle()}
           className="w-full flex items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition shadow-sm"
         >
           <svg className="w-5 h-5 shrink-0" viewBox="0 0 48 48">

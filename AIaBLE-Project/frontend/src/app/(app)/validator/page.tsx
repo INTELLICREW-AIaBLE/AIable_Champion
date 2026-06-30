@@ -31,42 +31,58 @@ export default function ValidatorPage() {
   const charCount = output.length;
   const canValidate = output.trim().length >= 20 && !loading;
 
-  const handleValidate = () => {
+  const handleValidate = async () => {
     if (!canValidate) return;
     setLoading(true);
     setResult(null);
 
-    // Mock API call
-    setTimeout(() => {
-      setResult({
-        score: 85,
-        isSafe: true,
-        hallucinations: [
-          {
-            text: 'Mô hình waterfall luôn phù hợp cho mọi dự án phần mềm.',
-            reason: 'Tuyên bố này không chính xác. Waterfall thường chỉ hợp với dự án có yêu cầu rõ ràng từ đầu, không linh hoạt như Agile.',
-            severity: 'high'
-          },
-          {
-            text: 'Năm 2025, 100% doanh nghiệp sẽ dùng microservices.',
-            reason: 'Không có dữ liệu thực tế nào chứng minh được điều này. Đây có thể là AI tự tạo ra (hallucination).',
-            severity: 'medium'
-          }
-        ],
-        suggestions: [
-          'Thêm trích dẫn hoặc nguồn tham khảo cho các số liệu.',
-          'Làm rõ hơn ngữ cảnh áp dụng của kiến trúc được nhắc đến.',
-          'Kiểm tra lại tính trung lập của giọng văn.'
-        ],
-        formatting: [
-          { label: 'Cấu trúc đoạn văn', passed: true },
-          { label: 'Độ dài phù hợp', passed: true },
-          { label: 'Không chứa từ ngữ độc hại', passed: true },
-          { label: 'Có tính chuyên môn cao', passed: false },
-        ]
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/validator`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: output,
+          geminiKey: typeof window !== 'undefined' ? localStorage.getItem('geminiKey') || undefined : undefined
+        }),
       });
+
+      const json = await res.json();
+      
+      if (res.ok && json.success !== false) {
+        // Map backend ValidatorResult to frontend ValidationResult
+        const formattedResult: ValidationResult = {
+          score: json.overallScore || 0,
+          isSafe: json.disputedCount === 0,
+          hallucinations: (json.claims || [])
+            .filter((c: any) => c.status === 'disputed' || c.status === 'unverified')
+            .map((c: any) => ({
+              text: c.claim,
+              reason: c.explanation,
+              severity: c.status === 'disputed' ? 'high' : 'medium'
+            })),
+          suggestions: [
+            json.summary || '',
+            'Kiểm tra lại các nguồn thông tin nếu có phát ngôn chưa xác thực.',
+          ],
+          formatting: [
+            { label: `Kiểm tra ${json.totalClaims || 0} phát ngôn (Claims)`, passed: (json.totalClaims || 0) > 0 },
+            { label: 'Độ tin cậy tổng thể > 50%', passed: (json.overallScore || 0) > 50 },
+            { label: 'Không có phát ngôn bị bác bỏ', passed: json.disputedCount === 0 },
+          ]
+        };
+        setResult(formattedResult);
+      } else {
+        console.error('Validation error:', json.message);
+        alert(json.message || 'Có lỗi xảy ra khi kiểm định.');
+      }
+    } catch (error) {
+      console.error('Failed to validate output:', error);
+      alert('Không thể kết nối đến server backend.');
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
 
   const handleReset = () => {

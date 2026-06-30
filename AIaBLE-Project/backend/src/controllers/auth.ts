@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
+import fetch from 'node-fetch'; // if needed, but Next/Node 18+ has fetch built-in, assuming Node 18+ because Express + Next14.
 
 const USERS_FILE = path.join(__dirname, '../data/users.json');
 
@@ -79,5 +80,54 @@ export const login = (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(500).json({ success: false, message: 'Lỗi server khi đăng nhập.' });
+  }
+};
+
+export const googleLogin = async (req: Request, res: Response) => {
+  try {
+    const { accessToken } = req.body;
+
+    if (!accessToken) {
+      return res.status(400).json({ success: false, message: 'Thiếu Google Access Token.' });
+    }
+
+    // Fetch user info from Google
+    const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      return res.status(401).json({ success: false, message: 'Google Access Token không hợp lệ.' });
+    }
+
+    const payload = await response.json();
+    const { email, name, sub } = payload;
+
+    const users = readUsers();
+    let user = users.find(u => u.email === email);
+
+    if (!user) {
+      // Auto-register
+      user = {
+        id: 'google-' + sub,
+        fullName: name,
+        email,
+        password: 'google-oauth-dummy-password',
+      };
+      users.push(user);
+      writeUsers(users);
+    }
+
+    res.json({
+      success: true,
+      message: 'Đăng nhập bằng Google thành công!',
+      token: 'mock-jwt-token-' + user.id,
+      data: { id: user.id, email: user.email, fullName: user.fullName }
+    });
+  } catch (error: any) {
+    console.error('[Google Login Error]:', error);
+    res.status(500).json({ success: false, message: 'Lỗi server khi xử lý Google Login.' });
   }
 };

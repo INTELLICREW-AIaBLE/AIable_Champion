@@ -3,6 +3,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -32,9 +33,11 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <TooltipProvider>
-          {children}
-        </TooltipProvider>
+        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '123456789-dummy.apps.googleusercontent.com'}>
+          <TooltipProvider>
+            {children}
+          </TooltipProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

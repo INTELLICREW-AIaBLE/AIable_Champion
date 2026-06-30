@@ -17,5 +17,11 @@
     "fullName": "Phạm Quốc Anh",
     "email": "quocanhdeptrai1",
     "password": "Phamquocanh1"
+  },
+  {
+    "id": "google-100915196624085407780",
+    "fullName": "Nguyễn Huy Hoàng",
+    "email": "hoangbeo172006@gmail.com",
+    "password": "google-oauth-dummy-password"
   }
 ]
