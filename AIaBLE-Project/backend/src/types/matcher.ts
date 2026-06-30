@@ -14,6 +14,6 @@ export interface TaskMatcherRequest {
 export interface TaskMatcherResponse {
   success: boolean;
   subject: string;
-  source: 'rule-based' | 'gemini'; // Tra ve tu rule co san hay tu Gemini
+  source: 'rule-based' | 'gemini' | 'rule-based (LLM failed)'; // Tra ve tu rule co san hay tu Gemini
   steps: WorkflowStep[];
 }
