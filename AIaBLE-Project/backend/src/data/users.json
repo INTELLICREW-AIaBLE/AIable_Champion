@@ -23,5 +23,11 @@
     "fullName": "Nguyễn Huy Hoàng",
     "email": "hoangbeo172006@gmail.com",
     "password": "google-oauth-dummy-password"
+  },
+  {
+    "id": "google-101068778867399945944",
+    "fullName": "Hoàng Nguyễn",
+    "email": "0107hoanguyen@gmail.com",
+    "password": "google-oauth-dummy-password"
   }
 ]
