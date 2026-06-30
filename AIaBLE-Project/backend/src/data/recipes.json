@@ -1,47 +1,26 @@
 [
   {
     "id": "coding-001",
-    "title": "Giải thích code",
-    "category": "coding",
-    "description": "Giải thích code từng dòng cho người mới học.",
-    "prompt": "Hãy giải thích đoạn code sau theo từng dòng, dùng ngôn ngữ đơn giản như giải thích cho người mới học:\n\n[CODE]\n\nSau đó cho biết đoạn code này dùng để làm gì trong thực tế.",
+    "title": "Debug & giải thích lỗi code chi tiết",
+    "category": "CODING",
+    "description": "Phân tích lỗi runtime/compile, giải thích nguyên nhân và đề xuất cách sửa đúng.",
+    "prompt": "Đoạn code sau đang gặp lỗi:\n\n[CODE]\n\nLỗi hoặc hành vi sai gặp phải:\n\n[ERROR]\n\nHãy phân tích theo cấu trúc:\n1. Lỗi nằm ở đâu\n2. Vì sao lỗi xảy ra\n3. Cách sửa đúng\n4. Code đã sửa\n5. Cách tránh lỗi tương tự trong tương lai.",
+    "bestAI": "Claude",
     "variables": [
       {
         "name": "CODE",
-        "label": "Đoạn code cần giải thích",
-        "type": "textarea",
-        "required": true
-      }
-    ],
-    "tags": ["code", "debug", "learning"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "coding-002",
-    "title": "Debug lỗi code",
-    "category": "coding",
-    "description": "Tìm nguyên nhân và sửa lỗi code nhanh chóng.",
-    "prompt": "Đoạn code sau đang bị lỗi:\n\n[CODE]\n\nLỗi gặp phải: [ERROR]\n\nHãy: 1) Xác định nguyên nhân lỗi, 2) Đưa ra code đã sửa, 3) Giải thích tại sao lỗi xảy ra.",
-    "variables": [
-      {
-        "name": "CODE",
-        "label": "Đoạn code bị lỗi",
+        "label": "Đoạn code cần debug",
         "type": "textarea",
         "required": true
       },
       {
         "name": "ERROR",
-        "label": "Mô tả lỗi gặp phải",
-        "type": "text",
+        "label": "Lỗi hoặc mô tả hành vi sai",
+        "type": "textarea",
         "required": true
       }
     ],
-    "tags": ["debug", "lỗi", "sửa code"],
+    "tags": ["debug", "code", "giải thích"],
     "difficulty": "intermediate",
     "language": "vi",
     "version": "1.0",
@@ -50,15 +29,91 @@
     "updatedAt": "2026-06-27"
   },
   {
-    "id": "coding-003",
-    "title": "Phân tích bài toán lập trình",
-    "category": "coding",
-    "description": "Phân tích và lên hướng giải cho bài toán code.",
-    "prompt": "Phân tích bài toán sau:\n\n[PROBLEM]\n\nHãy: 1) Xác định Input/Output, 2) Đề xuất 2-3 hướng giải, 3) So sánh độ phức tạp Big O, 4) Viết code tối ưu nhất bằng [LANGUAGE].",
+    "id": "report-001",
+    "title": "Viết báo cáo học thuật chuẩn APA",
+    "category": "REPORT",
+    "description": "Tạo cấu trúc báo cáo đúng format học thuật với trích dẫn, luận điểm và kết luận rõ ràng.",
+    "prompt": "Bạn là một sinh viên đại học. Hãy viết báo cáo học thuật về chủ đề [TOPIC].\n\nYêu cầu:\n1. Có mở đầu, nội dung chính và kết luận\n2. Văn phong học thuật, trang trọng\n3. Có luận điểm rõ ràng\n4. Gợi ý nguồn tham khảo theo chuẩn APA\n5. Tránh viết chung chung, ưu tiên lập luận có chiều sâu.",
+    "bestAI": "ChatGPT",
     "variables": [
       {
-        "name": "PROBLEM",
-        "label": "Mô tả bài toán",
+        "name": "TOPIC",
+        "label": "Chủ đề báo cáo",
+        "type": "text",
+        "required": true
+      }
+    ],
+    "tags": ["báo cáo", "học thuật", "APA"],
+    "difficulty": "intermediate",
+    "language": "vi",
+    "version": "1.0",
+    "author": "AIaBLE Team",
+    "createdAt": "2026-06-27",
+    "updatedAt": "2026-06-27"
+  },
+  {
+    "id": "slide-001",
+    "title": "Outline slide thuyết trình 10 phút",
+    "category": "SLIDE",
+    "description": "Phân bổ nội dung hợp lý cho bài thuyết trình ngắn, có hook mở đầu và call-to-action kết thúc.",
+    "prompt": "Tạo outline cho bài thuyết trình 10 phút về chủ đề:\n\n[TOPIC]\n\nYêu cầu:\n1. Chia thành từng slide\n2. Mỗi slide có tiêu đề và 3 ý chính\n3. Gợi ý thời lượng cho từng phần\n4. Có phần mở đầu thu hút\n5. Có kết luận và lời kêu gọi hành động.",
+    "bestAI": "Gemini",
+    "variables": [
+      {
+        "name": "TOPIC",
+        "label": "Chủ đề thuyết trình",
+        "type": "text",
+        "required": true
+      }
+    ],
+    "tags": ["slide", "presentation", "outline"],
+    "difficulty": "beginner",
+    "language": "vi",
+    "version": "1.0",
+    "author": "AIaBLE Team",
+    "createdAt": "2026-06-27",
+    "updatedAt": "2026-06-27"
+  },
+  {
+    "id": "research-001",
+    "title": "Tổng hợp literature review",
+    "category": "RESEARCH",
+    "description": "Tóm tắt và so sánh nhiều bài báo khoa học theo chủ đề, xu hướng nghiên cứu và khoảng trống nghiên cứu.",
+    "prompt": "Hãy hỗ trợ tổng hợp literature review cho chủ đề:\n\n[TOPIC]\n\nDanh sách tài liệu hoặc ghi chú:\n\n[SOURCES]\n\nYêu cầu:\n1. Tóm tắt từng nguồn\n2. Nhóm các nghiên cứu theo hướng tiếp cận\n3. So sánh điểm giống và khác nhau\n4. Chỉ ra research gap\n5. Đề xuất hướng nghiên cứu tiếp theo.",
+    "bestAI": "Claude",
+    "variables": [
+      {
+        "name": "TOPIC",
+        "label": "Chủ đề nghiên cứu",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "SOURCES",
+        "label": "Nguồn tài liệu hoặc ghi chú",
+        "type": "textarea",
+        "required": true
+      }
+    ],
+    "tags": ["research", "literature review", "paper"],
+    "difficulty": "advanced",
+    "language": "vi",
+    "version": "1.0",
+    "author": "AIaBLE Team",
+    "createdAt": "2026-06-27",
+    "updatedAt": "2026-06-27"
+  },
+  {
+    "id": "coding-002",
+    "title": "Review & tối ưu code hiện tại",
+    "category": "CODING",
+    "description": "Đánh giá code hiện tại, gợi ý cải thiện performance, readability và best practices.",
+    "prompt": "Hãy review đoạn code sau:\n\n[CODE]\n\nNgôn ngữ: [LANGUAGE]\n\nYêu cầu:\n1. Nhận xét readability\n2. Tìm vấn đề về performance\n3. Tìm bug tiềm ẩn\n4. Đề xuất refactor\n5. Viết lại phiên bản tốt hơn nếu cần.",
+    "bestAI": "Claude",
+    "variables": [
+      {
+        "name": "CODE",
+        "label": "Đoạn code cần review",
         "type": "textarea",
         "required": true
       },
@@ -69,85 +124,7 @@
         "required": true
       }
     ],
-    "tags": ["thuật toán", "phân tích", "lập trình"],
-    "difficulty": "advanced",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "coding-004",
-    "title": "Thiết kế database",
-    "category": "coding",
-    "description": "Thiết kế cấu trúc database cho dự án.",
-    "prompt": "Thiết kế database cho hệ thống [SYSTEM].\n\nYêu cầu: 1) Liệt kê các bảng cần thiết, 2) Mô tả các trường và kiểu dữ liệu, 3) Xác định quan hệ giữa các bảng, 4) Viết SQL tạo bảng.",
-    "variables": [
-      {
-        "name": "SYSTEM",
-        "label": "Mô tả hệ thống",
-        "type": "textarea",
-        "required": true
-      }
-    ],
-    "tags": ["database", "SQL", "thiết kế"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "coding-005",
-    "title": "Viết README cho dự án",
-    "category": "coding",
-    "description": "Tạo file README chuyên nghiệp cho dự án GitHub.",
-    "prompt": "Viết file README.md chuyên nghiệp cho dự án:\n\nTên: [PROJECT_NAME]\nMô tả: [DESCRIPTION]\nCông nghệ: [TECH_STACK]\n\nBao gồm: badges, mô tả, tính năng, hướng dẫn cài đặt, cách sử dụng.",
-    "variables": [
-      {
-        "name": "PROJECT_NAME",
-        "label": "Tên dự án",
-        "type": "text",
-        "required": true
-      },
-      {
-        "name": "DESCRIPTION",
-        "label": "Mô tả dự án",
-        "type": "textarea",
-        "required": true
-      },
-      {
-        "name": "TECH_STACK",
-        "label": "Công nghệ sử dụng",
-        "type": "text",
-        "required": true
-      }
-    ],
-    "tags": ["README", "GitHub", "tài liệu"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "report-001",
-    "title": "Viết báo cáo học thuật",
-    "category": "report",
-    "description": "Viết báo cáo học thuật có cấu trúc rõ ràng.",
-    "prompt": "Bạn là một sinh viên đại học. Hãy viết báo cáo học thuật về chủ đề [TOPIC] với cấu trúc: Mở đầu, Nội dung chính (3 luận điểm), Kết luận. Văn phong trang trọng, có dẫn chứng cụ thể.",
-    "variables": [
-      {
-        "name": "TOPIC",
-        "label": "Chủ đề báo cáo",
-        "type": "text",
-        "required": true
-      }
-    ],
-    "tags": ["báo cáo", "học thuật", "đại học"],
+    "tags": ["review", "optimization", "clean code"],
     "difficulty": "intermediate",
     "language": "vi",
     "version": "1.0",
@@ -157,232 +134,21 @@
   },
   {
     "id": "report-002",
-    "title": "Viết luận điểm phản biện",
-    "category": "report",
-    "description": "Xây dựng luận điểm phản biện có căn cứ.",
-    "prompt": "Chủ đề tranh luận: [TOPIC]\nLập trường của tôi: [POSITION]\n\nHãy xây dựng 3 luận điểm phản biện mạnh, mỗi luận điểm có: lý lẽ chính, dẫn chứng cụ thể, cách phản bác ý kiến đối lập.",
-    "variables": [
-      {
-        "name": "TOPIC",
-        "label": "Chủ đề tranh luận",
-        "type": "text",
-        "required": true
-      },
-      {
-        "name": "POSITION",
-        "label": "Quan điểm của bạn",
-        "type": "textarea",
-        "required": true
-      }
-    ],
-    "tags": ["phản biện", "luận điểm", "tranh luận"],
-    "difficulty": "advanced",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "presentation-001",
-    "title": "Làm slide thuyết trình",
-    "category": "presentation",
-    "description": "Tạo outline slide thuyết trình chuyên nghiệp.",
-    "prompt": "Tạo outline cho bài thuyết trình về [TOPIC] gồm [SLIDE_COUNT] slide. Mỗi slide ghi rõ: Tiêu đề, 3 gạch đầu dòng nội dung chính, gợi ý hình ảnh minh họa. Phong cách chuyên nghiệp.",
-    "variables": [
-      {
-        "name": "TOPIC",
-        "label": "Chủ đề thuyết trình",
-        "type": "text",
-        "required": true
-      },
-      {
-        "name": "SLIDE_COUNT",
-        "label": "Số lượng slide",
-        "type": "text",
-        "required": true
-      }
-    ],
-    "tags": ["slide", "thuyết trình", "presentation"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "summary-001",
-    "title": "Tóm tắt tài liệu dài",
-    "category": "summary",
-    "description": "Tóm tắt văn bản dài thành các ý chính.",
-    "prompt": "Hãy tóm tắt tài liệu sau thành 5 ý chính quan trọng nhất, mỗi ý không quá 2 câu. Sau đó viết 1 đoạn tóm tắt tổng thể không quá 100 từ:\n\n[DOCUMENT]",
-    "variables": [
-      {
-        "name": "DOCUMENT",
-        "label": "Tài liệu cần tóm tắt",
-        "type": "textarea",
-        "required": true
-      }
-    ],
-    "tags": ["tóm tắt", "tài liệu", "ý chính"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "writing-001",
-    "title": "Viết email chuyên nghiệp",
-    "category": "writing",
-    "description": "Soạn email chuyên nghiệp gửi giảng viên hoặc doanh nghiệp.",
-    "prompt": "Viết email chuyên nghiệp với nội dung: [CONTENT]\nNgười nhận: [RECEIVER]\n\nTone: lịch sự, trang trọng. Bao gồm: lời chào, nội dung chính, lời kết và chữ ký.",
+    "title": "Viết kết luận & đề xuất học thuật",
+    "category": "REPORT",
+    "description": "Tổng hợp kết quả nghiên cứu thành phần kết luận sắc bén và đề xuất thực tiễn có căn cứ.",
+    "prompt": "Dựa trên nội dung nghiên cứu sau:\n\n[CONTENT]\n\nHãy viết phần kết luận và đề xuất theo cấu trúc:\n1. Tóm tắt phát hiện chính\n2. Ý nghĩa của kết quả\n3. Hạn chế của nghiên cứu\n4. Đề xuất giải pháp hoặc hướng phát triển\n5. Kết luận ngắn gọn, thuyết phục.",
+    "bestAI": "Gemini",
     "variables": [
       {
         "name": "CONTENT",
-        "label": "Nội dung cần truyền đạt",
-        "type": "textarea",
-        "required": true
-      },
-      {
-        "name": "RECEIVER",
-        "label": "Người nhận (giảng viên/doanh nghiệp...)",
-        "type": "text",
-        "required": true
-      }
-    ],
-    "tags": ["email", "chuyên nghiệp", "viết lách"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "writing-002",
-    "title": "Dịch thuật học thuật",
-    "category": "writing",
-    "description": "Dịch tài liệu học thuật sang tiếng Việt tự nhiên.",
-    "prompt": "Dịch đoạn văn học thuật sau sang tiếng Việt, đảm bảo: giữ nguyên thuật ngữ chuyên ngành (ghi kèm tiếng Anh trong ngoặc), văn phong học thuật, dễ hiểu với sinh viên đại học:\n\n[TEXT]",
-    "variables": [
-      {
-        "name": "TEXT",
-        "label": "Văn bản cần dịch",
+        "label": "Nội dung nghiên cứu",
         "type": "textarea",
         "required": true
       }
     ],
-    "tags": ["dịch thuật", "học thuật", "tiếng Anh"],
+    "tags": ["kết luận", "đề xuất", "học thuật"],
     "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "writing-003",
-    "title": "Review và cải thiện bài viết",
-    "category": "writing",
-    "description": "Nhận xét và cải thiện chất lượng bài viết.",
-    "prompt": "Hãy review bài viết sau theo 4 tiêu chí: 1) Cấu trúc và logic, 2) Ngôn ngữ và văn phong, 3) Nội dung và lập luận, 4) Điểm mạnh cần giữ. Sau đó viết lại đoạn yếu nhất:\n\n[ESSAY]",
-    "variables": [
-      {
-        "name": "ESSAY",
-        "label": "Bài viết cần review",
-        "type": "textarea",
-        "required": true
-      }
-    ],
-    "tags": ["review", "cải thiện", "bài viết"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "studying-001",
-    "title": "Tạo câu hỏi ôn tập",
-    "category": "studying",
-    "description": "Sinh câu hỏi ôn tập từ tài liệu học.",
-    "prompt": "Dựa vào nội dung sau:\n\n[MATERIAL]\n\nHãy tạo 10 câu hỏi ôn tập gồm: 5 câu trắc nghiệm (4 lựa chọn, đánh dấu đáp án đúng) và 5 câu tự luận ngắn. Độ khó tăng dần.",
-    "variables": [
-      {
-        "name": "MATERIAL",
-        "label": "Tài liệu học",
-        "type": "textarea",
-        "required": true
-      }
-    ],
-    "tags": ["ôn tập", "câu hỏi", "trắc nghiệm"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "planning-001",
-    "title": "Lên kế hoạch học tập",
-    "category": "planning",
-    "description": "Tạo lịch học tập chi tiết cho kỳ thi.",
-    "prompt": "Tôi cần ôn thi môn [SUBJECT] trong [DAYS] ngày. Các chương cần ôn: [CHAPTERS].\n\nHãy lập lịch học chi tiết theo từng ngày, ưu tiên các chương quan trọng và có thời gian ôn tập lại.",
-    "variables": [
-      {
-        "name": "SUBJECT",
-        "label": "Tên môn học",
-        "type": "text",
-        "required": true
-      },
-      {
-        "name": "DAYS",
-        "label": "Số ngày ôn thi",
-        "type": "text",
-        "required": true
-      },
-      {
-        "name": "CHAPTERS",
-        "label": "Các chương cần ôn",
-        "type": "textarea",
-        "required": true
-      }
-    ],
-    "tags": ["học tập", "kế hoạch", "ôn thi"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "planning-002",
-    "title": "Brainstorm ý tưởng",
-    "category": "planning",
-    "description": "Sinh ý tưởng sáng tạo cho dự án hoặc bài tập.",
-    "prompt": "Tôi cần ý tưởng cho [PROJECT].\nĐối tượng hướng đến: [TARGET]\n\nHãy đưa ra 10 ý tưởng sáng tạo, mỗi ý gồm: tên ý tưởng, mô tả ngắn, điểm độc đáo và khó khăn có thể gặp.",
-    "variables": [
-      {
-        "name": "PROJECT",
-        "label": "Mô tả dự án/bài tập",
-        "type": "textarea",
-        "required": true
-      },
-      {
-        "name": "TARGET",
-        "label": "Đối tượng hướng đến",
-        "type": "text",
-        "required": true
-      }
-    ],
-    "tags": ["ý tưởng", "brainstorm", "sáng tạo"],
-    "difficulty": "beginner",
     "language": "vi",
     "version": "1.0",
     "author": "AIaBLE Team",
