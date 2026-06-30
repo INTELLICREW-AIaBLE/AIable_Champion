@@ -76,7 +76,7 @@ Return ONLY a valid JSON object matching this schema:
 
     const dynamicGenAI = new GoogleGenerativeAI(activeKey);
     const model = dynamicGenAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.5-flash',
       generationConfig: {
         responseMimeType: 'application/json',
       },

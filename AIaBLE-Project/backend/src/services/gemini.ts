@@ -23,7 +23,7 @@ export const callGemini = async (prompt: string, userKey?: string): Promise<stri
     }
 
     const dynamicGenAI = new GoogleGenerativeAI(activeKey);
-    const model = dynamicGenAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = dynamicGenAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
 
 
     const result = await model.generateContent(prompt);
