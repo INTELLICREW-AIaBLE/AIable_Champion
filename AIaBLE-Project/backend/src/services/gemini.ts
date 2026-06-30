@@ -3,34 +3,70 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const apiKey = process.env.GEMINI_API_KEY;
+const DEFAULT_MODEL = 'gemini-2.0-flash';
 
-if (!apiKey) {
-  console.warn('[Warning]: GEMINI_API_KEY is not defined in environment variables.');
-}
+// Minimum delay between Gemini calls across the whole backend.
+const GEMINI_COOLDOWN_MS = Number(process.env.GEMINI_COOLDOWN_MS || 5000);
 
-const genAI = new GoogleGenerativeAI(apiKey || 'temporary-placeholder');
+// Simple global queue lock.
+let lastGeminiCallTime = 0;
+let queue: Promise<void> = Promise.resolve();
 
-/**
- * Basic helper to invoke Google Gemini model
- * @param prompt User instruction
- */
-export const callGemini = async (prompt: string, userKey?: string): Promise<string> => {
-  try {
-    const activeKey = userKey || process.env.GEMINI_API_KEY;
-    if (!activeKey) {
-      throw new Error('GEMINI_API_KEY is missing from environment variables and user settings.');
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const waitForCooldown = async () => {
+  queue = queue.then(async () => {
+    const now = Date.now();
+    const elapsed = now - lastGeminiCallTime;
+    const waitTime = Math.max(0, GEMINI_COOLDOWN_MS - elapsed);
+
+    if (waitTime > 0) {
+      console.log(`[Gemini Cooldown]: waiting ${waitTime}ms before next request...`);
+      await sleep(waitTime);
     }
 
-    const dynamicGenAI = new GoogleGenerativeAI(activeKey);
-    const model = dynamicGenAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    lastGeminiCallTime = Date.now();
+  });
 
+  return queue;
+};
+
+/**
+ * Basic helper to invoke Google Gemini model safely.
+ * Adds a backend-wide cooldown so services do not spam the API.
+ *
+ * @param prompt User instruction
+ * @param userKey Optional user-provided Gemini API key
+ */
+export const callGemini = async (
+  prompt: string,
+  userKey?: string
+): Promise<string> => {
+  try {
+    const activeKey = userKey || process.env.GEMINI_API_KEY;
+
+    if (!activeKey) {
+      throw new Error(
+        'GEMINI_API_KEY is missing from environment variables and user settings.'
+      );
+    }
+
+    await waitForCooldown();
+
+    const genAI = new GoogleGenerativeAI(activeKey);
+    const model = genAI.getGenerativeModel({
+      model: DEFAULT_MODEL,
+    });
 
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    return response.text();
+    return result.response.text();
   } catch (error: any) {
     console.error('[Gemini API Error]:', error);
-    throw new Error(`Failed to communicate with Gemini API: ${error.message}`);
+
+    throw new Error(
+      `Failed to communicate with Gemini API: ${
+        error?.message || 'Unknown error'
+      }`
+    );
   }
 };
