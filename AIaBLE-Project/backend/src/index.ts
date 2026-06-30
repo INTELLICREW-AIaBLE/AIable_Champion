@@ -10,6 +10,7 @@ import sandboxRoutes from './routes/sandbox';
 import authRoutes from './routes/auth';
 import profileRoutes from './routes/profile';
 import validatorRoutes from './routes/validator';
+import { apiLimiter } from './middleware/rateLimiter';
 
 // Load environment variables
 dotenv.config();
@@ -33,7 +34,7 @@ app.use('/api/recipes', recipeRoutes);
 app.use('/api/task-matcher', matcherRoutes);
 
 // Prompt Optimizer routes
-app.use('/api/optimizer', optimizerRoutes);
+app.use('/api/optimizer', apiLimiter, optimizerRoutes);
 
 // Auth routes
 app.use('/api/auth', authRoutes);
@@ -42,7 +43,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 
 // Sandbox routes
-app.use('/api/sandbox', sandboxRoutes);
+app.use('/api/sandbox', apiLimiter, sandboxRoutes);
 
 // Validator routes
 app.use('/api/validator', validatorRoutes);

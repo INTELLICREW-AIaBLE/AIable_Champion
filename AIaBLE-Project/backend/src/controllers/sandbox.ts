@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { callGemini } from '../services/gemini';
+import { callGPT4 } from '../services/openai';
+import { callClaude } from '../services/claude';
 
 // POST /api/sandbox
 export const runSandboxModel = async (req: Request, res: Response) => {
@@ -15,17 +17,34 @@ export const runSandboxModel = async (req: Request, res: Response) => {
 
     let result = '';
 
-    // Hiện tại do mình mới chỉ có GEMINI_API_KEY, 
-    // nên em sẽ cấu hình cho Gemini "đóng vai" các model khác (Claude, GPT-4) 
-    // để anh có thể test giao diện Sandbox hoạt động song song.
     if (model === 'Gemini') {
       result = await callGemini(prompt);
     } else if (model === 'Claude') {
-      const claudePrompt = `Bạn là Claude, một AI được phát triển bởi Anthropic. Bạn nổi tiếng với phong cách viết văn tự nhiên, chi tiết, cẩn thận và thấu cảm. Hãy trả lời câu hỏi sau bằng phong cách của Claude:\n\n${prompt}`;
-      result = await callGemini(claudePrompt);
+      if (process.env.CLAUDE_API_KEY) {
+        try {
+          result = await callClaude(prompt);
+        } catch (err: any) {
+          console.warn('[Claude API Failed - Using Gemini Simulator]:', err.message);
+          const claudePrompt = `Bạn là Claude, một AI được phát triển bởi Anthropic. Bạn nổi tiếng với phong cách viết văn tự nhiên, chi tiết, cẩn thận và thấu cảm. Hãy trả lời câu hỏi sau bằng phong cách của Claude:\n\n${prompt}`;
+          result = await callGemini(claudePrompt);
+        }
+      } else {
+        const claudePrompt = `Bạn là Claude, một AI được phát triển bởi Anthropic. Bạn nổi tiếng với phong cách viết văn tự nhiên, chi tiết, cẩn thận và thấu cảm. Hãy trả lời câu hỏi sau bằng phong cách của Claude:\n\n${prompt}`;
+        result = await callGemini(claudePrompt);
+      }
     } else if (model === 'GPT-4') {
-      const gptPrompt = `Bạn là ChatGPT (GPT-4), một AI của OpenAI. Bạn nổi tiếng với phong cách viết logic, cấu trúc cực kỳ chặt chẽ, thẳng thắn và tập trung vào giải quyết vấn đề. Hãy trả lời câu hỏi sau bằng phong cách của GPT-4:\n\n${prompt}`;
-      result = await callGemini(gptPrompt);
+      if (process.env.OPENAI_API_KEY) {
+        try {
+          result = await callGPT4(prompt);
+        } catch (err: any) {
+          console.warn('[OpenAI API Failed - Using Gemini Simulator]:', err.message);
+          const gptPrompt = `Bạn là ChatGPT (GPT-4), một AI của OpenAI. Bạn nổi tiếng với phong cách viết logic, cấu trúc cực kỳ chặt chẽ, thẳng thắn và tập trung vào giải quyết vấn đề. Hãy trả lời câu hỏi sau bằng phong cách của GPT-4:\n\n${prompt}`;
+          result = await callGemini(gptPrompt);
+        }
+      } else {
+        const gptPrompt = `Bạn là ChatGPT (GPT-4), một AI của OpenAI. Bạn nổi tiếng với phong cách viết logic, cấu trúc cực kỳ chặt chẽ, thẳng thắn và tập trung vào giải quyết vấn đề. Hãy trả lời câu hỏi sau bằng phong cách của GPT-4:\n\n${prompt}`;
+        result = await callGemini(gptPrompt);
+      }
     } else {
       return res.status(400).json({ success: false, message: 'Model không được hỗ trợ' });
     }
