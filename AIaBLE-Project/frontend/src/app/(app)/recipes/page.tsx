@@ -3,9 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Copy, Wand2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 import {
   BookOpen,
+  Code2,
+  FileText,
+  Presentation,
+  FlaskConical,
   Target,
   Languages,
   Search,
@@ -13,77 +18,100 @@ import {
   ArrowRight,
 } from 'lucide-react';
 
+export type RecipeCategory = 'REPORT' | 'REPORT' | 'SLIDE' | 'RESEARCH';
+export type AIProvider = 'ChatGPT' | 'Claude' | 'Gemini';
+
 type Recipe = {
   id: string;
   title: string;
-  category: string;
+  category: RecipeCategory;
   description: string;
   prompt: string;
-  difficulty: string;
-  language: string;
+  bestAI: AIProvider;
+  variables: {
+    name: string;
+    label: string;
+    type: 'text' | 'textarea' | 'number';
+    required: boolean;
+  }[];
   tags: string[];
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  language: 'vi' | 'en';
 };
 
 const RECIPES: Recipe[] = [];
-const CATEGORIES = ['All', 'Coding', 'Report', 'Presentation', 'Writing', 'Summary', 'Planning'];
+const CATEGORIES = ['All', 'Coding', 'Report', 'Slide', 'Research'];
 
-function RecipeCard({ recipe, onApply,
+function RecipeCard({
+  recipe,
+  onApply,
 }: {
   recipe: Recipe;
   onApply: (recipe: Recipe) => void;
 }) {
+  const categoryStyles: Record<string, string> = {
+    coding: 'bg-violet-50 text-violet-700 border-violet-100',
+    report: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+    slide: 'bg-amber-50 text-amber-700 border-amber-100',
+    research: 'bg-sky-50 text-sky-700 border-sky-100',
+  };
+
+  const categoryIcons: Record<string, React.ElementType> = {
+    coding: Code2,
+    report: FileText,
+    slide: Presentation,
+    research: FlaskConical,
+  };
+
+  const Icon = categoryIcons[recipe.category] ?? BookOpen;
+
   return (
-    <article className="group bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:shadow-lg hover:shadow-violet-100 transition-all duration-300">
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 mb-1.5">
-            <div className="w-8 h-8 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center shrink-0">
-              <BookOpen className="w-4 h-4 text-violet-600" />
-            </div>
-
-            <h2 className="text-base font-black text-slate-900 group-hover:text-violet-700 transition truncate">
-              {recipe.title}
-            </h2>
-          </div>
-
-          <p className="text-sm text-slate-500 leading-relaxed line-clamp-2">
-            {recipe.description}
-          </p>
-        </div>
-
-        <span className="px-2.5 py-1 rounded-full bg-violet-50 border border-violet-100 text-[11px] font-bold text-violet-700 shrink-0">
+    <article className="group rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-100 hover:shadow-md hover:shadow-violet-100/60">
+      <div className="mb-3 flex items-center gap-2">
+        <span
+          className={cn(
+            'inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-semibold capitalize',
+            categoryStyles[recipe.category] ??
+              'bg-slate-50 text-slate-600 border-slate-100'
+          )}
+        >
+          <Icon className="h-3 w-3" />
           {recipe.category}
         </span>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 mb-4">
-        <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-100 text-[11px] font-semibold text-slate-600">
-          <Target className="w-3.5 h-3.5 text-violet-500" />
-          {recipe.difficulty}
-        </span>
+      <h3 className="mb-1.5 line-clamp-1 text-sm font-semibold text-slate-800 transition-colors group-hover:text-violet-700">
+        {recipe.title}
+      </h3>
 
-        <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-100 text-[11px] font-semibold text-slate-600">
-          <Languages className="w-3.5 h-3.5 text-violet-500" />
-          {recipe.language}
-        </span>
+      <p className="mb-3 line-clamp-2 min-h-[40px] text-xs leading-relaxed text-slate-500">
+        {recipe.description}
+      </p>
 
-        {recipe.tags.slice(0, 2).map((tag) => (
-          <span
-            key={tag}
-            className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-100 text-[11px] font-semibold text-slate-500"
-          >
-            #{tag}
-          </span>
-        ))}
+      <div className="mb-4 flex items-center gap-1.5 text-[11px] text-slate-500">
+        <span>🧠</span>
+        <span>Tốt nhất với</span>
+        <span className="font-semibold text-slate-700">{recipe.bestAI}</span>
       </div>
 
-      <button
-        onClick={() => onApply(recipe)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-50 text-violet-700 text-xs font-bold hover:bg-violet-100 transition"
-      >
-        <Wand2 className="w-3.5 h-3.5" />
-        Apply Recipe
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          className="inline-flex items-center gap-1 rounded-md border border-slate-100 px-2.5 py-1.5 text-[11px] font-medium text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
+        >
+          <Copy className="h-3 w-3" />
+          Copy
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onApply(recipe)}
+          className="inline-flex items-center gap-1 rounded-md bg-violet-50 px-2.5 py-1.5 text-[11px] font-semibold text-violet-700 transition hover:bg-violet-100 hover:text-violet-800"
+        >
+          <Wand2 className="h-3 w-3" />
+          Apply Recipe
+        </button>
+      </div>
     </article>
   );
 }
