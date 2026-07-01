@@ -167,6 +167,10 @@ export const optimizePrompt = async (
     }
   } catch (error: any) {
     console.warn('[Optimizer Service Error - Using Fallback]:', error.message);
+    const msg = error.message?.toLowerCase() || '';
+    if (msg.includes('429') || msg.includes('quota') || msg.includes('rate limit') || msg.includes('token') || msg.includes('overloaded')) {
+      throw new Error('Hệ thống AI đang quá tải hoặc hết Token (Rate Limit). Vui lòng thử lại sau ít phút!');
+    }
     return generateFallback(rawPrompt, modelName, tone);
   }
 };

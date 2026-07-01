@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "id": "1782910920968-i67i1oad3",
+    "userId": "default-user",
+    "title": "Javaweb",
+    "description": "làm web bán đồ ăn",
+    "category": "academic",
+    "status": "planning",
+    "tasks": [],
+    "tags": [
+      "JSP",
+      "JSTL",
+      "JDBC"
+    ],
+    "color": "#8B5CF6",
+    "createdAt": 1782910920968,
+    "updatedAt": 1782910920968
+  }
+]
