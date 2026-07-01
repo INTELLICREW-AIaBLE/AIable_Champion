@@ -5,7 +5,7 @@
     "category": "CODING",
     "description": "Phân tích lỗi runtime/compile, giải thích nguyên nhân và đề xuất cách sửa đúng.",
     "prompt": "Đoạn code sau đang gặp lỗi:\n\n[CODE]\n\nLỗi hoặc hành vi sai gặp phải:\n\n[ERROR]\n\nHãy phân tích theo cấu trúc:\n1. Lỗi nằm ở đâu\n2. Vì sao lỗi xảy ra\n3. Cách sửa đúng\n4. Code đã sửa\n5. Cách tránh lỗi tương tự trong tương lai.",
-    "bestAI": "Claude",
+    "bestAI": "Groq",
     "variables": [
       {
         "name": "CODE",
@@ -34,7 +34,7 @@
     "category": "REPORT",
     "description": "Tạo cấu trúc báo cáo đúng format học thuật với trích dẫn, luận điểm và kết luận rõ ràng.",
     "prompt": "Bạn là một sinh viên đại học. Hãy viết báo cáo học thuật về chủ đề [TOPIC].\n\nYêu cầu:\n1. Có mở đầu, nội dung chính và kết luận\n2. Văn phong học thuật, trang trọng\n3. Có luận điểm rõ ràng\n4. Gợi ý nguồn tham khảo theo chuẩn APA\n5. Tránh viết chung chung, ưu tiên lập luận có chiều sâu.",
-    "bestAI": "ChatGPT",
+    "bestAI": "OpenRouter",
     "variables": [
       {
         "name": "TOPIC",
@@ -80,7 +80,7 @@
     "category": "RESEARCH",
     "description": "Tóm tắt và so sánh nhiều bài báo khoa học theo chủ đề, xu hướng nghiên cứu và khoảng trống nghiên cứu.",
     "prompt": "Hãy hỗ trợ tổng hợp literature review cho chủ đề:\n\n[TOPIC]\n\nDanh sách tài liệu hoặc ghi chú:\n\n[SOURCES]\n\nYêu cầu:\n1. Tóm tắt từng nguồn\n2. Nhóm các nghiên cứu theo hướng tiếp cận\n3. So sánh điểm giống và khác nhau\n4. Chỉ ra research gap\n5. Đề xuất hướng nghiên cứu tiếp theo.",
-    "bestAI": "Claude",
+    "bestAI": "Groq",
     "variables": [
       {
         "name": "TOPIC",
@@ -109,7 +109,7 @@
     "category": "CODING",
     "description": "Đánh giá code hiện tại, gợi ý cải thiện performance, readability và best practices.",
     "prompt": "Hãy review đoạn code sau:\n\n[CODE]\n\nNgôn ngữ: [LANGUAGE]\n\nYêu cầu:\n1. Nhận xét readability\n2. Tìm vấn đề về performance\n3. Tìm bug tiềm ẩn\n4. Đề xuất refactor\n5. Viết lại phiên bản tốt hơn nếu cần.",
-    "bestAI": "Claude",
+    "bestAI": "Groq",
     "variables": [
       {
         "name": "CODE",

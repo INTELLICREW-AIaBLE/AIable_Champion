@@ -11,15 +11,12 @@ import {
   FileText,
   Presentation,
   FlaskConical,
-  Target,
-  Languages,
   Search,
   Filter,
-  ArrowRight,
 } from 'lucide-react';
 
-export type RecipeCategory = 'REPORT' | 'REPORT' | 'SLIDE' | 'RESEARCH';
-export type AIProvider = 'ChatGPT' | 'Claude' | 'Gemini';
+export type RecipeCategory = 'CODING' | 'REPORT' | 'SLIDE' | 'RESEARCH';
+export type AIProvider = 'OpenRouter' | 'Groq' | 'Gemini';
 
 type Recipe = {
   id: string;
@@ -144,6 +141,7 @@ export default function RecipeLibraryPage() {
 
   const handleApplyRecipe = (recipe: Recipe) => {
     sessionStorage.setItem('optimizer_prefill', recipe.prompt);
+    sessionStorage.setItem('optimizer_prefill_AI', recipe.bestAI);
     router.push('/optimizer');
   };
 
@@ -200,7 +198,7 @@ export default function RecipeLibraryPage() {
           {showFilters && (
             <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 p-2 z-10">
               <p className="text-xs font-bold text-slate-500 px-2 py-1 mb-1">Tối ưu cho mô hình AI:</p>
-              {['All', 'ChatGPT', 'Claude', 'Gemini'].map(ai => (
+              {['All', 'OpenRouter', 'Groq', 'Gemini'].map(ai => (
                 <button
                   key={ai}
                   onClick={() => { setAiFilter(ai as any); setShowFilters(false); }}
