@@ -44,6 +44,14 @@
     ],
     "history": [
       {
+        "id": "1782930375222",
+        "action": "Apply Recipe",
+        "tool": "Recipe Library",
+        "detail": "Applied recipe: Debug & giải thích lỗi code chi tiết",
+        "model": "Groq",
+        "time": "2026-07-01T18:26:15.222Z"
+      },
+      {
         "id": "1782930247889",
         "action": "Test prompt in Sandbox",
         "tool": "Sandbox",

@@ -63,6 +63,14 @@ export function useAuth() {
             );
 
             const data = await res.json();
+            
+            // Nếu server trả về lỗi (ví dụ token hết hạn hoặc user bị xóa khỏi database)
+            if (res.status === 401 || res.status === 404 || !data.success) {
+                logout();
+                window.location.href = '/login';
+                return;
+            }
+
             if (data.success && data.data) {
                 const profile: UserProfile = {
                     name: data.data.name || 'User',
