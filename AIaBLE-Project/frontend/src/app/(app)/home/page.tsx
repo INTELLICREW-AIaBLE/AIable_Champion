@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
 import { Wand2, GitBranch, BookOpen, ShieldCheck, Settings, Sparkles, Plus, Zap } from 'lucide-react';
 import { QuickAccessCard } from '@/components/dashboard/QuickAccessCard';
 import { FeaturedRecipes } from '@/components/dashboard/FeaturedRecipes';
@@ -56,7 +59,40 @@ const quickAccessItems = [
   },
 ];
 
+// Lấy 2 từ cuối từ full name, ví dụ "Nguyễn Huy Hoàng Anh" → "Hoàng Anh"
+function getFirstName(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/);
+  return parts.slice(-2).join(' ') || fullName;
+}
+
 export default function Home() {
+  const [userName, setUserName] = useState('');
+
+  const fetchProfile = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await res.json();
+      if (data.success && data.data?.name) {
+        setUserName(data.data.name);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProfile();
+    window.addEventListener('profileUpdated', fetchProfile);
+    return () => window.removeEventListener('profileUpdated', fetchProfile);
+  }, [fetchProfile]);
+
+  const displayName = userName ? getFirstName(userName) : null;
+
   return (
     <div className="relative min-h-full">
       {/* Decorative floating elements */}
@@ -69,7 +105,13 @@ export default function Home() {
 
       {/* Welcome Header */}
       <div className="mb-6 pr-24">
-        <h1 className="text-2xl font-bold text-slate-900">Welcome to Alable, U!</h1>
+        <h1 className="text-2xl font-bold text-slate-900">
+          {displayName ? (
+            <>Welcome <span className="text-violet-600">{displayName}</span> san!</>
+          ) : (
+            'Welcome to Alable!'
+          )}
+        </h1>
         <p className="text-sm text-slate-500 mt-1">
           Your AI-powered productivity platform. Optimizing prompts and matching tasks.
         </p>
