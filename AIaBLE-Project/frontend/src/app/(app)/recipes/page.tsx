@@ -62,6 +62,13 @@ function RecipeCard({
 
   const Icon = categoryIcons[recipe.category] ?? BookOpen;
 
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+  await navigator.clipboard.writeText(recipe.prompt);
+  setCopied(true);
+  setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <article className="group rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-100 hover:shadow-md hover:shadow-violet-100/60">
       <div className="mb-3 flex items-center gap-2">
@@ -95,9 +102,9 @@ function RecipeCard({
         <button
           type="button"
           className="inline-flex items-center gap-1 rounded-md border border-slate-100 px-2.5 py-1.5 text-[11px] font-medium text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
-        >
+        onClick={handleCopy}>
           <Copy className="h-3 w-3" />
-          Copy
+          {copied ? "Copied!" : "Copy"}
         </button>
 
         <button
