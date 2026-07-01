@@ -41,7 +41,11 @@ export const getProfile = (req: Request, res: Response) => {
         openai: process.env.OPENAI_API_KEY || '',
         anthropic: process.env.ANTHROPIC_API_KEY || '',
         gemini: process.env.GEMINI_API_KEY || ''
-      }
+      },
+      skills: user.skills || [
+        'Python', 'Machine Learning', 'Prompt Engineering', 'Data Analysis',
+        'React', 'TypeScript', 'SQL', 'Technical Writing', 'AI Research',
+      ]
     };
 
     res.json({ success: true, data: profile });
@@ -71,6 +75,7 @@ export const updateProfile = (req: Request, res: Response) => {
     if (updates.avatar !== undefined) users[userIndex].avatar = updates.avatar;
     if (updates.cover !== undefined) users[userIndex].cover = updates.cover;
     if (updates.birthday !== undefined) users[userIndex].birthday = updates.birthday;
+    if (updates.skills !== undefined) users[userIndex].skills = updates.skills;
     
     if (updates.email !== undefined) {
       // Check for duplicate email

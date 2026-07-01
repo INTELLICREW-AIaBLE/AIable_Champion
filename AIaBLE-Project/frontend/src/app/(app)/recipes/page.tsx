@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Copy, Wand2 } from 'lucide-react';
+import { Copy, Wand2, Bookmark } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import {
@@ -42,6 +42,8 @@ const t = {
     desc: 'Thư viện prompt chất lượng cao - được tuyển chọn, thử nghiệm và phân loại theo chuyên ngành.',
     bestWith: 'Tốt nhất với',
     copy: 'Copy',
+    save: 'Save',
+    saved: 'Saved',
     apply: 'Apply Recipe',
     searchPlaceholder: 'Tìm kiếm recipe...',
     filter: 'Filter',
@@ -55,6 +57,8 @@ const t = {
     desc: 'High-quality prompt library - curated, tested, and categorized by industry.',
     bestWith: 'Best with',
     copy: 'Copy',
+    save: 'Lưu',
+    saved: 'Đã lưu',
     apply: 'Apply Recipe',
     searchPlaceholder: 'Search recipes...',
     filter: 'Filter',
@@ -94,14 +98,37 @@ function RecipeCard({
   const Icon = categoryIcons[recipe.category] ?? BookOpen;
 
   const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
+
   const handleCopy = async () => {
     await navigator.clipboard.writeText(recipe.prompt);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleSave = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/recipes/saved`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ recipe: { ...recipe, id: recipe.id || Date.now().toString(), desc: recipe.description, model: recipe.bestAI } })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSaved(!saved);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
-    <article className="group rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-100 hover:shadow-md hover:shadow-violet-100/60">
+    <article className="group rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-100 hover:shadow-md hover:shadow-violet-100/60 relative">
+
       <div className="mb-3 flex items-center gap-2">
         <span
           className={cn(
@@ -132,10 +159,15 @@ function RecipeCard({
       <div className="flex items-center gap-2">
         <button
           type="button"
-          className="inline-flex items-center gap-1 rounded-md border border-slate-100 px-2.5 py-1.5 text-[11px] font-medium text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
-          onClick={handleCopy}>
-          <Copy className="h-3 w-3" />
-          {text.copy}
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[11px] font-medium transition focus:outline-none",
+            saved 
+              ? "border-rose-100 bg-rose-50 text-rose-600 hover:bg-rose-100" 
+              : "border-slate-100 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800"
+          )}
+          onClick={handleSave}>
+          <Bookmark className={cn("w-3.5 h-3.5", saved && "fill-rose-500 text-rose-500")} />
+          {saved ? (text as any).saved || "Saved" : (text as any).save || "Save"}
         </button>
 
         <button
@@ -192,9 +224,30 @@ export default function RecipeLibraryPage() {
     fetchRecipes();
   }, []);
 
+  const logHistory = async (recipe: Recipe) => {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/history`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          action: 'Apply Recipe',
+          tool: 'Recipe Library',
+          detail: `Applied recipe: ${recipe.title}`,
+          model: recipe.bestAI
+        })
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const handleApplyRecipe = (recipe: Recipe) => {
     sessionStorage.setItem('optimizer_prefill', recipe.prompt);
     sessionStorage.setItem('optimizer_prefill_AI', recipe.bestAI);
+    logHistory(recipe);
     router.push('/optimizer');
   };
 

@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Clock, Wand2, Sparkles, BookOpen, Search, ArrowUpRight, Activity } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function HistoryPage() {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -16,7 +18,7 @@ export default function HistoryPage() {
         return;
       }
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/profile/history`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/history`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -61,8 +63,22 @@ export default function HistoryPage() {
             // Simple time formatter for testing
             const formattedTime = item.time ? new Date(item.time).toLocaleString('vi-VN') : 'Gần đây';
 
+            const handleNavigate = () => {
+              const tool = (item.tool || '').toLowerCase();
+              if (tool.includes('optimizer')) router.push('/optimizer');
+              else if (tool.includes('sandbox')) router.push('/sandbox');
+              else if (tool.includes('matcher')) router.push('/matcher');
+              else if (tool.includes('saved')) router.push('/recipes/saved');
+              else if (tool.includes('library') || tool.includes('recipe')) router.push('/recipes');
+              else router.push('/dashboard');
+            };
+
             return (
-              <div key={item.id} className="p-4 flex items-start gap-4 hover:bg-slate-50 transition rounded-2xl group cursor-pointer">
+              <div 
+                key={item.id} 
+                onClick={handleNavigate}
+                className="p-4 flex items-start gap-4 hover:bg-slate-50 transition rounded-2xl group cursor-pointer"
+              >
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${item.color || 'text-violet-600 bg-violet-100'}`}>
                   <Icon className="w-5 h-5" />
                 </div>

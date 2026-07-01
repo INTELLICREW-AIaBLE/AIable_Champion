@@ -190,6 +190,24 @@ export default function SandboxPage() {
       runModel(2, 'Gemini', 3000)
     ]).then(() => {
       setIsRunning(false);
+      
+      // Log lịch sử hoạt động
+      const token = localStorage.getItem('token');
+      if (token) {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/history`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            action: 'Test prompt in Sandbox',
+            tool: 'Sandbox',
+            detail: `Prompt: ${prompt.substring(0, 60)}${prompt.length > 60 ? '...' : ''}`,
+            model: 'All Models'
+          })
+        }).catch(err => console.error('Lỗi khi lưu lịch sử:', err));
+      }
     });
   };
 

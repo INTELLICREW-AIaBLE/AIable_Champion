@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Bookmark, Search, Star, ExternalLink, Code2, BookOpen, Presentation, FileText } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function SavedRecipesPage() {
   const [recipes, setRecipes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchSaved = async () => {
@@ -16,7 +18,7 @@ export default function SavedRecipesPage() {
         return;
       }
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/profile/recipes/saved`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/recipes/saved`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -62,6 +64,34 @@ export default function SavedRecipesPage() {
           else if (recipe.category === 'Academic') Icon = BookOpen;
           else if (recipe.category === 'Presentation') Icon = Presentation;
 
+          const handleApplyRecipe = async () => {
+            sessionStorage.setItem('optimizer_prefill', recipe.prompt || recipe.desc);
+            sessionStorage.setItem('optimizer_prefill_AI', recipe.model);
+            
+            try {
+              const token = localStorage.getItem('token');
+              if (token) {
+                await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/history`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: JSON.stringify({
+                    action: 'Apply Saved Recipe',
+                    tool: 'Saved Recipes',
+                    detail: `Applied saved recipe: ${recipe.title}`,
+                    model: recipe.model
+                  })
+                });
+              }
+            } catch (e) {
+              console.error(e);
+            }
+            
+            router.push('/optimizer');
+          };
+
           return (
             <div key={recipe.id} className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition p-6 group flex flex-col relative overflow-hidden">
               <div className="absolute top-4 right-4 text-rose-500">
@@ -90,7 +120,11 @@ export default function SavedRecipesPage() {
                   <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                   Best with {recipe.model}
                 </div>
-                <button className="text-violet-600 hover:text-violet-800 p-1.5 rounded-lg hover:bg-violet-50 transition">
+                <button 
+                  onClick={handleApplyRecipe}
+                  className="text-violet-600 hover:text-violet-800 p-1.5 rounded-lg hover:bg-violet-50 transition"
+                  title="Mở trong Prompt Optimizer"
+                >
                   <ExternalLink className="w-4 h-4" />
                 </button>
               </div>

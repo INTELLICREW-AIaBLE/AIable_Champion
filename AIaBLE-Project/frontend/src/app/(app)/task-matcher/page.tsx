@@ -118,6 +118,24 @@ export default function TaskMatcherPage() {
       if (!json.success) throw new Error(json.message || 'Task matcher failed');
       setSteps(Array.isArray(json.steps) ? json.steps : []);
       setSource(json.source || '');
+      
+      // Log lịch sử hoạt động
+      const token = localStorage.getItem('token');
+      if (token) {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/history`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            action: 'Match workflow task',
+            tool: 'Task Matcher',
+            detail: `Subject: ${subject} - ${taskDescription.substring(0, 40)}${taskDescription.length > 40 ? '...' : ''}`,
+            model: json.source || 'Groq'
+          })
+        }).catch(err => console.error('Lỗi khi lưu lịch sử:', err));
+      }
     } catch (error) {
       console.error('Failed to match task:', error);
     } finally {

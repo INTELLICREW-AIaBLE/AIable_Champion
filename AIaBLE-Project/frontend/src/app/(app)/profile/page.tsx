@@ -8,33 +8,10 @@ import {
   TrendingUp, Clock, Code2, FileText, Presentation, Copy,
 } from 'lucide-react';
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-const STATS = [
-  { label: 'Projects',        value: 12,   icon: GitBranch, color: 'text-violet-600', bg: 'bg-violet-50' },
-  { label: 'Recipes Used',    value: 48,   icon: BookOpen,  color: 'text-blue-600',   bg: 'bg-blue-50'   },
-  { label: 'Prompts Optimized', value: 137, icon: Wand2,   color: 'text-indigo-600', bg: 'bg-indigo-50' },
-  { label: 'Outputs Verified', value: 64,  icon: ShieldCheck, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-];
-
-const BADGES = [
-  { label: 'Early Adopter',    icon: Star,      color: 'from-amber-400 to-orange-500',   desc: 'Tham gia từ những ngày đầu' },
-  { label: 'Power User',       icon: Zap,       color: 'from-violet-500 to-purple-600',  desc: 'Sử dụng hơn 100 prompts' },
-  { label: 'Top Contributor',  icon: Award,     color: 'from-emerald-400 to-teal-500',   desc: 'Đóng góp recipe nổi bật' },
-  { label: 'Prompt Master',    icon: TrendingUp, color: 'from-blue-400 to-cyan-500',    desc: 'Tỉ lệ tối ưu đạt 95%' },
-];
-
-const SKILLS = [
+// ─── Constants ────────────────────────────────────────────────────────────────
+const DEFAULT_SKILLS = [
   'Python', 'Machine Learning', 'Prompt Engineering', 'Data Analysis',
   'React', 'TypeScript', 'SQL', 'Technical Writing', 'AI Research',
-];
-
-const ACTIVITY = [
-  { icon: Wand2,      color: 'bg-violet-100 text-violet-600', title: 'Optimized prompt for Python debugging', time: '2 giờ trước', tag: 'Optimizer' },
-  { icon: BookOpen,   color: 'bg-blue-100 text-blue-600',     title: 'Applied "Giải thuật toàn tử đề thi" recipe', time: '5 giờ trước', tag: 'Recipe' },
-  { icon: GitBranch,  color: 'bg-indigo-100 text-indigo-600', title: 'Created project "Software Engineering R..."', time: 'Hôm qua',    tag: 'Project' },
-  { icon: ShieldCheck,color: 'bg-emerald-100 text-emerald-600', title: 'Verified output for APA report', time: 'Hôm qua',    tag: 'Verify' },
-  { icon: Code2,      color: 'bg-orange-100 text-orange-600', title: 'Used recipe "Viết unit test cho function"', time: '2 ngày trước', tag: 'Recipe' },
-  { icon: FileText,   color: 'bg-pink-100 text-pink-600',     title: 'Generated "Báo cáo môn học theo chuẩn APA"', time: '3 ngày trước', tag: 'Recipe' },
 ];
 
 function EditableField({
@@ -176,6 +153,24 @@ export default function ProfilePage() {
   const [email,    setEmail]    = useState('user@alable.edu.vn');
   const [birthday, setBirthday] = useState('2000-01-01');
 
+  const [favoriteModels, setFavoriteModels] = useState<any[]>([
+    { name: 'Claude',  pct: 45, color: 'from-orange-400 to-amber-500' },
+    { name: 'GPT-4',   pct: 35, color: 'from-emerald-400 to-teal-500' },
+    { name: 'Gemini',  pct: 20, color: 'from-blue-400 to-cyan-500' },
+  ]);
+  const [dynamicStats, setDynamicStats] = useState({ projects: 12, recipesUsed: 48, promptsOptimized: 137, outputsVerified: 64 });
+  const [activities, setActivities] = useState<any[]>([]);
+  const [recentRecipes, setRecentRecipes] = useState<any[]>([
+    { title: 'Debug code Python step-by-step', type: 'CODING', model: 'Claude', icon: Code2,       iconBg: 'bg-violet-50',  iconColor: 'text-violet-600' },
+    { title: 'Báo cáo môn học theo chuẩn APA', type: 'REPORT', model: 'Claude', icon: FileText,    iconBg: 'bg-blue-50',    iconColor: 'text-blue-600' },
+  ]);
+  const [totalActivities, setTotalActivities] = useState(137);
+  
+  const [skills, setSkills] = useState<string[]>([]);
+  const [newSkill, setNewSkill] = useState('');
+  const [isAddingSkill, setIsAddingSkill] = useState(false);
+  const [activityChart, setActivityChart] = useState<any[]>([]);
+
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
@@ -195,7 +190,128 @@ export default function ProfilePage() {
           setCover(data.data.cover || '');
           setEmail(data.data.email || '');
           setBirthday(data.data.birthday || 'Chưa cập nhật');
+          setSkills(data.data.skills || [
+            'Python', 'Machine Learning', 'Prompt Engineering', 'Data Analysis',
+            'React', 'TypeScript', 'SQL', 'Technical Writing', 'AI Research',
+          ]);
         }
+
+        // Fetch history to calculate favorite models
+        try {
+          const historyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/history`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const historyData = await historyRes.json();
+          if (historyData.success && historyData.data) {
+            const history = historyData.data;
+            const modelCounts: Record<string, number> = {};
+            let totalModels = 0;
+            history.forEach((item: any) => {
+              if (item.model) {
+                // Normalize model names if necessary
+                const mName = item.model;
+                modelCounts[mName] = (modelCounts[mName] || 0) + 1;
+                totalModels++;
+              }
+            });
+            
+            if (totalModels > 0) {
+              const colors = [
+                'from-violet-500 to-purple-600',
+                'from-blue-400 to-cyan-500',
+                'from-emerald-400 to-teal-500',
+                'from-orange-400 to-amber-500'
+              ];
+              
+              const sortedModels = Object.entries(modelCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([name, count], index) => ({
+                  name,
+                  pct: Math.round((count / totalModels) * 100),
+                  color: colors[index % colors.length]
+                }));
+                
+              setFavoriteModels(sortedModels);
+            }
+
+            setTotalActivities(history.length);
+            
+            // Map activities
+            const mappedActivities = history.slice(0, 6).map((item: any) => {
+              let Icon = Wand2;
+              if (item.tool === 'Optimizer') Icon = Wand2;
+              else if (item.tool === 'Sandbox') Icon = Zap;
+              else if (item.tool === 'Recipe Library' || item.tool === 'Saved Recipes') Icon = BookOpen;
+              return {
+                icon: Icon,
+                color: item.color || 'bg-violet-100 text-violet-600',
+                title: item.detail || item.action,
+                time: item.time ? new Date(item.time).toLocaleString('vi-VN') : 'Gần đây',
+                tag: item.tool || 'Action'
+              };
+            });
+            if (mappedActivities.length > 0) setActivities(mappedActivities);
+
+            // Filter recent recipes
+            const recipes = history.filter((item: any) => item.action?.includes('Recipe') || item.tool?.includes('Recipe'));
+            const mappedRecipes = recipes.slice(0, 4).map((item: any) => ({
+              title: item.detail?.replace('Applied saved recipe: ', '')?.replace('Applied recipe: ', '') || 'Recipe',
+              type: 'RECIPE',
+              model: item.model || 'Unknown',
+              icon: BookOpen,
+              iconBg: 'bg-blue-50',
+              iconColor: 'text-blue-600'
+            }));
+            if (mappedRecipes.length > 0) setRecentRecipes(mappedRecipes);
+
+            // Stats
+            const recipesUsed = recipes.length;
+            const promptsOptimized = history.filter((item: any) => item.tool?.includes('Optimizer')).length;
+            const outputsVerified = history.filter((item: any) => item.action?.includes('Verify') || item.tool?.includes('Validator')).length;
+
+            // Calculate activity for the last 14 days
+            const last14Days = Array.from({length: 14}, (_, i) => {
+              const d = new Date();
+              d.setDate(d.getDate() - (13 - i));
+              return d.toISOString().split('T')[0];
+            });
+            const activityByDay: Record<string, number> = {};
+            last14Days.forEach(d => activityByDay[d] = 0);
+            
+            history.forEach((item: any) => {
+              if (item.time) {
+                const dStr = item.time.split('T')[0];
+                if (activityByDay[dStr] !== undefined) {
+                  activityByDay[dStr]++;
+                }
+              }
+            });
+            
+            const maxActivity = Math.max(...Object.values(activityByDay), 1);
+            setActivityChart(last14Days.map(d => ({
+              date: d,
+              count: activityByDay[d],
+              height: Math.max((activityByDay[d] / maxActivity) * 100, 4) // min 4% height
+            })));
+
+            // Fetch projects for stats
+            try {
+              const projRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+              const projData = await projRes.json();
+              const projects = projData.success ? projData.data.length : 0;
+              setDynamicStats({ projects, recipesUsed, promptsOptimized, outputsVerified });
+            } catch (e) {
+              setDynamicStats(prev => ({ ...prev, recipesUsed, promptsOptimized, outputsVerified }));
+            }
+
+          }
+        } catch (err) {
+          console.error('Lỗi khi tải lịch sử:', err);
+        }
+
       } catch (err) {
         console.error('Lỗi khi tải profile:', err);
       }
@@ -213,7 +329,7 @@ export default function ProfilePage() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ name, username, bio, location, website, email, birthday, avatar, cover })
+        body: JSON.stringify({ name, username, bio, location, website, email, birthday, avatar, cover, skills })
       });
       const data = await res.json();
       if (data.success) {
@@ -247,6 +363,20 @@ export default function ProfilePage() {
   };
 
   const initials = name.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase();
+
+  // Calculate badges dynamically based on user stats!
+  const earnedBadges = [];
+  earnedBadges.push({ label: 'Early Adopter', icon: Star, color: 'from-amber-400 to-orange-500', desc: 'Tham gia từ những ngày đầu (Beta)' });
+  
+  if (totalActivities >= 10) {
+    earnedBadges.push({ label: 'Active Member', icon: Zap, color: 'from-violet-500 to-purple-600', desc: 'Thực hiện hơn 10 thao tác hệ thống' });
+  }
+  if (dynamicStats.recipesUsed >= 3) {
+    earnedBadges.push({ label: 'Recipe Explorer', icon: BookOpen, color: 'from-emerald-400 to-teal-500', desc: 'Khám phá và sử dụng nhiều công thức' });
+  }
+  if (dynamicStats.promptsOptimized >= 5) {
+    earnedBadges.push({ label: 'Prompt Master', icon: TrendingUp, color: 'from-blue-400 to-cyan-500', desc: 'Chuyên gia tối ưu hóa Prompt' });
+  }
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-12">
@@ -347,7 +477,12 @@ export default function ProfilePage() {
 
       {/* ── Stats Row ───────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {STATS.map(({ label, value, icon: Icon, color, bg }) => (
+        {[
+          { label: 'Projects', value: dynamicStats.projects, icon: GitBranch, color: 'text-violet-600', bg: 'bg-violet-50' },
+          { label: 'Recipes Used', value: dynamicStats.recipesUsed, icon: BookOpen, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Prompts Optimized', value: dynamicStats.promptsOptimized, icon: Wand2, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+          { label: 'Outputs Verified', value: dynamicStats.outputsVerified, icon: ShieldCheck, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+        ].map(({ label, value, icon: Icon, color, bg }) => (
           <div key={label} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center gap-4 hover:shadow-md transition group">
             <div className={`w-11 h-11 rounded-xl ${bg} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
               <Icon className={`w-5 h-5 ${color}`} />
@@ -372,17 +507,71 @@ export default function ProfilePage() {
               <Zap className="w-4 h-4 text-violet-500" /> Kỹ năng & Chuyên môn
             </h2>
             <div className="flex flex-wrap gap-2">
-              {SKILLS.map((skill) => (
+              {skills.map((skill) => (
                 <span
                   key={skill}
-                  className="text-xs font-semibold px-3 py-1.5 rounded-full bg-gradient-to-r from-violet-50 to-indigo-50 text-violet-700 border border-violet-100 hover:from-violet-100 hover:to-indigo-100 transition cursor-default"
+                  className="group text-xs font-semibold px-3 py-1.5 rounded-full bg-gradient-to-r from-violet-50 to-indigo-50 text-violet-700 border border-violet-100 hover:from-violet-100 hover:to-indigo-100 transition cursor-default flex items-center gap-1"
                 >
                   {skill}
+                  <button 
+                    onClick={() => setSkills(skills.filter(s => s !== skill))}
+                    className="opacity-0 group-hover:opacity-100 text-violet-400 hover:text-red-500 transition-all focus:outline-none"
+                    title="Xóa kỹ năng"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
                 </span>
               ))}
-              <button className="text-xs font-semibold px-3 py-1.5 rounded-full border border-dashed border-slate-300 text-slate-400 hover:border-violet-400 hover:text-violet-600 transition">
-                + Thêm
-              </button>
+              
+              {isAddingSkill ? (
+                <div className="flex items-center gap-1">
+                  <input
+                    type="text"
+                    value={newSkill}
+                    onChange={(e) => setNewSkill(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && newSkill.trim()) {
+                        if (!skills.includes(newSkill.trim())) {
+                          setSkills([...skills, newSkill.trim()]);
+                        }
+                        setNewSkill('');
+                        setIsAddingSkill(false);
+                      } else if (e.key === 'Escape') {
+                        setNewSkill('');
+                        setIsAddingSkill(false);
+                      }
+                    }}
+                    autoFocus
+                    placeholder="Nhập kỹ năng..."
+                    className="text-xs font-semibold px-3 py-1.5 rounded-full border border-violet-300 focus:outline-none focus:ring-2 focus:ring-violet-400 w-28 bg-white"
+                  />
+                  <button 
+                    onClick={() => {
+                      if (newSkill.trim() && !skills.includes(newSkill.trim())) {
+                        setSkills([...skills, newSkill.trim()]);
+                      }
+                      setNewSkill('');
+                      setIsAddingSkill(false);
+                    }}
+                    className="p-1 rounded-full text-emerald-500 hover:bg-emerald-50 transition"
+                  >
+                    <Check className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => { setNewSkill(''); setIsAddingSkill(false); }}
+                    className="p-1 rounded-full text-slate-400 hover:bg-slate-100 transition"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => setIsAddingSkill(true)}
+                  className="text-xs font-semibold px-3 py-1.5 rounded-full border border-dashed border-slate-300 text-slate-400 hover:border-violet-400 hover:text-violet-600 transition"
+                >
+                  + Thêm
+                </button>
+              )}
             </div>
           </div>
 
@@ -392,7 +581,7 @@ export default function ProfilePage() {
               <Award className="w-4 h-4 text-amber-500" /> Thành tích
             </h2>
             <div className="space-y-3">
-              {BADGES.map(({ label, icon: Icon, color, desc }) => (
+              {earnedBadges.map(({ label, icon: Icon, color, desc }) => (
                 <div key={label} className="flex items-center gap-3 group">
                   <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform`}>
                     <Icon className="w-4 h-4 text-white" />
@@ -412,11 +601,7 @@ export default function ProfilePage() {
               <Star className="w-4 h-4 text-blue-500" /> AI Model ưa thích
             </h2>
             <div className="space-y-2.5">
-              {[
-                { name: 'Claude',  pct: 45, color: 'from-orange-400 to-amber-500' },
-                { name: 'GPT-4',   pct: 35, color: 'from-emerald-400 to-teal-500' },
-                { name: 'Gemini',  pct: 20, color: 'from-blue-400 to-cyan-500' },
-              ].map(({ name, pct, color }) => (
+              {favoriteModels.map(({ name, pct, color }) => (
                 <div key={name}>
                   <div className="flex items-center justify-between text-xs mb-1">
                     <span className="font-medium text-slate-700">{name}</span>
@@ -442,24 +627,30 @@ export default function ProfilePage() {
             <h2 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-violet-500" /> Hoạt động gần đây
             </h2>
-            {/* Mini heatmap */}
-            <div className="flex gap-1 mb-1 flex-wrap">
-              {Array.from({ length: 52 }).map((_, col) => (
-                <div key={col} className="flex flex-col gap-1">
-                  {Array.from({ length: 7 }).map((_, row) => {
-                    const intensity = Math.random();
-                    const cls =
-                      intensity > 0.85 ? 'bg-violet-600' :
-                      intensity > 0.65 ? 'bg-violet-400' :
-                      intensity > 0.4  ? 'bg-violet-200' :
-                      intensity > 0.2  ? 'bg-violet-100' :
-                                         'bg-slate-100';
-                    return <div key={row} className={`w-2.5 h-2.5 rounded-sm ${cls}`} />;
-                  })}
+            <div className="h-28 mt-4 flex items-end gap-1.5 px-1">
+              {activityChart.length > 0 ? activityChart.map((day, idx) => (
+                <div key={idx} className="flex-1 flex flex-col items-center gap-2 group relative h-full justify-end">
+                  {/* Tooltip */}
+                  <div className="absolute -top-8 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-10 pointer-events-none">
+                    {day.count} hoạt động
+                  </div>
+                  {/* Bar */}
+                  <div className="w-full bg-slate-50 rounded-t-md flex items-end h-full relative overflow-hidden">
+                    <div 
+                      className={`w-full rounded-t-md transition-all duration-700 ease-out absolute bottom-0 ${day.count > 0 ? 'bg-violet-500 group-hover:bg-violet-600' : 'bg-slate-200'}`} 
+                      style={{ height: `${day.height}%` }}
+                    />
+                  </div>
                 </div>
-              ))}
+              )) : (
+                <div className="w-full text-center text-slate-400 text-sm mt-10">Đang tải biểu đồ...</div>
+              )}
             </div>
-            <p className="text-xs text-slate-400 mt-2">137 hoạt động trong 12 tháng qua</p>
+            <div className="flex justify-between text-[10px] font-medium text-slate-400 mt-3 px-1 border-t border-slate-50 pt-2">
+              <span>14 ngày trước</span>
+              <span>Hôm nay</span>
+            </div>
+            <p className="text-xs text-slate-400 mt-2">{totalActivities} hoạt động trong 12 tháng qua</p>
           </div>
 
           {/* Activity timeline */}
@@ -471,7 +662,9 @@ export default function ProfilePage() {
               <button className="text-xs text-violet-600 hover:text-violet-800 font-semibold transition">Xem tất cả</button>
             </div>
             <div className="space-y-1">
-              {ACTIVITY.map((item, i) => {
+              {activities.length === 0 ? (
+                <div className="text-sm text-slate-500 py-4 text-center">Chưa có hoạt động nào</div>
+              ) : activities.map((item, i) => {
                 const Icon = item.icon;
                 return (
                   <div key={i} className="flex items-start gap-3 py-2.5 border-b border-slate-50 last:border-0 group hover:bg-slate-50 rounded-xl px-2 -mx-2 transition cursor-pointer">
@@ -499,12 +692,9 @@ export default function ProfilePage() {
               </h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[
-                { title: 'Debug code Python step-by-step', type: 'CODING', model: 'Claude', icon: Code2,       iconBg: 'bg-violet-50',  iconColor: 'text-violet-600' },
-                { title: 'Báo cáo môn học theo chuẩn APA', type: 'REPORT', model: 'Claude', icon: FileText,    iconBg: 'bg-blue-50',    iconColor: 'text-blue-600' },
-                { title: 'Thiết kế slide thuyết trình',    type: 'SLIDE',  model: 'Claude', icon: Presentation, iconBg: 'bg-indigo-50', iconColor: 'text-indigo-600' },
-                { title: 'Viết unit test cho function',    type: 'CODING', model: 'Gemini', icon: Code2,        iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
-              ].map((r) => {
+              {recentRecipes.length === 0 ? (
+                <div className="col-span-full text-sm text-slate-500 py-4 text-center">Chưa dùng công thức nào</div>
+              ) : recentRecipes.map((r) => {
                 const Icon = r.icon;
                 return (
                   <div key={r.title} className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:border-violet-200 hover:shadow-sm transition group cursor-pointer">
