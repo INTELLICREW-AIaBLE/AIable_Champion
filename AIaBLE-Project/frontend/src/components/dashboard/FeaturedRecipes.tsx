@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import { Code2, FileText, Presentation, LayoutGrid, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 import { RecipeCard } from './RecipeCard';
 
 const recipes = [
   {
     id: 1,
     type: 'CODING' as const,
-    bestModel: 'Claude' as const,
+    bestModel: 'Groq' as const,
     title: 'Debug code Python step-by-step',
     description: '"Bạn là senior Python engineer. Hãy review code sau, chỉ ra bug và đề xuất fix từng dòng..."',
     tab: 'coding',
@@ -17,7 +18,7 @@ const recipes = [
   {
     id: 2,
     type: 'CODING' as const,
-    bestModel: 'GPT-4' as const,
+    bestModel: 'OpenRouter' as const,
     title: 'Giải thuật toàn tử đề thi',
     description: '"Đóng vai trò mentor cho sinh viên CNTT. Hãy giải bài toán thuật toán và đưa ra giải pháp tối ưu..."',
     tab: 'coding',
@@ -25,7 +26,7 @@ const recipes = [
   {
     id: 3,
     type: 'REPORT' as const,
-    bestModel: 'Claude' as const,
+    bestModel: 'Groq' as const,
     title: 'Báo cáo môn học theo chuẩn APA',
     description: '"Soạn báo cáo theo cấu trúc IMRAD với citation chuẩn học thuật. Đảm bảo format APA đúng..."',
     tab: 'report',
@@ -33,7 +34,7 @@ const recipes = [
   {
     id: 4,
     type: 'REPORT' as const,
-    bestModel: 'GPT-4' as const,
+    bestModel: 'OpenRouter' as const,
     title: 'Tổng kết dự án phần mềm',
     description: '"Viết báo cáo tổng kết dự án theo template chuẩn với các mục: giới thiệu, kết quả, bài học..."',
     tab: 'report',
@@ -41,7 +42,7 @@ const recipes = [
   {
     id: 5,
     type: 'SLIDE' as const,
-    bestModel: 'Claude' as const,
+    bestModel: 'Groq' as const,
     title: 'Thiết kế slide thuyết trình',
     description: '"Tạo outline slide thuyết trình chuyên nghiệp với cấu trúc rõ ràng, nội dung súc tích..."',
     tab: 'slide',
@@ -85,6 +86,7 @@ const t = {
 export function FeaturedRecipes() {
   const [activeTab, setActiveTab] = useState('all');
   const [lang, setLang] = useState('vi');
+  const router = useRouter();
 
   useEffect(() => {
     setLang(localStorage.getItem('app_lang') || 'vi');
@@ -99,7 +101,16 @@ export function FeaturedRecipes() {
 
   const text = t[lang as 'en' | 'vi'] || t.vi;
 
-  const filtered = activeTab === 'all' ? recipes : recipes.filter((r) => r.tab === activeTab);
+  const filtered =
+    activeTab === 'all'
+      ? recipes
+      : recipes.filter((r) => r.tab === activeTab);
+
+  const handleApplyRecipe = (prompt: any, bestModel: any) => {
+    sessionStorage.setItem('optimizer_prefill', prompt);
+    sessionStorage.setItem('optimizer_prefill_AI', bestModel);
+    router.push('/optimizer');
+  };
 
   return (
     <section>
@@ -135,13 +146,17 @@ export function FeaturedRecipes() {
             bestModel={recipe.bestModel}
             title={recipe.title}
             description={recipe.description}
+            onApply={() => handleApplyRecipe(recipe.description, recipe.bestModel)}
           />
         ))}
       </div>
 
       {/* View all link */}
       <div className="mt-4">
-        <button className="flex items-center gap-1 text-xs font-medium text-violet-600 hover:text-violet-800 transition">
+        <button
+          onClick={() => router.push('/recipes')}
+          className="flex items-center gap-1 text-xs font-medium text-violet-600 hover:text-violet-800 transition"
+        >
           {text.viewAll}
           <ArrowRight className="w-3 h-3" />
         </button>

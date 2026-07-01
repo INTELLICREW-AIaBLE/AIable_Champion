@@ -11,15 +11,12 @@ import {
   FileText,
   Presentation,
   FlaskConical,
-  Target,
-  Languages,
   Search,
   Filter,
-  ArrowRight,
 } from 'lucide-react';
 
-export type RecipeCategory = 'REPORT' | 'REPORT' | 'SLIDE' | 'RESEARCH';
-export type AIProvider = 'ChatGPT' | 'Claude' | 'Gemini';
+export type RecipeCategory = 'CODING' | 'REPORT' | 'SLIDE' | 'RESEARCH';
+export type AIProvider = 'OpenRouter' | 'Groq' | 'Gemini';
 
 type Recipe = {
   id: string;
@@ -96,6 +93,13 @@ function RecipeCard({
 
   const Icon = categoryIcons[recipe.category] ?? BookOpen;
 
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(recipe.prompt);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <article className="group rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-100 hover:shadow-md hover:shadow-violet-100/60">
       <div className="mb-3 flex items-center gap-2">
@@ -103,7 +107,7 @@ function RecipeCard({
           className={cn(
             'inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-semibold capitalize',
             categoryStyles[recipe.category] ??
-              'bg-slate-50 text-slate-600 border-slate-100'
+            'bg-slate-50 text-slate-600 border-slate-100'
           )}
         >
           <Icon className="h-3 w-3" />
@@ -129,7 +133,7 @@ function RecipeCard({
         <button
           type="button"
           className="inline-flex items-center gap-1 rounded-md border border-slate-100 px-2.5 py-1.5 text-[11px] font-medium text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
-        >
+          onClick={handleCopy}>
           <Copy className="h-3 w-3" />
           {text.copy}
         </button>
@@ -190,14 +194,15 @@ export default function RecipeLibraryPage() {
 
   const handleApplyRecipe = (recipe: Recipe) => {
     sessionStorage.setItem('optimizer_prefill', recipe.prompt);
+    sessionStorage.setItem('optimizer_prefill_AI', recipe.bestAI);
     router.push('/optimizer');
   };
 
   const filteredRecipes = recipes.filter(r => {
     const matchCategory = activeCategory === 'All' || r.category.toLowerCase() === activeCategory.toLowerCase();
-    const matchSearch = r.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                        r.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        (r.tags && r.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
+    const matchSearch = r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      r.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (r.tags && r.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
     const matchAi = aiFilter === 'All' || r.bestAI === aiFilter;
 
     return matchCategory && matchSearch && matchAi;
@@ -222,8 +227,8 @@ export default function RecipeLibraryPage() {
         <div className="flex items-center gap-2 relative">
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-slate-200 shadow-sm text-sm text-slate-700 w-64 focus-within:border-violet-500 focus-within:ring-2 focus-within:ring-violet-200 transition-all">
             <Search className="w-4 h-4 text-slate-400" />
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder={text.searchPlaceholder}
               className="bg-transparent border-none outline-none w-full placeholder:text-slate-400"
               value={searchQuery}
@@ -231,22 +236,21 @@ export default function RecipeLibraryPage() {
             />
           </div>
 
-          <button 
+          <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-semibold transition ${
-              showFilters || aiFilter !== 'All' 
-                ? 'bg-violet-50 border-violet-200 text-violet-700' 
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-semibold transition ${showFilters || aiFilter !== 'All'
+                ? 'bg-violet-50 border-violet-200 text-violet-700'
                 : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-            }`}
+              }`}
           >
             <Filter className="w-4 h-4" />
             {text.filter} {aiFilter !== 'All' && <span className="bg-violet-600 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1">1</span>}
           </button>
-          
+
           {showFilters && (
             <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 p-2 z-10">
-              <p className="text-xs font-bold text-slate-500 px-2 py-1 mb-1">{text.filterTitle}</p>
-              {['All', 'ChatGPT', 'Claude', 'Gemini'].map(ai => (
+              <p className="text-xs font-bold text-slate-500 px-2 py-1 mb-1">Tối ưu cho mô hình AI:</p>
+              {['All', 'OpenRouter', 'Groq', 'Gemini'].map(ai => (
                 <button
                   key={ai}
                   onClick={() => { setAiFilter(ai as any); setShowFilters(false); }}
