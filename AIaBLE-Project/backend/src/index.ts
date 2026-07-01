@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import dotenv from 'dotenv';
 import { errorHandler } from './middleware/errorHandler';
 import { callGemini } from './services/gemini';
@@ -17,6 +18,17 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Compression middleware - compress all responses
+app.use(compression({
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    return compression.filter(req, res);
+  },
+  level: 6 // Balance between speed and compression ratio
+}));
 
 // Middlewares
 app.use(cors({

@@ -10,6 +10,7 @@ import {
   Wand2, GitBranch, ShieldCheck, Code2, FileText, Presentation, Home,
   Sparkles, Keyboard, Moon,
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 // ─── Search Data ──────────────────────────────────────────────────────────────
 type SearchCategory = 'page' | 'tool' | 'recipe';
@@ -25,28 +26,28 @@ interface SearchItem {
 
 const SEARCH_DATA: SearchItem[] = [
   // Pages
-  { id: 'home',         category: 'page',   label: 'Home',             description: 'Trang chủ dashboard',               href: '/home',         icon: Home },
-  { id: 'projects',     category: 'page',   label: 'Projects',         description: 'Quản lý dự án của bạn',             href: '/projects',     icon: FolderOpen },
-  { id: 'settings',     category: 'page',   label: 'Settings',         description: 'Cài đặt tài khoản',                 href: '/settings',     icon: Settings },
-  { id: 'profile',      category: 'page',   label: 'Profile',          description: 'Thông tin cá nhân',                 href: '/profile',      icon: User },
+  { id: 'home', category: 'page', label: 'Home', description: 'Trang chủ dashboard', href: '/home', icon: Home },
+  { id: 'projects', category: 'page', label: 'Projects', description: 'Quản lý dự án của bạn', href: '/projects', icon: FolderOpen },
+  { id: 'settings', category: 'page', label: 'Settings', description: 'Cài đặt tài khoản', href: '/settings', icon: Settings },
+  { id: 'profile', category: 'page', label: 'Profile', description: 'Thông tin cá nhân', href: '/profile', icon: User },
   // Tools
-  { id: 'optimizer',    category: 'tool',   label: 'Optimize Prompt',  description: 'Tối ưu hoá raw prompts của bạn',    href: '/optimizer',    icon: Wand2 },
-  { id: 'task-matcher', category: 'tool',   label: 'Match Task',       description: 'Ghép task với AI workflow phù hợp', href: '/task-matcher', icon: GitBranch },
-  { id: 'validator',    category: 'tool',   label: 'Verify Output',    description: 'Kiểm tra kết quả AI với nguồn',     href: '/validator',    icon: ShieldCheck },
-  { id: 'sandbox',      category: 'tool',   label: 'AI Sandbox',       description: 'So sánh kết quả từ nhiều model AI', href: '/sandbox',      icon: Sparkles },
-  { id: 'recipes-all',  category: 'tool',   label: 'Browse Recipes',   description: 'Khám phá thư viện AI Recipe',       href: '/recipes',      icon: BookOpen },
+  { id: 'optimizer', category: 'tool', label: 'Optimize Prompt', description: 'Tối ưu hoá raw prompts của bạn', href: '/optimizer', icon: Wand2 },
+  { id: 'task-matcher', category: 'tool', label: 'Match Task', description: 'Ghép task với AI workflow phù hợp', href: '/task-matcher', icon: GitBranch },
+  { id: 'validator', category: 'tool', label: 'Verify Output', description: 'Kiểm tra kết quả AI với nguồn', href: '/validator', icon: ShieldCheck },
+  { id: 'sandbox', category: 'tool', label: 'AI Sandbox', description: 'So sánh kết quả từ nhiều model AI', href: '/sandbox', icon: Sparkles },
+  { id: 'recipes-all', category: 'tool', label: 'Browse Recipes', description: 'Khám phá thư viện AI Recipe', href: '/recipes', icon: BookOpen },
   // Recipes
-  { id: 'r1', category: 'recipe', label: 'Debug code Python step-by-step', description: 'Coding · Best: Claude', href: '/recipes', icon: Code2,        tag: 'CODING' },
-  { id: 'r2', category: 'recipe', label: 'Giải thuật toàn tử đề thi',      description: 'Coding · Best: GPT-4',  href: '/recipes', icon: Code2,        tag: 'CODING' },
-  { id: 'r3', category: 'recipe', label: 'Báo cáo môn học theo chuẩn APA', description: 'Report · Best: Claude', href: '/recipes', icon: FileText,     tag: 'REPORT' },
-  { id: 'r4', category: 'recipe', label: 'Tổng kết dự án phần mềm',        description: 'Report · Best: GPT-4',  href: '/recipes', icon: FileText,     tag: 'REPORT' },
-  { id: 'r5', category: 'recipe', label: 'Thiết kế slide thuyết trình',    description: 'Slide · Best: Claude',  href: '/recipes', icon: Presentation, tag: 'SLIDE' },
-  { id: 'r6', category: 'recipe', label: 'Viết unit test cho function',    description: 'Coding · Best: Gemini', href: '/recipes', icon: Code2,        tag: 'CODING' },
+  { id: 'r1', category: 'recipe', label: 'Debug code Python step-by-step', description: 'Coding · Best: Claude', href: '/recipes', icon: Code2, tag: 'CODING' },
+  { id: 'r2', category: 'recipe', label: 'Giải thuật toàn tử đề thi', description: 'Coding · Best: GPT-4', href: '/recipes', icon: Code2, tag: 'CODING' },
+  { id: 'r3', category: 'recipe', label: 'Báo cáo môn học theo chuẩn APA', description: 'Report · Best: Claude', href: '/recipes', icon: FileText, tag: 'REPORT' },
+  { id: 'r4', category: 'recipe', label: 'Tổng kết dự án phần mềm', description: 'Report · Best: GPT-4', href: '/recipes', icon: FileText, tag: 'REPORT' },
+  { id: 'r5', category: 'recipe', label: 'Thiết kế slide thuyết trình', description: 'Slide · Best: Claude', href: '/recipes', icon: Presentation, tag: 'SLIDE' },
+  { id: 'r6', category: 'recipe', label: 'Viết unit test cho function', description: 'Coding · Best: Gemini', href: '/recipes', icon: Code2, tag: 'CODING' },
 ];
 
 const CATEGORY_LABEL: Record<SearchCategory, string> = {
-  page:   'Trang',
-  tool:   'Công cụ',
+  page: 'Trang',
+  tool: 'Công cụ',
   recipe: 'Recipes',
 };
 
@@ -72,37 +73,37 @@ function NeuralNetDot({ cx, cy, r = 3.5, opacity = 1 }: { cx: number; cy: number
 function NeuralNetworkDecor({ flip = false }: { flip?: boolean }) {
   return (
     <svg width="180" height="48" viewBox="0 0 180 48" className="opacity-25 select-none" style={{ transform: flip ? 'scaleX(-1)' : undefined }}>
-      <line x1="8"   y1="24" x2="40"  y2="8"  stroke="#8B5CF6" strokeWidth="1" />
-      <line x1="8"   y1="24" x2="40"  y2="40" stroke="#8B5CF6" strokeWidth="1" />
-      <line x1="40"  y1="8"  x2="90"  y2="24" stroke="#8B5CF6" strokeWidth="1" />
-      <line x1="40"  y1="40" x2="90"  y2="24" stroke="#8B5CF6" strokeWidth="1" />
-      <line x1="90"  y1="24" x2="140" y2="8"  stroke="#8B5CF6" strokeWidth="1" />
-      <line x1="90"  y1="24" x2="140" y2="40" stroke="#8B5CF6" strokeWidth="1" />
-      <line x1="140" y1="8"  x2="172" y2="24" stroke="#8B5CF6" strokeWidth="1" />
+      <line x1="8" y1="24" x2="40" y2="8" stroke="#8B5CF6" strokeWidth="1" />
+      <line x1="8" y1="24" x2="40" y2="40" stroke="#8B5CF6" strokeWidth="1" />
+      <line x1="40" y1="8" x2="90" y2="24" stroke="#8B5CF6" strokeWidth="1" />
+      <line x1="40" y1="40" x2="90" y2="24" stroke="#8B5CF6" strokeWidth="1" />
+      <line x1="90" y1="24" x2="140" y2="8" stroke="#8B5CF6" strokeWidth="1" />
+      <line x1="90" y1="24" x2="140" y2="40" stroke="#8B5CF6" strokeWidth="1" />
+      <line x1="140" y1="8" x2="172" y2="24" stroke="#8B5CF6" strokeWidth="1" />
       <line x1="140" y1="40" x2="172" y2="24" stroke="#8B5CF6" strokeWidth="1" />
-      <NeuralNetDot cx={8}   cy={24} r={4}   />
-      <NeuralNetDot cx={40}  cy={8}  r={3.5} />
-      <NeuralNetDot cx={40}  cy={40} r={3.5} />
-      <NeuralNetDot cx={90}  cy={24} r={5}   />
-      <NeuralNetDot cx={140} cy={8}  r={3.5} />
+      <NeuralNetDot cx={8} cy={24} r={4} />
+      <NeuralNetDot cx={40} cy={8} r={3.5} />
+      <NeuralNetDot cx={40} cy={40} r={3.5} />
+      <NeuralNetDot cx={90} cy={24} r={5} />
+      <NeuralNetDot cx={140} cy={8} r={3.5} />
       <NeuralNetDot cx={140} cy={40} r={3.5} />
-      <NeuralNetDot cx={172} cy={24} r={4}   />
-      <NeuralNetDot cx={25}  cy={14} r={2}   opacity={0.6} />
-      <NeuralNetDot cx={60}  cy={35} r={2}   opacity={0.6} />
-      <NeuralNetDot cx={115} cy={14} r={2}   opacity={0.6} />
-      <NeuralNetDot cx={158} cy={38} r={2}   opacity={0.5} />
+      <NeuralNetDot cx={172} cy={24} r={4} />
+      <NeuralNetDot cx={25} cy={14} r={2} opacity={0.6} />
+      <NeuralNetDot cx={60} cy={35} r={2} opacity={0.6} />
+      <NeuralNetDot cx={115} cy={14} r={2} opacity={0.6} />
+      <NeuralNetDot cx={158} cy={38} r={2} opacity={0.5} />
     </svg>
   );
 }
 
 // ─── User menu items ──────────────────────────────────────────────────────────
 const menuItems = [
-  { icon: User,     label: 'Thông tin cá nhân', href: '/profile',       dividerAfter: false },
-  { icon: Bell,     label: 'Thông báo',          href: '/notifications', dividerAfter: false },
-  { icon: Sparkles, label: "What's New",          href: '/changelog',    dividerAfter: false },
-  { icon: Settings, label: 'Cài đặt',             href: '/settings',     dividerAfter: true  },
-  { icon: Keyboard, label: 'Phím tắt',            href: '/shortcuts',    dividerAfter: false },
-  { icon: HelpCircle, label: 'Trợ giúp',          href: '/help',         dividerAfter: false },
+  { icon: User, label: 'Thông tin cá nhân', href: '/profile', dividerAfter: false },
+  { icon: Bell, label: 'Thông báo', href: '/notifications', dividerAfter: false },
+  { icon: Sparkles, label: "What's New", href: '/changelog', dividerAfter: false },
+  { icon: Settings, label: 'Cài đặt', href: '/settings', dividerAfter: true },
+  { icon: Keyboard, label: 'Phím tắt', href: '/shortcuts', dividerAfter: false },
+  { icon: HelpCircle, label: 'Trợ giúp', href: '/help', dividerAfter: false },
 ];
 
 // ─── AppNavbar ────────────────────────────────────────────────────────────────
@@ -114,54 +115,23 @@ export function AppNavbar() {
   const avatarRef = useRef<HTMLDivElement>(null);
 
   // User Profile
-  const [userProfile, setUserProfile] = useState({
-    name: 'User',
-    email: 'user@alable.edu.vn',
-    avatar: ''
-  });
-
-  const fetchProfile = useCallback(async () => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.success && data.data) {
-        setUserProfile({
-          name: data.data.name || 'User',
-          email: data.data.email || 'user@alable.edu.vn',
-          avatar: data.data.avatar || ''
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchProfile();
-    window.addEventListener('profileUpdated', fetchProfile);
-    return () => window.removeEventListener('profileUpdated', fetchProfile);
-  }, [fetchProfile]);
-
+  const { userProfile, loading: profileLoading } = useAuth();
   const initials = userProfile.name.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase() || 'U';
 
   // Search
-  const [query, setQuery]           = useState('');
+  const [query, setQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
-  const [activeIdx, setActiveIdx]   = useState(-1);
-  const searchRef                   = useRef<HTMLDivElement>(null);
-  const inputRef                    = useRef<HTMLInputElement>(null);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const results = query.trim().length === 0
     ? []
     : SEARCH_DATA.filter(
-        (item) =>
-          item.label.toLowerCase().includes(query.toLowerCase()) ||
-          item.description?.toLowerCase().includes(query.toLowerCase())
-      );
+      (item) =>
+        item.label.toLowerCase().includes(query.toLowerCase()) ||
+        item.description?.toLowerCase().includes(query.toLowerCase())
+    );
 
   const grouped = (['page', 'tool', 'recipe'] as SearchCategory[])
     .map((cat) => ({ cat, items: results.filter((r) => r.category === cat) }))
@@ -282,22 +252,20 @@ export function AppNavbar() {
                         </p>
                         {items.map((item) => {
                           const globalIdx = results.indexOf(item);
-                          const isActive  = globalIdx === activeIdx;
-                          const Icon      = item.icon;
+                          const isActive = globalIdx === activeIdx;
+                          const Icon = item.icon;
                           return (
                             <button
                               key={item.id}
                               onMouseDown={() => selectItem(item)}
                               onMouseEnter={() => setActiveIdx(globalIdx)}
-                              className={`w-full flex items-center gap-3 px-4 py-2 text-left transition group ${
-                                isActive ? 'bg-violet-50' : 'hover:bg-slate-50'
-                              }`}
+                              className={`w-full flex items-center gap-3 px-4 py-2 text-left transition group ${isActive ? 'bg-violet-50' : 'hover:bg-slate-50'
+                                }`}
                             >
-                              <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition ${
-                                isActive
-                                  ? 'bg-violet-600 text-white'
-                                  : 'bg-slate-100 text-slate-500 group-hover:bg-violet-100 group-hover:text-violet-600'
-                              }`}>
+                              <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition ${isActive
+                                ? 'bg-violet-600 text-white'
+                                : 'bg-slate-100 text-slate-500 group-hover:bg-violet-100 group-hover:text-violet-600'
+                                }`}>
                                 <Icon className="w-3.5 h-3.5" />
                               </div>
                               <div className="min-w-0 flex-1">
@@ -343,7 +311,7 @@ export function AppNavbar() {
               aria-expanded={avatarOpen}
             >
               <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-violet-200 ring-2 ring-white group-hover:ring-violet-200 transition overflow-hidden bg-cover bg-center ignore-dark-mode"
-                   style={userProfile.avatar ? { backgroundImage: `url(${userProfile.avatar})` } : {}}>
+                style={userProfile.avatar ? { backgroundImage: `url(${userProfile.avatar})` } : {}}>
                 {!userProfile.avatar && initials}
               </div>
               <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${avatarOpen ? 'rotate-180' : ''}`} />
@@ -354,7 +322,7 @@ export function AppNavbar() {
                 <div className="px-4 py-3 border-b border-slate-100 mb-1">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden bg-cover bg-center ignore-dark-mode"
-                         style={userProfile.avatar ? { backgroundImage: `url(${userProfile.avatar})` } : {}}>
+                      style={userProfile.avatar ? { backgroundImage: `url(${userProfile.avatar})` } : {}}>
                       {!userProfile.avatar && initials}
                     </div>
                     <div className="min-w-0">

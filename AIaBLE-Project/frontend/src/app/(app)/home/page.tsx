@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { Wand2, GitBranch, BookOpen, ShieldCheck, Settings, Sparkles, Plus, Zap } from 'lucide-react';
 import { QuickAccessCard } from '@/components/dashboard/QuickAccessCard';
 import { FeaturedRecipes } from '@/components/dashboard/FeaturedRecipes';
 import { RecentProjects } from '@/components/dashboard/RecentProjects';
+import { useAuth } from '@/hooks/useAuth';
 
 const quickAccessItems = [
   {
@@ -66,32 +66,9 @@ function getFirstName(fullName: string): string {
 }
 
 export default function Home() {
-  const [userName, setUserName] = useState('');
+  const { userProfile, loading } = useAuth();
 
-  const fetchProfile = useCallback(async () => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const data = await res.json();
-      if (data.success && data.data?.name) {
-        setUserName(data.data.name);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchProfile();
-    window.addEventListener('profileUpdated', fetchProfile);
-    return () => window.removeEventListener('profileUpdated', fetchProfile);
-  }, [fetchProfile]);
-
-  const displayName = userName ? getFirstName(userName) : null;
+  const displayName = !loading && userProfile.name !== 'User' ? getFirstName(userProfile.name) : null;
 
   return (
     <div className="relative min-h-full">

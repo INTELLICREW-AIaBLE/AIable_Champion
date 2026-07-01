@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { callGemini } from '../services/gemini';
-import { callGPT4 } from '../services/openai';
-import { callClaude } from '../services/claude';
+import { callGemini, callGeminiStream } from '../services/gemini';
+import { callGPT4, callGPT4Stream } from '../services/openai';
+import { callClaude, callClaudeStream } from '../services/claude';
 
 // POST /api/sandbox
 export const runSandboxModel = async (req: Request, res: Response) => {
-  const { prompt, model } = req.body;
+  const { prompt, model, stream } = req.body;
 
   if (!prompt || !model) {
     return res.status(400).json({
@@ -14,6 +14,53 @@ export const runSandboxModel = async (req: Request, res: Response) => {
     });
   }
 
+  // Handle streaming response
+  if (stream === true) {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    try {
+      let fullText = '';
+
+      const onChunk = (chunk: string) => {
+        fullText += chunk;
+        res.write(`data: ${JSON.stringify({ type: 'chunk', content: chunk })}\n\n`);
+      };
+
+      if (model === 'Gemini') {
+        await callGeminiStream(prompt, undefined, onChunk);
+      } else if (model === 'Claude') {
+        if (process.env.CLAUDE_API_KEY) {
+          await callClaudeStream(prompt, onChunk);
+        } else {
+          const claudePrompt = `Bạn là Claude, một AI được phát triển bởi Anthropic. Bạn nổi tiếng với phong cách viết văn tự nhiên, chi tiết, cẩn thận và thấu cảm. Hãy trả lời câu hỏi sau bằng phong cách của Claude:\n\n${prompt}`;
+          await callGeminiStream(claudePrompt, undefined, onChunk);
+        }
+      } else if (model === 'GPT-4') {
+        if (process.env.OPENAI_API_KEY) {
+          await callGPT4Stream(prompt, onChunk);
+        } else {
+          const gptPrompt = `Bạn là ChatGPT (GPT-4), một AI của OpenAI. Bạn nổi tiếng với phong cách viết logic, cấu trúc cực kỳ chặt chẽ, thẳng thắn và tập trung vào giải quyết vấn đề. Hãy trả lời câu hỏi sau bằng phong cách của GPT-4:\n\n${prompt}`;
+          await callGeminiStream(gptPrompt, undefined, onChunk);
+        }
+      } else {
+        res.write(`data: ${JSON.stringify({ type: 'error', message: 'Model không được hỗ trợ' })}\n\n`);
+        res.end();
+        return;
+      }
+
+      res.write(`data: ${JSON.stringify({ type: 'complete', fullText })}\n\n`);
+      res.end();
+    } catch (error: any) {
+      console.warn(`[Sandbox Stream Error - Model ${model}]:`, error.message);
+      res.write(`data: ${JSON.stringify({ type: 'error', message: error.message })}\n\n`);
+      res.end();
+    }
+    return;
+  }
+
+  // Normal JSON response (non-streaming)
   try {
     let result = '';
 
@@ -43,7 +90,7 @@ export const runSandboxModel = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.warn(`[Sandbox API Error - Model ${model} - Using Fallback Simulator]:`, error.message);
-    
+
     // Fallback static responses based on model style
     let fallbackText = '';
     if (model === 'Gemini') {
