@@ -92,3 +92,77 @@ export const updateProfile = (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: 'Lỗi server khi cập nhật profile' });
   }
 };
+
+export const getHistory = (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+    const users = readUsers();
+    const user = users.find(u => u.id === userId);
+    if (!user) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
+    res.json({ success: true, data: user.history || [] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+};
+
+export const addHistory = (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+    const { action, tool, detail, model } = req.body;
+    const users = readUsers();
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
+    
+    if (!users[userIndex].history) users[userIndex].history = [];
+    const newItem = {
+      id: Date.now().toString(),
+      action, tool, detail, model,
+      time: new Date().toISOString()
+    };
+    users[userIndex].history.unshift(newItem);
+    // Keep max 50 history items
+    if (users[userIndex].history.length > 50) {
+      users[userIndex].history = users[userIndex].history.slice(0, 50);
+    }
+    writeUsers(users);
+    res.json({ success: true, data: newItem });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+};
+
+export const getSavedRecipes = (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+    const users = readUsers();
+    const user = users.find(u => u.id === userId);
+    if (!user) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
+    res.json({ success: true, data: user.savedRecipes || [] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+};
+
+export const toggleSavedRecipe = (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+    const { recipe } = req.body;
+    const users = readUsers();
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
+    
+    if (!users[userIndex].savedRecipes) users[userIndex].savedRecipes = [];
+    const existingIndex = users[userIndex].savedRecipes.findIndex((r: any) => r.id === recipe.id);
+    
+    if (existingIndex > -1) {
+      users[userIndex].savedRecipes.splice(existingIndex, 1);
+    } else {
+      users[userIndex].savedRecipes.unshift(recipe);
+    }
+    
+    writeUsers(users);
+    res.json({ success: true, message: 'Đã cập nhật danh sách lưu' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+};
