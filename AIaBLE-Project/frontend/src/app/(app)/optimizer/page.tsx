@@ -179,15 +179,24 @@ export default function OptimizerPage() {
   const [activeView, setActiveView] = useState<'split' | 'before' | 'after'>('split');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    const prefill = sessionStorage.getItem('optimizer_prefill');
+        useEffect(() => {
+          const prefill = sessionStorage.getItem('optimizer_prefill');
+          const prefillAI = sessionStorage.getItem('optimizer_prefill_AI') as AIModel | null;
 
-    if (prefill) {
-      setRaw(prefill);
-      sessionStorage.removeItem('optimizer_prefill');
-    }
-  }, []);
+          if (prefill) {
+            setRaw(prefill);
+            sessionStorage.removeItem('optimizer_prefill');
+          }
 
+          if (
+            prefillAI &&
+            ['Groq', 'OpenRouter', 'Gemini'].includes(prefillAI)
+          ) {
+            setModel(prefillAI);
+            sessionStorage.removeItem('optimizer_prefill_AI');
+          }
+        }, []);
+  
   const charCount = raw.length;
   const wordCount = raw.trim() ? raw.trim().split(/\s+/).length : 0;
   const canOptimize = raw.trim().length >= 10 && !loading;
