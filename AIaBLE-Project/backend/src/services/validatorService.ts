@@ -58,7 +58,7 @@ ${text.trim()}
 
   const genAI = new GoogleGenerativeAI(activeKey);
   const model = genAI.getGenerativeModel({
-    model: 'gemini-3.5-flash',
+    model: 'gemini-3.1-flash-lite',
     generationConfig: { responseMimeType: 'application/json' },
   });
 
@@ -112,7 +112,7 @@ Rules:
 
     try {
       const analyzeModel = genAI.getGenerativeModel({
-        model: 'gemini-3.5-flash',
+        model: 'gemini-3.1-flash-lite',
         generationConfig: { responseMimeType: 'application/json' },
       });
       const analyzeResult = await analyzeModel.generateContent(analyzePrompt);

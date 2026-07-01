@@ -49,7 +49,7 @@ const quickAccessItems = [
   },
   {
     title: 'AI Sandbox',
-    description: 'Compare outputs from Claude, GPT-4, and Gemini.',
+    description: 'Compare outputs from Groq, OpenRouter, and Gemini.',
     icon: <Sparkles className="w-5 h-5" />,
     decorIcon: <Sparkles className="w-10 h-10" />,
     iconBg: 'bg-fuchsia-100',

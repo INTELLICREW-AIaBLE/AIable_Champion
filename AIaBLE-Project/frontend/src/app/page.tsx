@@ -202,7 +202,7 @@ export default function LandingPage() {
             <h4 className="text-lg font-bold text-slate-900 mb-2">Personal Sandbox</h4>
             <p className="text-xs text-slate-400 mb-3 font-semibold uppercase tracking-wider">Features 6 (Expansion)</p>
             <p className="text-xs text-slate-500 leading-relaxed flex-1 mb-4">
-              A multi-model playground. Run a single optimized prompt across **Claude, Gemini, and GPT-4** side-by-side to compare output quality.
+              A multi-model playground. Run a single optimized prompt across **Groq, Gemini, and OpenRouter** side-by-side to compare output quality.
             </p>
             <Link href="/login" className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 group-hover:gap-2 transition-all">
               Try Sandbox <ChevronRight className="w-3.5 h-3.5" />

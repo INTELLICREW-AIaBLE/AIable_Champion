@@ -9,7 +9,7 @@ import {
 import Image from 'next/image';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type AIModel = 'Claude' | 'GPT-4' | 'Gemini';
+type AIModel = 'Groq' | 'OpenRouter' | 'Gemini';
 type ToneType = 'academic' | 'technical' | 'creative' | 'concise';
 
 interface OptimizeResult {
@@ -22,8 +22,8 @@ interface OptimizeResult {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const AI_MODELS: { id: AIModel; label: string; badge: string; color: string; logo: string }[] = [
-  { id: 'Claude', label: 'Claude', badge: 'Best for writing', color: 'from-orange-400 to-amber-500', logo: '/claude.png' },
-  { id: 'GPT-4', label: 'GPT-4', badge: 'Best for coding', color: 'from-emerald-400 to-teal-500', logo: '/chatgpt.png' },
+  { id: 'Groq', label: 'Groq', badge: 'Best for writing', color: 'from-orange-400 to-amber-500', logo: '/groq.svg' },
+  { id: 'OpenRouter', label: 'OpenRouter', badge: 'Best for coding', color: 'from-emerald-400 to-teal-500', logo: '/openrouter.svg' },
   { id: 'Gemini', label: 'Gemini', badge: 'Best for analysis', color: 'from-blue-400 to-cyan-500', logo: '/gemini.png' },
 ];
 
@@ -171,7 +171,7 @@ function EthicsDialog({ reason, onDismiss }: { reason: string; onDismiss: () => 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function OptimizerPage() {
   const [raw, setRaw] = useState('');
-  const [model, setModel] = useState<AIModel>('Claude');
+  const [model, setModel] = useState<AIModel>('Groq');
   const [tone, setTone] = useState<ToneType>('academic');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<OptimizeResult | null>(null);

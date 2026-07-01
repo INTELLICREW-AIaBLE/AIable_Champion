@@ -32,7 +32,7 @@ You are a master Prompt Engineer specializing in academic and student tasks.
 Your job is to analyze a raw prompt from a student, check it for academic integrity/ethics, and optimize it into a highly professional structured prompt.
 
 Tone context: "${tone}" (academic, technical, creative, or concise).
-Target Model: "${modelName}" (Claude, GPT-4, or Gemini).
+Target Model: "${modelName}" (Groq, OpenRouter, or Gemini).
 
 1. OPTIMIZATION FRAMEWORK:
 Rewrite the raw prompt into a structured format containing:
@@ -76,7 +76,7 @@ Return ONLY a valid JSON object matching this schema:
 
     const dynamicGenAI = new GoogleGenerativeAI(activeKey);
     const model = dynamicGenAI.getGenerativeModel({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.1-flash-lite',
       generationConfig: {
         responseMimeType: 'application/json',
       },

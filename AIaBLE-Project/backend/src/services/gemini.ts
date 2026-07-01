@@ -35,7 +35,7 @@ export const callGemini = async (prompt: string, userKey?: string): Promise<stri
     }
 
     const dynamicGenAI = new GoogleGenerativeAI(activeKey);
-    const model = dynamicGenAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
+    const model = dynamicGenAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite' });
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -73,7 +73,7 @@ export const callGeminiStream = async (
     }
 
     const dynamicGenAI = new GoogleGenerativeAI(activeKey);
-    const model = dynamicGenAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
+    const model = dynamicGenAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite' });
 
     const result = await model.generateContentStream(prompt);
     let fullText = '';

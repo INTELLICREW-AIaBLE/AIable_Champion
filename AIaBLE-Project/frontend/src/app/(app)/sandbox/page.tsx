@@ -7,7 +7,7 @@ import {
   Zap, Settings2, Info, ChevronDown 
 } from 'lucide-react';
 
-type AIModel = 'Claude' | 'GPT-4' | 'Gemini';
+type AIModel = 'Groq' | 'OpenRouter' | 'Gemini';
 
 interface ModelResult {
   model: AIModel;
@@ -19,9 +19,9 @@ interface ModelResult {
 }
 
 const INITIAL_MODELS: ModelResult[] = [
-  { model: 'Claude', content: '', status: 'idle', color: 'from-orange-400 to-amber-500', logo: '/claude.png' },
-  { model: 'GPT-4',  content: '', status: 'idle', color: 'from-emerald-400 to-teal-500', logo: '/chatgpt.png' },
-  { model: 'Gemini', content: '', status: 'idle', color: 'from-blue-400 to-cyan-500',    logo: '/gemini.png' },
+  { model: 'Groq',       content: '', status: 'idle', color: 'from-orange-400 to-amber-500', logo: '/groq.svg' },
+  { model: 'OpenRouter', content: '', status: 'idle', color: 'from-emerald-400 to-teal-500', logo: '/openrouter.svg' },
+  { model: 'Gemini',     content: '', status: 'idle', color: 'from-blue-400 to-cyan-500',    logo: '/gemini.png' },
 ];
 
 const EXAMPLE_PROMPTS = [
@@ -133,8 +133,8 @@ export default function SandboxPage() {
 
     // Chạy tuần tự cách nhau 1.5s để Google không chặn do gọi quá nhiều request cùng 1 lúc (Rate Limit)
     Promise.all([
-      runModel(0, 'Claude', 0),
-      runModel(1, 'GPT-4', 1500),
+      runModel(0, 'Groq', 0),
+      runModel(1, 'OpenRouter', 1500),
       runModel(2, 'Gemini', 3000)
     ]).then(() => {
       setIsRunning(false);
@@ -160,7 +160,7 @@ export default function SandboxPage() {
             <h1 className="text-2xl font-black text-slate-900">AI Sandbox</h1>
           </div>
           <p className="text-sm text-slate-500">
-            Kiểm thử và so sánh kết quả trực tiếp từ nhiều mô hình AI (Claude, GPT-4, Gemini) cùng một lúc.
+            Kiểm thử và so sánh kết quả trực tiếp từ nhiều mô hình AI (Groq, OpenRouter, Gemini) cùng một lúc.
           </p>
         </div>
         <div className="flex gap-2">
