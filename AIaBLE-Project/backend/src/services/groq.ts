@@ -33,7 +33,7 @@ export const callGroq = async (
 
   try {
     // Check cache
-    const cacheKey = prompt.substring(0, 200);
+    const cacheKey = prompt;
     const cached = cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
       console.log('[Groq Cache Hit]');
