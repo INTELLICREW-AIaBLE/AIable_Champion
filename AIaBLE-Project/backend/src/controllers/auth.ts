@@ -23,7 +23,34 @@ const writeUsers = (users: any[]) => {
   fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
 };
 
-export const register = (req: Request, res: Response) => {
+// Helper to verify Turnstile token
+const verifyTurnstile = async (token: string): Promise<boolean> => {
+  if (!token) return false;
+  try {
+    const SECRET_KEY = process.env.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000AA';
+    
+    // Cloudflare validation requires x-www-form-urlencoded
+    const formData = new URLSearchParams();
+    formData.append('secret', SECRET_KEY);
+    formData.append('response', token);
+
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+
+    const data = await res.json();
+    return data.success === true;
+  } catch (error) {
+    console.error('[Turnstile Verify Error]:', error);
+    return false;
+  }
+};
+
+export const register = async (req: Request, res: Response) => {
   try {
     const { fullName, email, password } = req.body;
 
@@ -56,7 +83,7 @@ export const register = (req: Request, res: Response) => {
   }
 };
 
-export const login = (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
@@ -129,5 +156,23 @@ export const googleLogin = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error('[Google Login Error]:', error);
     res.status(500).json({ success: false, message: 'Lỗi server khi xử lý Google Login.' });
+  }
+};
+
+export const verifyBot = async (req: Request, res: Response) => {
+  try {
+    const { turnstileToken } = req.body;
+    if (!turnstileToken) {
+      return res.status(400).json({ success: false, message: 'Missing token' });
+    }
+    
+    const isValid = await verifyTurnstile(turnstileToken);
+    if (isValid) {
+      res.json({ success: true, message: 'Xác minh thành công' });
+    } else {
+      res.status(403).json({ success: false, message: 'Xác minh thất bại' });
+    }
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: 'Lỗi server' });
   }
 };

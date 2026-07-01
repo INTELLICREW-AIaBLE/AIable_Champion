@@ -35,5 +35,11 @@
     "fullName": "Nguyen Van An",
     "email": "annv",
     "password": "123456"
+  },
+  {
+    "id": "1782910508337",
+    "fullName": "Nguyen Van Minh",
+    "email": "tientd",
+    "password": "123456"
   }
 ]

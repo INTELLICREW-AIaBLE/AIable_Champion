@@ -30,6 +30,7 @@ export default function RegisterPage() {
     if (passwordMismatch || !agreed) return;
     setLoading(true);
     setError('');
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/register`, {
         method: 'POST',
