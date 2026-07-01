@@ -120,6 +120,9 @@ export default function RecipeLibraryPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [aiFilter, setAiFilter] = useState<'All' | AIProvider>('All');
+  const [showFilters, setShowFilters] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -144,9 +147,15 @@ export default function RecipeLibraryPage() {
     router.push('/optimizer');
   };
 
-  const filteredRecipes = activeCategory === 'All' 
-    ? recipes 
-    : recipes.filter(r => r.category.toLowerCase() === activeCategory.toLowerCase());
+  const filteredRecipes = recipes.filter(r => {
+    const matchCategory = activeCategory === 'All' || r.category.toLowerCase() === activeCategory.toLowerCase();
+    const matchSearch = r.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                        r.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        (r.tags && r.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
+    const matchAi = aiFilter === 'All' || r.bestAI === aiFilter;
+
+    return matchCategory && matchSearch && matchAi;
+  });
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
@@ -164,16 +173,44 @@ export default function RecipeLibraryPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-slate-100 shadow-sm text-sm text-slate-400">
-            <Search className="w-4 h-4" />
-            Tìm recipe...
+        <div className="flex items-center gap-2 relative">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-slate-200 shadow-sm text-sm text-slate-700 w-64 focus-within:border-violet-500 focus-within:ring-2 focus-within:ring-violet-200 transition-all">
+            <Search className="w-4 h-4 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Tìm kiếm recipe..." 
+              className="bg-transparent border-none outline-none w-full placeholder:text-slate-400"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
 
-          <button className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition">
+          <button 
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-semibold transition ${
+              showFilters || aiFilter !== 'All' 
+                ? 'bg-violet-50 border-violet-200 text-violet-700' 
+                : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
             <Filter className="w-4 h-4" />
-            Filter
+            Filter {aiFilter !== 'All' && <span className="bg-violet-600 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1">1</span>}
           </button>
+          
+          {showFilters && (
+            <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 p-2 z-10">
+              <p className="text-xs font-bold text-slate-500 px-2 py-1 mb-1">Tối ưu cho mô hình AI:</p>
+              {['All', 'ChatGPT', 'Claude', 'Gemini'].map(ai => (
+                <button
+                  key={ai}
+                  onClick={() => { setAiFilter(ai as any); setShowFilters(false); }}
+                  className={`w-full text-left px-2 py-1.5 text-sm rounded-lg transition ${aiFilter === ai ? 'bg-violet-50 text-violet-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'}`}
+                >
+                  {ai === 'All' ? 'Tất cả AI' : ai}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
