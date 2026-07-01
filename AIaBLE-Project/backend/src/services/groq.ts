@@ -23,7 +23,10 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  * Call Groq (Llama 3.1) model
  * @param prompt User instruction
  */
-export const callGroq = async (prompt: string): Promise<string> => {
+export const callGroq = async (
+  prompt: string,
+  options?: { jsonMode?: boolean }
+): Promise<string> => {
   if (!groq) {
     throw new Error('Groq client is not initialized because GROQ_API_KEY is missing.');
   }
@@ -40,6 +43,7 @@ export const callGroq = async (prompt: string): Promise<string> => {
     const response = await groq.chat.completions.create({
       model: 'llama-3.1-8b-instant',
       messages: [{ role: 'user', content: prompt }],
+      ...(options?.jsonMode ? { response_format: { type: 'json_object' } } : {}),
     });
 
     const text = response.choices[0]?.message?.content || '';

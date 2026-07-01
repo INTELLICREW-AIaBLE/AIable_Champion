@@ -130,7 +130,7 @@ export const optimizePrompt = async (
     // Call the appropriate AI model service (with caching!)
     if (modelName === 'Groq') {
       if (process.env.GROQ_API_KEY) {
-        responseText = await callGroq(promptInput);
+        responseText = await callGroq(promptInput, { jsonMode: true });
       } else {
         // Fallback to Gemini with Groq style
         const groqStylePrompt = `You are Llama 3.1 via Groq. ${promptInput}`;
@@ -138,7 +138,7 @@ export const optimizePrompt = async (
       }
     } else if (modelName === 'OpenRouter') {
       if (process.env.OPENROUTER_API_KEY) {
-        responseText = await callOpenRouter(promptInput);
+        responseText = await callOpenRouter(promptInput, { jsonMode: true });
       } else {
         // Fallback to Gemini with OpenRouter style
         const openRouterStylePrompt = `You are an AI via OpenRouter. ${promptInput}`;
