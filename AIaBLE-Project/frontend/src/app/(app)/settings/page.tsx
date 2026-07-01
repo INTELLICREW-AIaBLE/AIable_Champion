@@ -136,6 +136,7 @@ export default function SettingsPage() {
   const handleLangChange = (newLang: string) => {
     setLang(newLang);
     localStorage.setItem('app_lang', newLang);
+    window.dispatchEvent(new Event('app_lang_changed'));
   };
 
   const currentLang = (lang === 'en' ? 'en' : 'vi') as 'en' | 'vi';
