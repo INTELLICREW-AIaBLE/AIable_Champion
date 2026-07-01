@@ -1,40 +1,36 @@
 'use client';
 
-import { Bookmark, Search, Star, ExternalLink, Code2, BookOpen, Presentation } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bookmark, Search, Star, ExternalLink, Code2, BookOpen, Presentation, FileText } from 'lucide-react';
 import Link from 'next/link';
 
-const SAVED_RECIPES = [
-  {
-    id: 'r1',
-    title: 'Giải thuật & Code Python step-by-step',
-    desc: 'Prompt yêu cầu AI đóng vai kỹ sư phần mềm giải thích logic thuật toán kèm code ví dụ.',
-    category: 'Coding',
-    icon: Code2,
-    color: 'text-blue-500 bg-blue-50 border-blue-100',
-    model: 'Claude 3.5 Sonnet'
-  },
-  {
-    id: 'r3',
-    title: 'Báo cáo môn học theo chuẩn APA',
-    desc: 'Mẫu prompt viết báo cáo học thuật chuẩn mực, có trích dẫn nguồn rõ ràng và logic chặt chẽ.',
-    category: 'Academic',
-    icon: BookOpen,
-    color: 'text-amber-500 bg-amber-50 border-amber-100',
-    model: 'GPT-4o'
-  },
-  {
-    id: 'r5',
-    title: 'Thiết kế slide thuyết trình ấn tượng',
-    desc: 'Yêu cầu AI phân bổ nội dung cho 10 slide, kèm gợi ý hình ảnh minh hoạ và ý tưởng diễn thuyết.',
-    category: 'Presentation',
-    icon: Presentation,
-    color: 'text-emerald-500 bg-emerald-50 border-emerald-100',
-    model: 'Gemini 2.0 Flash'
-  }
-];
-
 export default function SavedRecipesPage() {
-  return (
+  const [recipes, setRecipes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSaved = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/profile/recipes/saved`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+          setRecipes(data.data);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSaved();
+  }, []);
     <div className="max-w-6xl mx-auto space-y-8 pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -54,8 +50,16 @@ export default function SavedRecipesPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {SAVED_RECIPES.map((recipe) => {
-          const Icon = recipe.icon;
+        {loading ? (
+          <div className="col-span-full text-center py-12 text-slate-500">Đang tải công thức đã lưu...</div>
+        ) : recipes.length === 0 ? (
+          <div className="col-span-full text-center py-12 text-slate-500">Bạn chưa lưu công thức nào.</div>
+        ) : recipes.map((recipe) => {
+          let Icon = FileText;
+          if (recipe.category === 'Coding') Icon = Code2;
+          else if (recipe.category === 'Academic') Icon = BookOpen;
+          else if (recipe.category === 'Presentation') Icon = Presentation;
+
           return (
             <div key={recipe.id} className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition p-6 group flex flex-col relative overflow-hidden">
               <div className="absolute top-4 right-4 text-rose-500">

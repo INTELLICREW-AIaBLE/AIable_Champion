@@ -1,53 +1,36 @@
 'use client';
 
-import { Clock, Wand2, Sparkles, BookOpen, Search, ArrowUpRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Clock, Wand2, Sparkles, BookOpen, Search, ArrowUpRight, Activity } from 'lucide-react';
 import Link from 'next/link';
 
-const HISTORY = [
-  {
-    id: 1,
-    action: 'Tối ưu Prompt',
-    tool: 'Optimizer',
-    icon: Wand2,
-    color: 'text-violet-600 bg-violet-100',
-    detail: '"Giải thích thuật toán quicksort" → "Đóng vai chuyên gia hệ thống, giải thích..."',
-    time: '10 phút trước',
-    model: 'Gemini 2.0 Flash'
-  },
-  {
-    id: 2,
-    action: 'Thử nghiệm AI',
-    tool: 'Sandbox',
-    icon: Sparkles,
-    color: 'text-fuchsia-600 bg-fuchsia-100',
-    detail: 'So sánh Claude và GPT-4o cho tác vụ "Viết email xin lỗi sếp".',
-    time: '2 giờ trước',
-    model: 'Multi-model'
-  },
-  {
-    id: 3,
-    action: 'Lưu Recipe',
-    tool: 'Library',
-    icon: BookOpen,
-    color: 'text-emerald-600 bg-emerald-100',
-    detail: 'Đã lưu công thức "Báo cáo môn học theo chuẩn APA".',
-    time: 'Hôm qua',
-    model: 'System'
-  },
-  {
-    id: 4,
-    action: 'Tối ưu Prompt',
-    tool: 'Optimizer',
-    icon: Wand2,
-    color: 'text-violet-600 bg-violet-100',
-    detail: '"Viết luận văn về môi trường" → "Xây dựng đề cương chi tiết 3 chương..."',
-    time: '3 ngày trước',
-    model: 'Claude 3.5 Sonnet'
-  }
-];
-
 export default function HistoryPage() {
-  return (
+  const [history, setHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/profile/history`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+          setHistory(data.data);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchHistory();
+  }, []);
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -63,11 +46,22 @@ export default function HistoryPage() {
 
       <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden p-2">
         <div className="divide-y divide-slate-50">
-          {HISTORY.map((item) => {
-            const Icon = item.icon;
+          {loading ? (
+            <div className="p-8 text-center text-slate-500">Đang tải lịch sử...</div>
+          ) : history.length === 0 ? (
+            <div className="p-8 text-center text-slate-500">Chưa có lịch sử hoạt động.</div>
+          ) : history.map((item) => {
+            let Icon = Activity;
+            if (item.tool === 'Optimizer') Icon = Wand2;
+            else if (item.tool === 'Sandbox') Icon = Sparkles;
+            else if (item.tool === 'Library') Icon = BookOpen;
+
+            // Simple time formatter for testing
+            const formattedTime = item.time ? new Date(item.time).toLocaleString('vi-VN') : 'Gần đây';
+
             return (
               <div key={item.id} className="p-4 flex items-start gap-4 hover:bg-slate-50 transition rounded-2xl group cursor-pointer">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${item.color || 'text-violet-600 bg-violet-100'}`}>
                   <Icon className="w-5 h-5" />
                 </div>
                 
@@ -84,7 +78,7 @@ export default function HistoryPage() {
                 </div>
 
                 <div className="flex flex-col items-end gap-1.5 shrink-0 pt-1">
-                  <span className="text-xs font-semibold text-slate-400">{item.time}</span>
+                  <span className="text-xs font-semibold text-slate-400">{formattedTime}</span>
                   <span className="text-[10px] font-medium text-slate-400 border border-slate-200 px-1.5 py-0.5 rounded text-right max-w-[100px] truncate">
                     {item.model}
                   </span>

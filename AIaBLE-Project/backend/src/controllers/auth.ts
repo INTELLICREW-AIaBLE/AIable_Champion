@@ -176,3 +176,27 @@ export const verifyBot = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: 'Lỗi server' });
   }
 };
+
+export const forgotPassword = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Vui lòng cung cấp email.' });
+    }
+
+    const users = readUsers();
+    const user = users.find(u => u.email === email);
+    
+    // Luôn trả về success để tránh dò rỉ email (security best practice)
+    if (!user) {
+      return res.json({ success: true, message: 'Nếu email tồn tại, một hướng dẫn đã được gửi đi.' });
+    }
+
+    // TODO: Send email here
+    console.log(`[Mock Email] Gửi link reset password tới ${email}`);
+
+    res.json({ success: true, message: 'Hướng dẫn khôi phục mật khẩu đã được gửi đến email của bạn.' });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: 'Lỗi server khi xử lý yêu cầu quên mật khẩu.' });
+  }
+};

@@ -1,7 +1,93 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Settings, Bell, Lock, Key, Globe, Moon, Shield, Sparkles, Monitor, KeyRound, Smartphone } from 'lucide-react';
+
+const t = {
+  vi: {
+    title: 'Cài đặt',
+    desc: 'Quản lý cấu hình tài khoản và trải nghiệm của bạn',
+    tabs: { account: 'Tài khoản', prefs: 'Giao diện & Ngôn ngữ', notifs: 'Thông báo', keys: 'API Keys' },
+    account: {
+      title: 'Đổi mật khẩu',
+      curr: 'Mật khẩu hiện tại',
+      new: 'Mật khẩu mới',
+      confirm: 'Xác nhận mật khẩu mới',
+      update: 'Cập nhật mật khẩu',
+      forgot: 'Quên mật khẩu hiện tại?',
+      success: 'Mật khẩu đã được cập nhật!',
+      errorMismatch: 'Mật khẩu mới không khớp!',
+      errorEmpty: 'Vui lòng nhập đầy đủ thông tin!'
+    },
+    prefs: {
+      themeTitle: 'Giao diện (Theme)',
+      light: 'Sáng (Light)',
+      dark: 'Tối (Dark)',
+      langTitle: 'Ngôn ngữ (Language)',
+    },
+    keys: {
+      title: 'Cấu hình API Keys',
+      desc: 'Kết nối trực tiếp tài khoản của bạn với các nhà cung cấp AI. Key được lưu trữ cục bộ (Local Storage).',
+      connected: 'Đã kết nối',
+      unconnected: 'Chưa kết nối',
+      saveBtn: 'Lưu cấu hình API',
+      success: '🎉 Đã lưu API Keys thành công!',
+      fail: 'Lưu thất bại'
+    },
+    notifs: {
+      title: 'Tuỳ chọn thông báo',
+      sys: 'Thông báo hệ thống',
+      sysDesc: 'Cập nhật tính năng mới, bảo trì hệ thống',
+      ai: 'Hoạt động AI',
+      aiDesc: 'Khi Optimize hoặc Match task hoàn tất',
+      marketing: 'Email Marketing',
+      marketingDesc: 'Nhận tips và recipes AI mới nhất qua email'
+    },
+    alertLang: 'Ngôn ngữ đã được cập nhật cho trang này.'
+  },
+  en: {
+    title: 'Settings',
+    desc: 'Manage your account configuration and experience',
+    tabs: { account: 'Account', prefs: 'Appearance & Language', notifs: 'Notifications', keys: 'API Keys' },
+    account: {
+      title: 'Change Password',
+      curr: 'Current Password',
+      new: 'New Password',
+      confirm: 'Confirm New Password',
+      update: 'Update Password',
+      forgot: 'Forgot current password?',
+      success: 'Password updated successfully!',
+      errorMismatch: 'New passwords do not match!',
+      errorEmpty: 'Please fill in all fields!'
+    },
+    prefs: {
+      themeTitle: 'Theme',
+      light: 'Light',
+      dark: 'Dark',
+      langTitle: 'Language',
+    },
+    keys: {
+      title: 'API Keys Configuration',
+      desc: 'Connect your account directly with AI providers. Keys are stored locally (Local Storage).',
+      connected: 'Connected',
+      unconnected: 'Not Connected',
+      saveBtn: 'Save API Config',
+      success: '🎉 API Keys saved successfully!',
+      fail: 'Save failed'
+    },
+    notifs: {
+      title: 'Notification Preferences',
+      sys: 'System Notifications',
+      sysDesc: 'New feature updates, system maintenance',
+      ai: 'AI Activity',
+      aiDesc: 'When Optimize or Match task completes',
+      marketing: 'Email Marketing',
+      marketingDesc: 'Receive latest AI tips and recipes via email'
+    },
+    alertLang: 'Language has been updated for this page.'
+  }
+};
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('account');
@@ -9,6 +95,11 @@ export default function SettingsPage() {
   
   const [theme, setTheme] = useState('light');
   const [lang, setLang] = useState('vi');
+
+  // Password state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -45,7 +136,25 @@ export default function SettingsPage() {
   const handleLangChange = (newLang: string) => {
     setLang(newLang);
     localStorage.setItem('app_lang', newLang);
-    alert('Ngôn ngữ đã được cập nhật. (Trong bản MVP các label sẽ tự dịch sau).');
+  };
+
+  const currentLang = (lang === 'en' ? 'en' : 'vi') as 'en' | 'vi';
+  const text = t[currentLang];
+
+  const handleUpdatePassword = () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      alert(text.account.errorEmpty);
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      alert(text.account.errorMismatch);
+      return;
+    }
+    // TODO: Connect to backend password update endpoint
+    alert(text.account.success);
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
   };
 
   const handleSaveApiKeys = async () => {
@@ -65,20 +174,20 @@ export default function SettingsPage() {
         localStorage.setItem('openaiKey', apiKeys.openai);
         localStorage.setItem('anthropicKey', apiKeys.anthropic);
         localStorage.setItem('geminiKey', apiKeys.gemini);
-        alert('🎉 Đã lưu API Keys thành công! Các models sẽ sử dụng key này ngay lập tức.');
+        alert(text.keys.success);
       } else {
-        alert(data.message || 'Lưu thất bại');
+        alert(data.message || text.keys.fail);
       }
     } catch (e) {
-      alert('Lỗi kết nối');
+      alert(text.keys.fail);
     }
   };
 
   const tabs = [
-    { id: 'account', label: 'Tài khoản', icon: Shield },
-    { id: 'preferences', label: 'Giao diện & Ngôn ngữ', icon: Monitor },
-    { id: 'notifications', label: 'Thông báo', icon: Bell },
-    { id: 'api_keys', label: 'API Keys', icon: KeyRound },
+    { id: 'account', label: text.tabs.account, icon: Shield },
+    { id: 'preferences', label: text.tabs.prefs, icon: Monitor },
+    { id: 'notifications', label: text.tabs.notifs, icon: Bell },
+    { id: 'api_keys', label: text.tabs.keys, icon: KeyRound },
   ];
 
   return (
@@ -88,8 +197,8 @@ export default function SettingsPage() {
           <Settings className="w-6 h-6" />
         </div>
         <div>
-          <h1 className="text-2xl font-black text-slate-900">Cài đặt</h1>
-          <p className="text-slate-500 text-sm mt-0.5">Quản lý cấu hình tài khoản và trải nghiệm của bạn</p>
+          <h1 className="text-2xl font-black text-slate-900">{text.title}</h1>
+          <p className="text-slate-500 text-sm mt-0.5">{text.desc}</p>
         </div>
       </div>
 
@@ -123,30 +232,27 @@ export default function SettingsPage() {
           {activeTab === 'account' && (
             <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div>
-                <h2 className="text-lg font-bold text-slate-900 mb-4">Đổi mật khẩu</h2>
+                <h2 className="text-lg font-bold text-slate-900 mb-4">{text.account.title}</h2>
                 <div className="space-y-4 max-w-sm">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Mật khẩu hiện tại</label>
-                    <input type="password" placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm" />
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">{text.account.curr}</label>
+                      <Link href="/forgot-password" className="text-xs text-violet-600 font-semibold hover:underline">{text.account.forgot}</Link>
+                    </div>
+                    <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Mật khẩu mới</label>
-                    <input type="password" placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm" />
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{text.account.new}</label>
+                    <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm" />
                   </div>
-                  <button className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition">
-                    Cập nhật mật khẩu
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{text.account.confirm}</label>
+                    <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm" />
+                  </div>
+                  <button onClick={handleUpdatePassword} className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition">
+                    {text.account.update}
                   </button>
                 </div>
-              </div>
-
-              <div className="h-px bg-slate-100" />
-
-              <div>
-                <h2 className="text-lg font-bold text-red-600 mb-2">Xoá tài khoản</h2>
-                <p className="text-sm text-slate-500 mb-4">Lưu ý: Hành động này không thể hoàn tác. Mọi dữ liệu sẽ bị xoá vĩnh viễn.</p>
-                <button className="px-5 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-semibold rounded-xl transition border border-red-100">
-                  Xoá tài khoản của tôi
-                </button>
               </div>
             </div>
           )}
@@ -155,7 +261,7 @@ export default function SettingsPage() {
           {activeTab === 'preferences' && (
             <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div>
-                <h2 className="text-lg font-bold text-slate-900 mb-4">Giao diện (Theme)</h2>
+                <h2 className="text-lg font-bold text-slate-900 mb-4">{text.prefs.themeTitle}</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   <div 
                     onClick={() => handleThemeChange('light')}
@@ -163,7 +269,7 @@ export default function SettingsPage() {
                   >
                     {theme === 'light' && <div className="absolute inset-0 bg-gradient-to-br from-violet-100/50 to-transparent pointer-events-none" />}
                     <Monitor className={`w-6 h-6 mb-2 ${theme === 'light' ? 'text-violet-600' : 'text-slate-400'}`} />
-                    <p className={`font-semibold text-sm ${theme === 'light' ? 'text-slate-900' : 'text-slate-500'}`}>Sáng (Light)</p>
+                    <p className={`font-semibold text-sm ${theme === 'light' ? 'text-slate-900' : 'text-slate-500'}`}>{text.prefs.light}</p>
                   </div>
                   
                   <div 
@@ -171,7 +277,7 @@ export default function SettingsPage() {
                     className={`border-2 rounded-2xl p-4 cursor-pointer relative overflow-hidden transition ${theme === 'dark' ? 'border-violet-500 bg-slate-900' : 'border-slate-100 hover:border-slate-800 hover:bg-slate-800 bg-slate-900'}`}
                   >
                     <Moon className={`w-6 h-6 mb-2 ${theme === 'dark' ? 'text-violet-400' : 'text-slate-400'}`} />
-                    <p className={`font-semibold text-sm ${theme === 'dark' ? 'text-white' : 'text-slate-300'}`}>Tối (Dark)</p>
+                    <p className={`font-semibold text-sm ${theme === 'dark' ? 'text-white' : 'text-slate-300'}`}>{text.prefs.dark}</p>
                   </div>
                 </div>
               </div>
@@ -179,7 +285,7 @@ export default function SettingsPage() {
               <div className="h-px bg-slate-100" />
 
               <div>
-                <h2 className="text-lg font-bold text-slate-900 mb-4">Ngôn ngữ</h2>
+                <h2 className="text-lg font-bold text-slate-900 mb-4">{text.prefs.langTitle}</h2>
                 <select 
                   value={lang}
                   onChange={(e) => handleLangChange(e.target.value)}
@@ -197,8 +303,8 @@ export default function SettingsPage() {
           {activeTab === 'api_keys' && (
             <div className="p-8 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div>
-                <h2 className="text-lg font-bold text-slate-900 mb-2">Cấu hình API Keys</h2>
-                <p className="text-sm text-slate-500 mb-6">Kết nối trực tiếp tài khoản của bạn với các nhà cung cấp AI. Key được lưu trữ cục bộ (Local Storage).</p>
+                <h2 className="text-lg font-bold text-slate-900 mb-2">{text.keys.title}</h2>
+                <p className="text-sm text-slate-500 mb-6">{text.keys.desc}</p>
                 
                 <div className="space-y-4">
                   {/* OpenAI */}
@@ -209,7 +315,7 @@ export default function SettingsPage() {
                         <span className="font-bold text-sm text-slate-800">OpenAI (GPT-4)</span>
                       </div>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${apiKeys.openai ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
-                        {apiKeys.openai ? 'Đã kết nối' : 'Chưa kết nối'}
+                        {apiKeys.openai ? text.keys.connected : text.keys.unconnected}
                       </span>
                     </div>
                     <input 
@@ -221,7 +327,6 @@ export default function SettingsPage() {
                     />
                   </div>
 
-                  {/* Anthropic */}
                   <div className="p-4 rounded-2xl border border-slate-200 bg-white">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
@@ -229,7 +334,7 @@ export default function SettingsPage() {
                         <span className="font-bold text-sm text-slate-800">Anthropic (Claude)</span>
                       </div>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${apiKeys.anthropic ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
-                        {apiKeys.anthropic ? 'Đã kết nối' : 'Chưa kết nối'}
+                        {apiKeys.anthropic ? text.keys.connected : text.keys.unconnected}
                       </span>
                     </div>
                     <input 
@@ -249,7 +354,7 @@ export default function SettingsPage() {
                         <span className="font-bold text-sm text-slate-800">Google (Gemini)</span>
                       </div>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${apiKeys.gemini ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
-                        {apiKeys.gemini ? 'Đã kết nối' : 'Chưa kết nối'}
+                        {apiKeys.gemini ? text.keys.connected : text.keys.unconnected}
                       </span>
                     </div>
                     <input 
@@ -264,7 +369,7 @@ export default function SettingsPage() {
 
                 <div className="mt-6 flex justify-end">
                   <button onClick={handleSaveApiKeys} className="px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold rounded-xl transition shadow-md shadow-violet-200">
-                    Lưu cấu hình API
+                    {text.keys.saveBtn}
                   </button>
                 </div>
               </div>
@@ -274,13 +379,13 @@ export default function SettingsPage() {
           {/* ── Tab: Thông báo ── */}
           {activeTab === 'notifications' && (
             <div className="p-8 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <h2 className="text-lg font-bold text-slate-900 mb-4">Tuỳ chọn thông báo</h2>
+              <h2 className="text-lg font-bold text-slate-900 mb-4">{text.notifs.title}</h2>
               
               <div className="space-y-4">
                 {[
-                  { title: 'Thông báo hệ thống', desc: 'Cập nhật tính năng mới, bảo trì hệ thống', checked: true },
-                  { title: 'Hoạt động AI', desc: 'Khi Optimize hoặc Match task hoàn tất', checked: true },
-                  { title: 'Email Marketing', desc: 'Nhận tips và recipes AI mới nhất qua email', checked: false },
+                  { title: text.notifs.sys, desc: text.notifs.sysDesc, checked: true },
+                  { title: text.notifs.ai, desc: text.notifs.aiDesc, checked: true },
+                  { title: text.notifs.marketing, desc: text.notifs.marketingDesc, checked: false },
                 ].map((item, idx) => (
                   <label key={idx} className="flex items-start gap-3 cursor-pointer group">
                     <div className="relative flex items-center justify-center mt-1">
