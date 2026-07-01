@@ -1,10 +1,9 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { callGemini } from './gemini';
+import { callGPT4 } from './openai';
+import { callClaude } from './claude';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
-const apiKey = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(apiKey || 'temporary-placeholder');
 
 export interface OptimizeResult {
   optimized: string;
@@ -14,20 +13,11 @@ export interface OptimizeResult {
   ethicsReason?: string;
 }
 
-export const optimizePrompt = async (
-  rawPrompt: string,
-  modelName: string,
-  tone: string,
-  userKey?: string
-): Promise<OptimizeResult> => {
-  try {
-    const activeKey = userKey || process.env.GEMINI_API_KEY;
-    if (!activeKey) {
-      throw new Error('GEMINI_API_KEY is missing from environment variables and user settings.');
-    }
-
-    // System instructions for Prompt Optimizer
-    const systemInstruction = `
+/**
+ * Build system instruction for the optimizer
+ */
+function buildSystemInstruction(modelName: string, tone: string): string {
+  return `
 You are a master Prompt Engineer specializing in academic and student tasks.
 Your job is to analyze a raw prompt from a student, check it for academic integrity/ethics, and optimize it into a highly professional structured prompt.
 
@@ -73,7 +63,9 @@ Return ONLY a valid JSON object matching this schema:
   "ethicsReason": "string or null"
 }
 `;
+}
 
+<<<<<<< Updated upstream
     const dynamicGenAI = new GoogleGenerativeAI(activeKey);
     const model = dynamicGenAI.getGenerativeModel({
       model: 'gemini-3.1-flash-lite',
@@ -81,11 +73,18 @@ Return ONLY a valid JSON object matching this schema:
         responseMimeType: 'application/json',
       },
     });
+=======
+/**
+ * Generate fallback result when AI fails
+ */
+function generateFallback(rawPrompt: string, modelName: string, tone: string): OptimizeResult {
+  const isEthics = /làm hộ|làm giùm|viết thay|làm bài|thi hộ|gian lận|lam ho|lam gium|viet thay|lam bai|thi ho|gian lan/i.test(rawPrompt);
+>>>>>>> Stashed changes
 
-    const promptInput = `
-Raw Prompt to optimize: "${rawPrompt}"
-`;
+  const toneRole = tone === 'academic' ? 'Chuyên gia Học thuật' : tone === 'technical' ? 'Kỹ sư Hệ thống' : tone === 'creative' ? 'Chuyên viên Sáng tạo' : 'Trợ lý Tinh gọn';
+  const toneStyle = tone === 'academic' ? 'văn phong học thuật khoa học, rõ ràng' : tone === 'technical' ? 'chính xác, đặc tả kỹ thuật chi tiết' : tone === 'creative' ? 'sinh động, phong phú, gợi mở' : 'tập trung ngắn gọn vào ý chính';
 
+<<<<<<< Updated upstream
     const result = await model.generateContent([
       { text: systemInstruction },
       { text: promptInput }
@@ -121,6 +120,9 @@ Raw Prompt to optimize: "${rawPrompt}"
     const toneStyle = tone === 'academic' ? 'văn phong học thuật khoa học, rõ ràng' : tone === 'technical' ? 'chính xác, đặc tả kỹ thuật chi tiết' : tone === 'creative' ? 'sinh động, phong phú, gợi mở' : 'tập trung ngắn gọn vào ý chính';
 
     const optimized = `[VAI TRÒ / ROLE]:
+=======
+  const optimized = `[VAI TRÒ / ROLE]:
+>>>>>>> Stashed changes
 Acting as an expert ${toneRole} optimizing for the ${modelName} model.
 
 [BỐI CẢNH / CONTEXT]:
@@ -139,25 +141,80 @@ Thực hiện yêu cầu sau đây một cách chi tiết:
 - Đưa ra ví dụ minh họa cụ thể cho các khái niệm trừu tượng.
 - Giữ vững tính nguyên bản và không sao chép nguyên văn.`;
 
-    const rawWords = rawPrompt.trim() ? rawPrompt.trim().split(/\s+/).length : 0;
-    const optimizedWords = optimized.split(/\s+/).length;
+  const rawWords = rawPrompt.trim() ? rawPrompt.trim().split(/\s+/).length : 0;
+  const optimizedWords = optimized.split(/\s+/).length;
 
-    return {
-      optimized,
-      improvements: [
-        { label: 'Clarity Score', before: 35, after: 90, unit: '%' },
-        { label: 'Word Count', before: rawWords, after: optimizedWords, unit: 'w' },
-        { label: 'Structure', before: 15, after: 85, unit: '%' }
-      ],
-      suggestions: [
-        'Cung cấp thêm mục tiêu cụ thể của bài tập để AI điều hướng chính xác hơn.',
-        'Chỉ rõ độ dài mong muốn của câu trả lời (ví dụ: khoảng 500 từ).',
-        'Bổ sung thêm các tài liệu tham khảo chính mà bạn muốn AI tham chiếu.'
-      ],
-      ethicsFlag: isEthics,
-      ethicsReason: isEthics 
-        ? 'Cảnh báo: Câu lệnh chứa các từ khóa yêu cầu làm bài hộ hoặc gian lận học thuật. AIaBLE khuyến khích bạn sử dụng AI để gợi ý cấu trúc và học hỏi thay vì chép bài trực tiếp.' 
-        : undefined
-    };
+  return {
+    optimized,
+    improvements: [
+      { label: 'Clarity Score', before: 35, after: 90, unit: '%' },
+      { label: 'Word Count', before: rawWords, after: optimizedWords, unit: 'w' },
+      { label: 'Structure', before: 15, after: 85, unit: '%' }
+    ],
+    suggestions: [
+      'Cung cấp thêm mục tiêu cụ thể của bài tập để AI điều hướng chính xác hơn.',
+      'Chỉ rõ độ dài mong muốn của câu trả lời (ví dụ: khoảng 500 từ).',
+      'Bổ sung thêm các tài liệu tham khảo chính mà bạn muốn AI tham chiếu.'
+    ],
+    ethicsFlag: isEthics,
+    ethicsReason: isEthics
+      ? 'Cảnh báo: Câu lệnh chứa các từ khóa yêu cầu làm bài hộ hoặc gian lận học thuật. AIaBLE khuyến khích bạn sử dụng AI để gợi ý cấu trúc và học hỏi thay vì chép bài trực tiếp.'
+      : undefined
+  };
+}
+
+export const optimizePrompt = async (
+  rawPrompt: string,
+  modelName: string,
+  tone: string,
+  userKey?: string
+): Promise<OptimizeResult> => {
+  try {
+    const systemInstruction = buildSystemInstruction(modelName, tone);
+    const promptInput = `${systemInstruction}\n\nRaw Prompt to optimize: "${rawPrompt}"`;
+
+    let responseText: string;
+
+    // Call the appropriate AI model service (with caching!)
+    if (modelName === 'Claude') {
+      if (process.env.CLAUDE_API_KEY) {
+        responseText = await callClaude(promptInput);
+      } else {
+        // Fallback to Gemini with Claude style
+        const claudeStylePrompt = `You are Claude by Anthropic. ${promptInput}`;
+        responseText = await callGemini(claudeStylePrompt, userKey);
+      }
+    } else if (modelName === 'GPT-4') {
+      if (process.env.OPENAI_API_KEY) {
+        responseText = await callGPT4(promptInput);
+      } else {
+        // Fallback to Gemini with GPT-4 style
+        const gptStylePrompt = `You are GPT-4 by OpenAI. ${promptInput}`;
+        responseText = await callGemini(gptStylePrompt, userKey);
+      }
+    } else {
+      // Default: Gemini
+      responseText = await callGemini(promptInput, userKey);
+    }
+
+    // Try to parse JSON response
+    try {
+      // Extract JSON from markdown code blocks if present
+      let jsonText = responseText.trim();
+      if (jsonText.startsWith('```json')) {
+        jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?$/g, '');
+      } else if (jsonText.startsWith('```')) {
+        jsonText = jsonText.replace(/```\n?/g, '');
+      }
+
+      const parsed: OptimizeResult = JSON.parse(jsonText.trim());
+      return parsed;
+    } catch (parseError) {
+      console.error('Failed to parse AI JSON output:', responseText.substring(0, 200));
+      throw new Error('AI response parser error');
+    }
+  } catch (error: any) {
+    console.warn('[Optimizer Service Error - Using Fallback]:', error.message);
+    return generateFallback(rawPrompt, modelName, tone);
   }
 };

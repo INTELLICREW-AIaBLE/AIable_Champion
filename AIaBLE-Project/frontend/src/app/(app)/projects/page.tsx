@@ -1,58 +1,105 @@
 'use client';
 
-import { FolderOpen, Plus, MoreVertical, Clock, FileText, Users, Search } from 'lucide-react';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { FolderOpen, Plus, MoreVertical, Clock, FileText, CheckCircle2, Search, Trash2, Edit2, X, Folder } from 'lucide-react';
+import { useAPIRequest } from '@/hooks/useAPIRequest';
 
-const PROJECTS = [
-  {
-    id: 1,
-    title: 'Tiểu luận Cuối kỳ - Trí tuệ nhân tạo',
-    desc: 'Nghiên cứu về ứng dụng của LLMs trong giáo dục đại học.',
-    updated: '2 giờ trước',
-    status: 'Đang làm',
-    color: 'bg-emerald-500',
-    progress: 75,
-    members: 3,
-    files: 12
-  },
-  {
-    id: 2,
-    title: 'Đồ án Nhập môn Kỹ thuật Phần mềm',
-    desc: 'Thiết kế hệ thống quản lý thư viện sinh viên bằng Java Spring Boot.',
-    updated: '1 ngày trước',
-    status: 'Sắp đến hạn',
-    color: 'bg-amber-500',
-    progress: 40,
-    members: 5,
-    files: 8
-  },
-  {
-    id: 3,
-    title: 'Thuyết trình Marketing Căn bản',
-    desc: 'Phân tích chiến lược 4P của chiến dịch Vinamilk Green Farm.',
-    updated: '3 ngày trước',
-    status: 'Hoàn thành',
-    color: 'bg-violet-500',
-    progress: 100,
-    members: 4,
-    files: 5
-  },
-  {
-    id: 4,
-    title: 'Bài tập nhóm - Xác suất thống kê',
-    desc: 'Thu thập số liệu và dùng R để vẽ biểu đồ phân phối chuẩn.',
-    updated: '1 tuần trước',
-    status: 'Đang làm',
-    color: 'bg-blue-500',
-    progress: 15,
-    members: 2,
-    files: 3
-  }
-];
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  status: 'planning' | 'in-progress' | 'review' | 'completed' | 'archived';
+  tasks: any[];
+  tags: string[];
+  color: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  'planning': 'Đang lên kế hoạch',
+  'in-progress': 'Đang thực hiện',
+  'review': 'Đang review',
+  'completed': 'Hoàn thành',
+  'archived': 'Đã lưu trữ'
+};
+
+const STATUS_COLORS: Record<string, string> = {
+  'planning': 'bg-blue-100 text-blue-700',
+  'in-progress': 'bg-amber-100 text-amber-700',
+  'review': 'bg-purple-100 text-purple-700',
+  'completed': 'bg-emerald-100 text-emerald-700',
+  'archived': 'bg-slate-100 text-slate-500'
+};
+
+const CATEGORY_LABELS: Record<string, string> = {
+  'software-engineering': 'Phần mềm',
+  'data-science': 'Data Science',
+  'marketing': 'Marketing',
+  'business': 'Kinh doanh',
+  'academic': 'Học thuật',
+  'research': 'Nghiên cứu',
+  'other': 'Khác'
+};
 
 export default function ProjectsPage() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const { execute, loading } = useAPIRequest();
+
+  // Fetch projects
+  const fetchProjects = async () => {
+    const result = await execute(
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects`,
+      { method: 'GET' }
+    );
+
+    if (result?.success) {
+      setProjects(result.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  // Delete project
+  const handleDelete = async () => {
+    if (!selectedProject) return;
+
+    const result = await execute(
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects/${selectedProject.id}`,
+      { method: 'DELETE' }
+    );
+
+    if (result?.success) {
+      setProjects(projects.filter(p => p.id !== selectedProject.id));
+      setShowDeleteConfirm(false);
+      setSelectedProject(null);
+    }
+  };
+
+  // Filter projects
+  const filteredProjects = projects.filter(p =>
+    p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Calculate progress
+  const getProgress = (project: Project) => {
+    if (project.tasks.length === 0) return 0;
+    const completed = project.tasks.filter(t => t.status === 'done').length;
+    return Math.round((completed / project.tasks.length) * 100);
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-12">
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center text-violet-600">
@@ -60,77 +107,330 @@ export default function ProjectsPage() {
           </div>
           <div>
             <h1 className="text-2xl font-black text-slate-900">Projects của bạn</h1>
-            <p className="text-slate-500 text-sm mt-0.5">Quản lý tài liệu và các luồng công việc AI theo dự án.</p>
+            <p className="text-slate-500 text-sm mt-0.5">Quản lý dự án và theo dõi tiến độ công việc.</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Tìm kiếm dự án..." 
+            <input
+              type="text"
+              placeholder="Tìm kiếm dự án..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-violet-400 w-64"
             />
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold rounded-xl transition shadow-sm shadow-violet-200">
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold rounded-xl transition shadow-sm shadow-violet-200"
+          >
             <Plus className="w-4 h-4" />
-            Tạo Project mới
+            Tạo Project
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {PROJECTS.map((project) => (
-          <div key={project.id} className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md hover:border-violet-200 transition p-6 group cursor-pointer relative overflow-hidden">
-            {/* Top Color Line */}
-            <div className={`absolute top-0 left-0 right-0 h-1.5 ${project.color}`} />
-            
-            <div className="flex items-start justify-between mb-4 mt-1">
-              <div className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-50 text-slate-500`}>
-                {project.status}
+      {/* Projects Grid */}
+      {loading && projects.length === 0 ? (
+        <div className="text-center py-12 text-slate-500">
+          <div className="animate-spin w-8 h-8 border-4 border-violet-200 border-t-violet-600 rounded-full mx-auto mb-4" />
+          Đang tải projects...
+        </div>
+      ) : filteredProjects.length === 0 ? (
+        <div className="text-center py-12">
+          <Folder className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+          <p className="text-slate-500 font-medium">
+            {searchQuery ? 'Không tìm thấy project nào' : 'Chưa có project nào'}
+          </p>
+          <p className="text-sm text-slate-400 mt-1">
+            {!searchQuery && 'Tạo project đầu tiên để bắt đầu!'}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProjects.map((project) => {
+            const progress = getProgress(project);
+            const completedTasks = project.tasks.filter(t => t.status === 'done').length;
+
+            return (
+              <div
+                key={project.id}
+                className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md hover:border-violet-200 transition p-6 group cursor-pointer relative overflow-hidden"
+              >
+                {/* Top Color Line */}
+                <div className="absolute top-0 left-0 right-0 h-1.5" style={{ backgroundColor: project.color || '#8B5CF6' }} />
+
+                <div className="flex items-start justify-between mb-4 mt-1">
+                  <div className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${STATUS_COLORS[project.status]}`}>
+                    {STATUS_LABELS[project.status]}
+                  </div>
+                  <div className="relative">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedProject(selectedProject?.id === project.id ? null : project);
+                      }}
+                      className="text-slate-400 hover:text-slate-600 transition"
+                    >
+                      <MoreVertical className="w-5 h-5" />
+                    </button>
+
+                    {selectedProject?.id === project.id && (
+                      <div className="absolute right-0 top-8 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-10 min-w-[150px]">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.location.href = `/projects/${project.id}`;
+                          }}
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                          Xem chi tiết
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowDeleteConfirm(true);
+                          }}
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Xóa
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <a href={`/projects/${project.id}`} className="block">
+                  <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-violet-600 transition line-clamp-2">
+                    {project.title}
+                  </h3>
+                  <p className="text-sm text-slate-500 mb-4 line-clamp-2 leading-relaxed">
+                    {project.description}
+                  </p>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    <span className="px-2 py-0.5 rounded-md bg-violet-50 text-violet-600 text-[10px] font-semibold">
+                      {CATEGORY_LABELS[project.category] || project.category}
+                    </span>
+                    {project.tags.slice(0, 2).map((tag, i) => (
+                      <span key={i} className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-medium">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Progress */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between text-xs font-semibold text-slate-700">
+                      <span>Tiến độ</span>
+                      <span>{progress}%</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-300"
+                        style={{
+                          width: `${progress}%`,
+                          backgroundColor: project.color || '#8B5CF6'
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-50 text-xs text-slate-400 font-medium">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1.5">
+                        <FileText className="w-4 h-4" />
+                        {project.tasks.length}
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4" />
+                        {completedTasks}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5" />
+                      {new Date(project.updatedAt).toLocaleDateString('vi-VN')}
+                    </div>
+                  </div>
+                </a>
               </div>
-              <button className="text-slate-400 hover:text-slate-600 transition">
-                <MoreVertical className="w-5 h-5" />
+            );
+          })}
+        </div>
+      )}
+
+      {/* Create Modal */}
+      {showCreateModal && (
+        <CreateProjectModal
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            setShowCreateModal(false);
+            fetchProjects();
+          }}
+        />
+      )}
+
+      {/* Delete Confirmation */}
+      {showDeleteConfirm && selectedProject && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Xác nhận xóa</h3>
+            <p className="text-sm text-slate-600 mb-6">
+              Bạn có chắc muốn xóa project "<strong>{selectedProject.title}</strong>"?
+              Hành động này không thể hoàn tác.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setSelectedProject(null);
+                }}
+                className="flex-1 px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 px-4 py-2 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition"
+              >
+                Xóa
               </button>
             </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
-            <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-violet-600 transition">
-              {project.title}
-            </h3>
-            <p className="text-sm text-slate-500 mb-6 line-clamp-2 leading-relaxed">
-              {project.desc}
-            </p>
+// Create Project Modal Component
+function CreateProjectModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: 'academic' as any,
+    tags: '',
+    color: '#8B5CF6'
+  });
 
-            {/* Progress */}
-            <div className="space-y-2 mb-6">
-              <div className="flex justify-between text-xs font-semibold text-slate-700">
-                <span>Tiến độ</span>
-                <span>{project.progress}%</span>
-              </div>
-              <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div className={`h-full ${project.color} rounded-full`} style={{ width: `${project.progress}%` }} />
-              </div>
-            </div>
+  const { execute, loading } = useAPIRequest();
 
-            <div className="flex items-center justify-between pt-4 border-t border-slate-50 text-xs text-slate-400 font-medium">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5">
-                  <FileText className="w-4 h-4" />
-                  {project.files}
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Users className="w-4 h-4" />
-                  {project.members}
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
-                {project.updated}
-              </div>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const result = await execute(
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean)
+        })
+      }
+    );
+
+    if (result?.success) {
+      onSuccess();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-slate-900">Tạo Project Mới</h2>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Tên Project *</label>
+            <input
+              type="text"
+              required
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              placeholder="VD: Đồ án Nhập môn Kỹ thuật Phần mềm"
+              className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-violet-400"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Mô tả *</label>
+            <textarea
+              required
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Mô tả ngắn gọn về project..."
+              rows={3}
+              className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-violet-400 resize-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Danh mục *</label>
+            <select
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+              className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-violet-400"
+            >
+              {Object.entries(CATEGORY_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Tags (tùy chọn)</label>
+            <input
+              type="text"
+              value={formData.tags}
+              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+              placeholder="VD: Java, Spring Boot, MySQL (cách nhau bởi dấu phẩy)"
+              className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-violet-400"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Màu chủ đạo</label>
+            <div className="flex gap-2">
+              {['#8B5CF6', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#EC4899'].map(color => (
+                <button
+                  key={color}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, color })}
+                  className={`w-10 h-10 rounded-lg transition ${formData.color === color ? 'ring-2 ring-offset-2 ring-slate-400' : ''}`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
             </div>
           </div>
-        ))}
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 px-4 py-2 rounded-xl bg-violet-600 text-white font-semibold hover:bg-violet-700 transition disabled:opacity-50"
+            >
+              {loading ? 'Đang tạo...' : 'Tạo Project'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
