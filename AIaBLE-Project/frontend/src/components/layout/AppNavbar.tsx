@@ -136,7 +136,7 @@ export function AppNavbar() {
   const avatarRef = useRef<HTMLDivElement>(null);
 
   // User Profile
-  const { userProfile, loading: profileLoading } = useAuth();
+  const { userProfile, loading: profileLoading, logout } = useAuth();
   const initials = userProfile.name.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase() || 'U';
 
   const [lang, setLang] = useState('vi');
@@ -215,6 +215,7 @@ export function AppNavbar() {
 
   const handleLogout = () => {
     setAvatarOpen(false);
+    logout();
     router.push('/login');
   };
 

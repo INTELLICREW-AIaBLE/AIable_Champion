@@ -291,14 +291,11 @@ export default function OptimizerPage() {
       sessionStorage.removeItem('optimizer_prefill');
     }
 
-          if (
-            prefillAI &&
-            ['Groq', 'OpenRouter', 'Gemini'].includes(prefillAI)
-          ) {
-            setModel(prefillAI);
-            sessionStorage.removeItem('optimizer_prefill_AI');
-          }
-        }, []);
+    if (prefillAI && ['Groq', 'OpenRouter', 'Gemini'].includes(prefillAI)) {
+      setModel(prefillAI);
+      sessionStorage.removeItem('optimizer_prefill_AI');
+    }
+  }, []);
   
   const charCount = raw.length;
   const wordCount = raw.trim() ? raw.trim().split(/\s+/).length : 0;
