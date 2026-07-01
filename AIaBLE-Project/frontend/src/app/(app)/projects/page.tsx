@@ -17,12 +17,95 @@ interface Project {
   updatedAt: number;
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  'planning': 'Đang lên kế hoạch',
-  'in-progress': 'Đang thực hiện',
-  'review': 'Đang review',
-  'completed': 'Hoàn thành',
-  'archived': 'Đã lưu trữ'
+const t = {
+  vi: {
+    title: 'Projects của bạn',
+    desc: 'Quản lý dự án và theo dõi tiến độ công việc.',
+    searchPlaceholder: 'Tìm kiếm dự án...',
+    createBtn: 'Tạo Project',
+    loading: 'Đang tải projects...',
+    notFound: 'Không tìm thấy project nào',
+    noProjects: 'Chưa có project nào',
+    noProjectsHint: 'Tạo project đầu tiên để bắt đầu!',
+    progress: 'Tiến độ',
+    details: 'Xem chi tiết',
+    delete: 'Xóa',
+    confirmDeleteTitle: 'Xác nhận xóa',
+    confirmDeleteMsg: 'Bạn có chắc muốn xóa project',
+    confirmDeleteWarn: 'Hành động này không thể hoàn tác.',
+    cancel: 'Hủy',
+    deleteBtn: 'Xóa',
+    createModalTitle: 'Tạo Project Mới',
+    nameLabel: 'Tên Project *',
+    namePlaceholder: 'VD: Đồ án Nhập môn Kỹ thuật Phần mềm',
+    descLabel: 'Mô tả *',
+    descPlaceholder: 'Mô tả ngắn gọn về project...',
+    categoryLabel: 'Danh mục *',
+    tagsLabel: 'Tags (tùy chọn)',
+    tagsPlaceholder: 'VD: Java, Spring Boot, MySQL (cách nhau bởi dấu phẩy)',
+    colorLabel: 'Màu chủ đạo',
+    creating: 'Đang tạo...',
+    statusLabels: {
+      'planning': 'Đang lên kế hoạch',
+      'in-progress': 'Đang thực hiện',
+      'review': 'Đang review',
+      'completed': 'Hoàn thành',
+      'archived': 'Đã lưu trữ'
+    },
+    categoryLabels: {
+      'software-engineering': 'Phần mềm',
+      'data-science': 'Data Science',
+      'marketing': 'Marketing',
+      'business': 'Kinh doanh',
+      'academic': 'Học thuật',
+      'research': 'Nghiên cứu',
+      'other': 'Khác'
+    }
+  },
+  en: {
+    title: 'Your Projects',
+    desc: 'Manage projects and track work progress.',
+    searchPlaceholder: 'Search projects...',
+    createBtn: 'Create Project',
+    loading: 'Loading projects...',
+    notFound: 'No projects found',
+    noProjects: 'No projects yet',
+    noProjectsHint: 'Create your first project to get started!',
+    progress: 'Progress',
+    details: 'View details',
+    delete: 'Delete',
+    confirmDeleteTitle: 'Confirm Deletion',
+    confirmDeleteMsg: 'Are you sure you want to delete the project',
+    confirmDeleteWarn: 'This action cannot be undone.',
+    cancel: 'Cancel',
+    deleteBtn: 'Delete',
+    createModalTitle: 'Create New Project',
+    nameLabel: 'Project Name *',
+    namePlaceholder: 'Ex: Intro to Software Engineering Project',
+    descLabel: 'Description *',
+    descPlaceholder: 'Brief description of the project...',
+    categoryLabel: 'Category *',
+    tagsLabel: 'Tags (optional)',
+    tagsPlaceholder: 'Ex: Java, Spring Boot, MySQL (comma separated)',
+    colorLabel: 'Primary Color',
+    creating: 'Creating...',
+    statusLabels: {
+      'planning': 'Planning',
+      'in-progress': 'In Progress',
+      'review': 'In Review',
+      'completed': 'Completed',
+      'archived': 'Archived'
+    },
+    categoryLabels: {
+      'software-engineering': 'Software Eng.',
+      'data-science': 'Data Science',
+      'marketing': 'Marketing',
+      'business': 'Business',
+      'academic': 'Academic',
+      'research': 'Research',
+      'other': 'Other'
+    }
+  }
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -31,16 +114,6 @@ const STATUS_COLORS: Record<string, string> = {
   'review': 'bg-purple-100 text-purple-700',
   'completed': 'bg-emerald-100 text-emerald-700',
   'archived': 'bg-slate-100 text-slate-500'
-};
-
-const CATEGORY_LABELS: Record<string, string> = {
-  'software-engineering': 'Phần mềm',
-  'data-science': 'Data Science',
-  'marketing': 'Marketing',
-  'business': 'Kinh doanh',
-  'academic': 'Học thuật',
-  'research': 'Nghiên cứu',
-  'other': 'Khác'
 };
 
 export default function ProjectsPage() {
@@ -63,6 +136,21 @@ export default function ProjectsPage() {
       setProjects(result.data);
     }
   };
+
+  const [lang, setLang] = useState('vi');
+
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
+
+  const text = t[lang as 'en' | 'vi'] || t.vi;
 
   useEffect(() => {
     fetchProjects();
@@ -106,8 +194,8 @@ export default function ProjectsPage() {
             <FolderOpen className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-slate-900">Projects của bạn</h1>
-            <p className="text-slate-500 text-sm mt-0.5">Quản lý dự án và theo dõi tiến độ công việc.</p>
+            <h1 className="text-2xl font-black text-slate-900">{text.title}</h1>
+            <p className="text-slate-500 text-sm mt-0.5">{text.desc}</p>
           </div>
         </div>
 
@@ -116,7 +204,7 @@ export default function ProjectsPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Tìm kiếm dự án..."
+              placeholder={text.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-violet-400 w-64"
@@ -127,7 +215,7 @@ export default function ProjectsPage() {
             className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold rounded-xl transition shadow-sm shadow-violet-200"
           >
             <Plus className="w-4 h-4" />
-            Tạo Project
+            {text.createBtn}
           </button>
         </div>
       </div>
@@ -136,16 +224,16 @@ export default function ProjectsPage() {
       {loading && projects.length === 0 ? (
         <div className="text-center py-12 text-slate-500">
           <div className="animate-spin w-8 h-8 border-4 border-violet-200 border-t-violet-600 rounded-full mx-auto mb-4" />
-          Đang tải projects...
+          {text.loading}
         </div>
       ) : filteredProjects.length === 0 ? (
         <div className="text-center py-12">
           <Folder className="w-16 h-16 text-slate-300 mx-auto mb-4" />
           <p className="text-slate-500 font-medium">
-            {searchQuery ? 'Không tìm thấy project nào' : 'Chưa có project nào'}
+            {searchQuery ? text.notFound : text.noProjects}
           </p>
           <p className="text-sm text-slate-400 mt-1">
-            {!searchQuery && 'Tạo project đầu tiên để bắt đầu!'}
+            {!searchQuery && text.noProjectsHint}
           </p>
         </div>
       ) : (
@@ -164,7 +252,7 @@ export default function ProjectsPage() {
 
                 <div className="flex items-start justify-between mb-4 mt-1">
                   <div className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${STATUS_COLORS[project.status]}`}>
-                    {STATUS_LABELS[project.status]}
+                    {(text.statusLabels as any)[project.status]}
                   </div>
                   <div className="relative">
                     <button
@@ -187,7 +275,7 @@ export default function ProjectsPage() {
                           className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                         >
                           <Edit2 className="w-4 h-4" />
-                          Xem chi tiết
+                          {text.details}
                         </button>
                         <button
                           onClick={(e) => {
@@ -197,7 +285,7 @@ export default function ProjectsPage() {
                           className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                         >
                           <Trash2 className="w-4 h-4" />
-                          Xóa
+                          {text.delete}
                         </button>
                       </div>
                     )}
@@ -215,7 +303,7 @@ export default function ProjectsPage() {
                   {/* Tags */}
                   <div className="flex flex-wrap gap-1.5 mb-4">
                     <span className="px-2 py-0.5 rounded-md bg-violet-50 text-violet-600 text-[10px] font-semibold">
-                      {CATEGORY_LABELS[project.category] || project.category}
+                      {(text.categoryLabels as any)[project.category] || project.category}
                     </span>
                     {project.tags.slice(0, 2).map((tag, i) => (
                       <span key={i} className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-medium">
@@ -227,7 +315,7 @@ export default function ProjectsPage() {
                   {/* Progress */}
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-xs font-semibold text-slate-700">
-                      <span>Tiến độ</span>
+                      <span>{text.progress}</span>
                       <span>{progress}%</span>
                     </div>
                     <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
@@ -267,6 +355,7 @@ export default function ProjectsPage() {
       {/* Create Modal */}
       {showCreateModal && (
         <CreateProjectModal
+          text={text}
           onClose={() => setShowCreateModal(false)}
           onSuccess={() => {
             setShowCreateModal(false);
@@ -279,10 +368,10 @@ export default function ProjectsPage() {
       {showDeleteConfirm && selectedProject && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <h3 className="text-lg font-bold text-slate-900 mb-2">Xác nhận xóa</h3>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">{text.confirmDeleteTitle}</h3>
             <p className="text-sm text-slate-600 mb-6">
-              Bạn có chắc muốn xóa project "<strong>{selectedProject.title}</strong>"?
-              Hành động này không thể hoàn tác.
+              {text.confirmDeleteMsg} "<strong>{selectedProject.title}</strong>"?
+              {text.confirmDeleteWarn}
             </p>
             <div className="flex gap-3">
               <button
@@ -292,13 +381,13 @@ export default function ProjectsPage() {
                 }}
                 className="flex-1 px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition"
               >
-                Hủy
+                {text.cancel}
               </button>
               <button
                 onClick={handleDelete}
                 className="flex-1 px-4 py-2 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition"
               >
-                Xóa
+                {text.deleteBtn}
               </button>
             </div>
           </div>
@@ -309,7 +398,7 @@ export default function ProjectsPage() {
 }
 
 // Create Project Modal Component
-function CreateProjectModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+function CreateProjectModal({ onClose, onSuccess, text }: { onClose: () => void; onSuccess: () => void; text: any }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -344,7 +433,7 @@ function CreateProjectModal({ onClose, onSuccess }: { onClose: () => void; onSuc
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-slate-900">Tạo Project Mới</h2>
+          <h2 className="text-xl font-bold text-slate-900">{text.createModalTitle}</h2>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
             <X className="w-5 h-5" />
           </button>
@@ -352,55 +441,55 @@ function CreateProjectModal({ onClose, onSuccess }: { onClose: () => void; onSuc
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Tên Project *</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">{text.nameLabel}</label>
             <input
               type="text"
               required
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="VD: Đồ án Nhập môn Kỹ thuật Phần mềm"
+              placeholder={text.namePlaceholder}
               className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-violet-400"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Mô tả *</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">{text.descLabel}</label>
             <textarea
               required
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Mô tả ngắn gọn về project..."
+              placeholder={text.descPlaceholder}
               rows={3}
               className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-violet-400 resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Danh mục *</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">{text.categoryLabel}</label>
             <select
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
               className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-violet-400"
             >
-              {Object.entries(CATEGORY_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>{label}</option>
+              {Object.entries(text.categoryLabels).map(([value, label]) => (
+                <option key={value} value={value}>{label as string}</option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Tags (tùy chọn)</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">{text.tagsLabel}</label>
             <input
               type="text"
               value={formData.tags}
               onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-              placeholder="VD: Java, Spring Boot, MySQL (cách nhau bởi dấu phẩy)"
+              placeholder={text.tagsPlaceholder}
               className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-violet-400"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Màu chủ đạo</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">{text.colorLabel}</label>
             <div className="flex gap-2">
               {['#8B5CF6', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#EC4899'].map(color => (
                 <button
@@ -420,14 +509,14 @@ function CreateProjectModal({ onClose, onSuccess }: { onClose: () => void; onSuc
               onClick={onClose}
               className="flex-1 px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition"
             >
-              Hủy
+              {text.cancel}
             </button>
             <button
               type="submit"
               disabled={loading}
               className="flex-1 px-4 py-2 rounded-xl bg-violet-600 text-white font-semibold hover:bg-violet-700 transition disabled:opacity-50"
             >
-              {loading ? 'Đang tạo...' : 'Tạo Project'}
+              {loading ? text.creating : text.createBtn}
             </button>
           </div>
         </form>

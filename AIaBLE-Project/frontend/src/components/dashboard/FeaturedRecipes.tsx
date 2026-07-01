@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Code2, FileText, Presentation, LayoutGrid, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RecipeCard } from './RecipeCard';
@@ -57,26 +57,59 @@ const recipes = [
 ];
 
 const tabs = [
-  { id: 'all', label: 'Tất cả', icon: LayoutGrid },
-  { id: 'coding', label: 'Coding', icon: Code2 },
-  { id: 'report', label: 'Report', icon: FileText },
-  { id: 'slide', label: 'Slide', icon: Presentation },
+  { id: 'all', icon: LayoutGrid },
+  { id: 'coding', icon: Code2 },
+  { id: 'report', icon: FileText },
+  { id: 'slide', icon: Presentation },
 ];
+
+const t = {
+  vi: {
+    title: 'Featured AI Recipe Templates',
+    all: 'Tất cả',
+    coding: 'Coding',
+    report: 'Report',
+    slide: 'Slide',
+    viewAll: 'Xem tất cả Recipes'
+  },
+  en: {
+    title: 'Featured AI Recipe Templates',
+    all: 'All',
+    coding: 'Coding',
+    report: 'Report',
+    slide: 'Slide',
+    viewAll: 'View All Recipes'
+  }
+};
 
 export function FeaturedRecipes() {
   const [activeTab, setActiveTab] = useState('all');
+  const [lang, setLang] = useState('vi');
+
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
+
+  const text = t[lang as 'en' | 'vi'] || t.vi;
 
   const filtered = activeTab === 'all' ? recipes : recipes.filter((r) => r.tab === activeTab);
 
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-base font-semibold text-slate-800">Featured AI Recipe Templates</h2>
+        <h2 className="text-base font-semibold text-slate-800">{text.title}</h2>
       </div>
 
       {/* Tab bar */}
       <div className="flex items-center gap-1 mb-4 border-b border-slate-100 pb-2">
-        {tabs.map(({ id, label, icon: Icon }) => (
+        {tabs.map(({ id, icon: Icon }) => (
           <button
             key={id}
             onClick={() => setActiveTab(id)}
@@ -88,7 +121,7 @@ export function FeaturedRecipes() {
             )}
           >
             <Icon className="w-3 h-3" />
-            {label}
+            {(text as any)[id] || id}
           </button>
         ))}
       </div>
@@ -109,7 +142,7 @@ export function FeaturedRecipes() {
       {/* View all link */}
       <div className="mt-4">
         <button className="flex items-center gap-1 text-xs font-medium text-violet-600 hover:text-violet-800 transition">
-          View All Recipes
+          {text.viewAll}
           <ArrowRight className="w-3 h-3" />
         </button>
       </div>

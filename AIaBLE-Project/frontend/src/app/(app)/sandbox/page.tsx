@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { 
   Sparkles, Send, Copy, Check, RotateCcw, 
@@ -24,11 +24,48 @@ const INITIAL_MODELS: ModelResult[] = [
   { model: 'Gemini',     content: '', status: 'idle', color: 'from-blue-400 to-cyan-500',    logo: '/gemini.png' },
 ];
 
-const EXAMPLE_PROMPTS = [
-  'Viết một email chuyên nghiệp từ chối lời mời phỏng vấn.',
-  'Giải thích nguyên lý hoạt động của Quantum Computing cho học sinh cấp 2.',
-  'Tạo một kế hoạch marketing 30 ngày cho quán cà phê mới mở.',
-];
+const t = {
+  vi: {
+    title: 'AI Sandbox',
+    desc: 'Kiểm thử và so sánh kết quả trực tiếp từ nhiều mô hình AI (Groq, OpenRouter, Gemini) cùng một lúc.',
+    reset: 'Reset',
+    settings: 'Cài đặt mô hình',
+    masterPrompt: 'Master Prompt',
+    samplePrompt: 'Prompt Mẫu',
+    placeholder: 'Nhập prompt bạn muốn kiểm thử trên nhiều mô hình AI...',
+    hint: 'Nhấn Ctrl + Enter để chạy',
+    running: 'Đang chạy...',
+    runBtn: 'Chạy Sandbox',
+    errConn: 'Không thể kết nối đến server.',
+    waiting: 'Chờ thực thi',
+    errApi: 'Lỗi kết nối API',
+    examples: [
+      'Viết một email chuyên nghiệp từ chối lời mời phỏng vấn.',
+      'Giải thích nguyên lý hoạt động của Quantum Computing cho học sinh cấp 2.',
+      'Tạo một kế hoạch marketing 30 ngày cho quán cà phê mới mở.'
+    ]
+  },
+  en: {
+    title: 'AI Sandbox',
+    desc: 'Test and compare results directly from multiple AI models (Groq, OpenRouter, Gemini) simultaneously.',
+    reset: 'Reset',
+    settings: 'Model Settings',
+    masterPrompt: 'Master Prompt',
+    samplePrompt: 'Sample Prompt',
+    placeholder: 'Enter the prompt you want to test across multiple AI models...',
+    hint: 'Press Ctrl + Enter to run',
+    running: 'Running...',
+    runBtn: 'Run Sandbox',
+    errConn: 'Cannot connect to server.',
+    waiting: 'Waiting to execute',
+    errApi: 'API Connection Error',
+    examples: [
+      'Write a professional email declining an interview invitation.',
+      'Explain the principles of Quantum Computing to a middle schooler.',
+      'Create a 30-day marketing plan for a newly opened coffee shop.'
+    ]
+  }
+};
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -77,6 +114,21 @@ function SkeletonLoader() {
 }
 
 export default function SandboxPage() {
+  const [lang, setLang] = useState('vi');
+
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
+
+  const text = t[lang as 'en' | 'vi'] || t.vi;
+
   const [prompt, setPrompt] = useState('');
   const [results, setResults] = useState<ModelResult[]>(INITIAL_MODELS);
   const [isRunning, setIsRunning] = useState(false);
@@ -124,7 +176,7 @@ export default function SandboxPage() {
           newResults[index] = { 
             ...newResults[index], 
             status: 'error', 
-            content: 'Không thể kết nối đến server.',
+            content: text.errConn,
           };
           return newResults;
         });
@@ -157,10 +209,10 @@ export default function SandboxPage() {
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center shadow-md shadow-fuchsia-200">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <h1 className="text-2xl font-black text-slate-900">AI Sandbox</h1>
+            <h1 className="text-2xl font-black text-slate-900">{text.title}</h1>
           </div>
           <p className="text-sm text-slate-500">
-            Kiểm thử và so sánh kết quả trực tiếp từ nhiều mô hình AI (Groq, OpenRouter, Gemini) cùng một lúc.
+            {text.desc}
           </p>
         </div>
         <div className="flex gap-2">
@@ -169,11 +221,11 @@ export default function SandboxPage() {
               onClick={handleReset}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 transition"
             >
-              <RotateCcw className="w-3.5 h-3.5" /> Reset
+              <RotateCcw className="w-3.5 h-3.5" /> {text.reset}
             </button>
           )}
           <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 transition">
-            <Settings2 className="w-3.5 h-3.5" /> Cài đặt mô hình
+            <Settings2 className="w-3.5 h-3.5" /> {text.settings}
           </button>
         </div>
       </div>
@@ -183,14 +235,14 @@ export default function SandboxPage() {
         <div className="flex items-center justify-between px-4 py-3 bg-slate-50/50 border-b border-slate-100">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-violet-500" />
-            <span className="text-sm font-bold text-slate-700">Master Prompt</span>
+            <span className="text-sm font-bold text-slate-700">{text.masterPrompt}</span>
           </div>
           <div className="relative group">
             <button className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-800 font-semibold transition">
-              Prompt Mẫu <ChevronDown className="w-3 h-3" />
+              {text.samplePrompt} <ChevronDown className="w-3 h-3" />
             </button>
             <div className="absolute right-0 top-6 w-72 bg-white border border-slate-100 rounded-xl shadow-lg py-1 hidden group-hover:block z-20">
-              {EXAMPLE_PROMPTS.map((ex, i) => (
+              {text.examples.map((ex, i) => (
                 <button
                   key={i}
                   onClick={() => setPrompt(ex)}
@@ -208,7 +260,7 @@ export default function SandboxPage() {
             ref={textareaRef}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Nhập prompt bạn muốn kiểm thử trên nhiều mô hình AI..."
+            placeholder={text.placeholder}
             rows={4}
             className="w-full text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
             onKeyDown={(e) => {
@@ -222,7 +274,7 @@ export default function SandboxPage() {
         <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-t border-slate-100">
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <Info className="w-4 h-4" />
-            Nhấn <kbd className="bg-white border border-slate-200 rounded px-1.5 font-sans shadow-sm">Ctrl</kbd> + <kbd className="bg-white border border-slate-200 rounded px-1.5 font-sans shadow-sm">Enter</kbd> để chạy
+            {text.hint}
           </div>
           <button
             onClick={handleRun}
@@ -235,12 +287,12 @@ export default function SandboxPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                 </svg>
-                Đang chạy...
+                {text.running}
               </>
             ) : (
               <>
                 <Send className="w-4 h-4" />
-                Chạy Sandbox
+                {text.runBtn}
               </>
             )}
           </button>
@@ -281,7 +333,7 @@ export default function SandboxPage() {
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center grayscale overflow-hidden">
                     <Image src={res.logo} alt={res.model} width={48} height={48} className="object-cover opacity-60" />
                   </div>
-                  <p className="text-xs font-medium">Chờ thực thi</p>
+                  <p className="text-xs font-medium">{text.waiting}</p>
                 </div>
               )}
 
@@ -301,7 +353,7 @@ export default function SandboxPage() {
                     <Zap className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold">Lỗi kết nối API</p>
+                    <p className="text-sm font-bold">{text.errApi}</p>
                     <p className="text-xs mt-1 max-w-[200px] text-red-400 leading-relaxed">{res.content}</p>
                   </div>
                 </div>

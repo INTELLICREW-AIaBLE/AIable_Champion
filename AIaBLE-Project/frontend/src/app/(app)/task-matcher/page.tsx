@@ -29,12 +29,60 @@ const MOCK_STEPS: TimelineStep[] = [
   },
 ];
 
+const t = {
+  vi: {
+    title: 'AI Task-Matcher',
+    desc: 'Mô tả bài tập lớn — hệ thống phân rã thành từng bước và gợi ý công cụ AI phù hợp nhất.',
+    placeholder: 'Làm báo cáo môn Software Engineering về kiến trúc microservices',
+    analyzing: 'Đang phân tích...',
+    analyzeBtn: 'Phân tích nhiệm vụ',
+    estimated: 'Estimated: 3–4 ngày',
+    viewPrompt: 'Xem prompt mẫu →',
+    stepDetail: 'Chi tiết bước',
+    stepDesc: 'Mô tả bước',
+    suggestTool: 'Công cụ đề xuất',
+    promptSample: 'Prompt mẫu',
+    promptDefault: `Bạn là trợ lý học thuật.\n\nNhiệm vụ:\n{stepName}\n\nNgữ cảnh:\nTôi đang làm bài tập lớn...\n\nYêu cầu:\n- Trình bày rõ ràng\n- Có cấu trúc từng phần\n- Gợi ý ví dụ thực tế\n- Không làm thay hoàn toàn, chỉ hỗ trợ định hướng`
+  },
+  en: {
+    title: 'AI Task-Matcher',
+    desc: 'Describe your large assignment — the system breaks it down step-by-step and recommends the best AI tool.',
+    placeholder: 'Write a Software Engineering report on microservices architecture',
+    analyzing: 'Analyzing...',
+    analyzeBtn: 'Analyze Task',
+    estimated: 'Estimated: 3-4 days',
+    viewPrompt: 'View sample prompt →',
+    stepDetail: 'Step Details',
+    stepDesc: 'Step Description',
+    suggestTool: 'Suggested Tool',
+    promptSample: 'Sample Prompt',
+    promptDefault: `You are an academic assistant.\n\nTask:\n{stepName}\n\nContext:\nI'm working on an assignment...\n\nRequirements:\n- Present clearly\n- Structured sections\n- Provide real-world examples\n- Do not do it all for me, only assist with directions`
+  }
+};
+
 export default function TaskMatcherPage() {
   const [selectedStep, setSelectedStep] = useState<TimelineStep | null>(null);
+  const [lang, setLang] = useState('vi');
 
-  const [taskDescription, setTaskDescription] = useState(
-    'Làm báo cáo môn Software Engineering về kiến trúc microservices'
-  );
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
+
+  const text = t[lang as 'en' | 'vi'] || t.vi;
+
+  const [taskDescription, setTaskDescription] = useState(text.placeholder);
+
+  // Update placeholder dynamically when language changes
+  useEffect(() => {
+    setTaskDescription(text.placeholder);
+  }, [lang]);
 
   const [subject, setSubject] = useState('software engineering');
   const [steps, setSteps] = useState<TimelineStep[]>(MOCK_STEPS);
@@ -45,10 +93,8 @@ export default function TaskMatcherPage() {
     async function fetchWorkflow() {
       try {
         setLoading(true);
-
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/task-matcher`);
         const json = await res.json();
-
         setSteps(Array.isArray(json.data) ? json.data : MOCK_STEPS);
       } catch (error) {
         console.error('Failed to fetch task workflow:', error);
@@ -57,31 +103,19 @@ export default function TaskMatcherPage() {
         setLoading(false);
       }
     }
-
     fetchWorkflow();
   }, []);
 
   const handleMatchTask = async () => {
     try {
       setLoading(true);
-
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/task-matcher`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          subject,
-          description: taskDescription,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, description: taskDescription }),
       });
-
       const json = await res.json();
-
-      if (!json.success) {
-        throw new Error(json.message || 'Task matcher failed');
-      }
-
+      if (!json.success) throw new Error(json.message || 'Task matcher failed');
       setSteps(Array.isArray(json.steps) ? json.steps : []);
       setSource(json.source || '');
     } catch (error) {
@@ -100,13 +134,12 @@ export default function TaskMatcherPage() {
           </div>
 
           <h1 className="text-2xl font-black text-slate-900">
-            AI Task-Matcher
+            {text.title}
           </h1>
         </div>
 
         <p className="text-sm text-slate-500">
-          Mô tả bài tập lớn — hệ thống phân rã thành từng bước và gợi ý công cụ
-          AI phù hợp nhất.
+          {text.desc}
         </p>
       </div>
 
@@ -136,7 +169,7 @@ export default function TaskMatcherPage() {
           className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-purple-700 text-sm font-bold text-white shadow-md shadow-violet-200 hover:from-violet-700 hover:to-purple-800 active:scale-95 transition disabled:opacity-70 disabled:cursor-not-allowed"
         >
           <Bot className="w-4 h-4" />
-          {loading ? 'Đang phân tích...' : 'Phân tích nhiệm vụ'}
+          {loading ? text.analyzing : text.analyzeBtn}
         </button>
       </div>
 
@@ -148,7 +181,7 @@ export default function TaskMatcherPage() {
           </span>
           <span className="text-violet-400">•</span>
           <span className="font-semibold text-violet-600">
-            Estimated: 3–4 ngày
+            {text.estimated}
           </span>
 
           {source && (
@@ -191,7 +224,7 @@ export default function TaskMatcherPage() {
                   </span>
 
                   <span className="ml-auto text-[11px] font-bold text-violet-600 group-hover:underline">
-                    Xem prompt mẫu →
+                    {text.viewPrompt}
                   </span>
                 </div>
               </div>
@@ -229,7 +262,7 @@ export default function TaskMatcherPage() {
             <div className="space-y-4">
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                 <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
-                  Mô tả bước
+                  {text.stepDesc}
                 </p>
                 <p className="text-sm text-slate-700 leading-relaxed">
                   {selectedStep.description}
@@ -238,13 +271,11 @@ export default function TaskMatcherPage() {
 
               <div className="rounded-2xl border border-purple-100 bg-purple-50 p-4">
                 <p className="text-xs font-bold text-purple-600 uppercase tracking-wide mb-2">
-                  Công cụ đề xuất
+                  {text.suggestTool}
                 </p>
-
                 <p className="text-sm font-black text-purple-800">
                   {selectedStep.suggestedTool}
                 </p>
-
                 <p className="text-sm text-slate-700 leading-relaxed mt-2">
                   {selectedStep.reason}
                 </p>
@@ -252,24 +283,10 @@ export default function TaskMatcherPage() {
 
               <div className="rounded-2xl border border-violet-100 bg-violet-50 p-4">
                 <p className="text-xs font-bold text-violet-600 uppercase tracking-wide mb-2">
-                  Prompt mẫu
+                  {text.promptSample}
                 </p>
-
                 <pre className="whitespace-pre-wrap text-sm text-slate-700 leading-relaxed font-mono">
-                  {selectedStep.suggestedPrompt ||
-                    `Bạn là trợ lý học thuật.
-
-Nhiệm vụ:
-${selectedStep.stepName}
-
-Ngữ cảnh:
-Tôi đang làm bài tập lớn môn Software Engineering về kiến trúc microservices.
-
-Yêu cầu:
-- Trình bày rõ ràng
-- Có cấu trúc từng phần
-- Gợi ý ví dụ thực tế
-- Không làm thay hoàn toàn, chỉ hỗ trợ định hướng`}
+                  {selectedStep.suggestedPrompt || text.promptDefault.replace('{stepName}', selectedStep.stepName)}
                 </pre>
               </div>
             </div>

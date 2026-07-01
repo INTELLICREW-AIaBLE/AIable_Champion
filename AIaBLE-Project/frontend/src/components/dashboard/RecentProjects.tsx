@@ -35,11 +35,43 @@ const statusDot: Record<string, string> = {
   blue: 'bg-blue-400',
 };
 
+const t = {
+  vi: {
+    title: 'My Recent Projects',
+    status: 'Trạng thái',
+    lastEdited: 'Cập nhật lần cuối',
+    viewAll: 'Tất cả Project'
+  },
+  en: {
+    title: 'My Recent Projects',
+    status: 'Status',
+    lastEdited: 'Last Edited',
+    viewAll: 'Projects'
+  }
+};
+
+import { useState, useEffect } from 'react';
+
 export function RecentProjects() {
+  const [lang, setLang] = useState('vi');
+
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
+
+  const text = t[lang as 'en' | 'vi'] || t.vi;
+
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-base font-semibold text-slate-800">My Recent Projects</h2>
+        <h2 className="text-base font-semibold text-slate-800">{text.title}</h2>
         <div className="flex items-center gap-1.5">
           <Sparkles className="w-3.5 h-3.5 text-violet-400" />
           <Settings className="w-3.5 h-3.5 text-slate-400" />
@@ -48,8 +80,8 @@ export function RecentProjects() {
 
       {/* Table header */}
       <div className="flex items-center justify-between px-2 mb-1">
-        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Status</span>
-        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Last Edited</span>
+        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{text.status}</span>
+        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{text.lastEdited}</span>
       </div>
 
       {/* Project list */}
@@ -80,7 +112,7 @@ export function RecentProjects() {
       {/* Footer */}
       <div className="mt-4">
         <button className="flex items-center gap-1 text-xs font-medium text-violet-600 hover:text-violet-800 transition">
-          Projects
+          {text.viewAll}
           <ArrowRight className="w-3 h-3" />
         </button>
       </div>

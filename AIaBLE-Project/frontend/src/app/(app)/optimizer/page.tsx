@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Wand2, Copy, Check, AlertTriangle, ChevronDown,
   Sparkles, ArrowRight, RotateCcw, Info, X,
@@ -34,12 +34,102 @@ const TONES: { id: ToneType; label: string; icon: React.ElementType; desc: strin
   { id: 'concise', label: 'Concise', icon: Zap, desc: 'Brief, to the point' },
 ];
 
-const EXAMPLE_PROMPTS = [
-  'Giải thích thuật toán quicksort cho tôi',
-  'Viết báo cáo về biến đổi khí hậu',
-  'Tóm tắt chương 3 sách giáo trình',
-  'Giải bài toán tích phân này cho tôi',
-];
+const t = {
+  vi: {
+    title: 'Prompt Optimizer',
+    desc: 'Biến raw prompt thô thành prompt chuyên nghiệp với AI. Xem ngay sự khác biệt Before / After.',
+    reset: 'Reset',
+    aiModel: 'AI Model',
+    outputTone: 'Output Tone',
+    rawPrompt: 'Raw Prompt',
+    chars: 'ký tự',
+    words: 'từ',
+    example: 'Ví dụ',
+    placeholder: "Nhập prompt thô của bạn vào đây...\n\nVí dụ: 'Giải thích thuật toán quicksort cho tôi'",
+    hint: 'Nhập tối thiểu 10 ký tự để bắt đầu tối ưu',
+    optimizing: 'Đang tối ưu...',
+    optimizeBtn: 'Optimize Prompt',
+    view: 'Xem:',
+    ethicsWarning: 'Cảnh báo đạo đức',
+    before: 'Before',
+    after: 'After',
+    optimizedBy: 'Optimized',
+    significantImprovement: 'Cải thiện đáng kể',
+    suggestions: 'Gợi ý cải thiện thêm',
+    reoptimize: 'Tối ưu lại với gợi ý này',
+    errConn: 'Không thể kết nối đến server backend.',
+    errGen: 'Có lỗi xảy ra khi tối ưu prompt.',
+    copied: 'Copied!',
+    copy: 'Copy',
+    tones: {
+      academic: { label: 'Academic', desc: 'Formal, citation-ready' },
+      technical: { label: 'Technical', desc: 'Precise, structured' },
+      creative: { label: 'Creative', desc: 'Vivid, engaging' },
+      concise: { label: 'Concise', desc: 'Brief, to the point' }
+    },
+    examples: [
+      'Giải thích thuật toán quicksort cho tôi',
+      'Viết báo cáo về biến đổi khí hậu',
+      'Tóm tắt chương 3 sách giáo trình',
+      'Giải bài toán tích phân này cho tôi',
+    ],
+    ethicsTitle: '⚠️ Cảnh báo Đạo đức Học thuật',
+    ethicsMsg1: 'AIaBLE khuyến khích sử dụng AI để:',
+    ethicsL1: 'Hiểu sâu hơn về chủ đề',
+    ethicsL2: 'Lấy ý tưởng và gợi ý cấu trúc',
+    ethicsL3: 'Review và cải thiện bài viết của mình',
+    ethicsL4: 'Làm bài thay hoặc gian lận thi cử',
+    close: 'Đóng',
+    iUnderstand: 'Tôi hiểu rồi'
+  },
+  en: {
+    title: 'Prompt Optimizer',
+    desc: 'Turn raw prompts into professional prompts with AI. See the Before / After difference instantly.',
+    reset: 'Reset',
+    aiModel: 'AI Model',
+    outputTone: 'Output Tone',
+    rawPrompt: 'Raw Prompt',
+    chars: 'chars',
+    words: 'words',
+    example: 'Examples',
+    placeholder: "Enter your raw prompt here...\n\nExample: 'Explain the quicksort algorithm to me'",
+    hint: 'Enter at least 10 characters to start optimizing',
+    optimizing: 'Optimizing...',
+    optimizeBtn: 'Optimize Prompt',
+    view: 'View:',
+    ethicsWarning: 'Ethics Warning',
+    before: 'Before',
+    after: 'After',
+    optimizedBy: 'Optimized',
+    significantImprovement: 'Significant Improvements',
+    suggestions: 'Suggestions for Improvement',
+    reoptimize: 'Re-optimize with this suggestion',
+    errConn: 'Cannot connect to backend server.',
+    errGen: 'An error occurred while optimizing prompt.',
+    copied: 'Copied!',
+    copy: 'Copy',
+    tones: {
+      academic: { label: 'Academic', desc: 'Formal, citation-ready' },
+      technical: { label: 'Technical', desc: 'Precise, structured' },
+      creative: { label: 'Creative', desc: 'Vivid, engaging' },
+      concise: { label: 'Concise', desc: 'Brief, to the point' }
+    },
+    examples: [
+      'Explain the quicksort algorithm to me',
+      'Write a report on climate change',
+      'Summarize chapter 3 of the textbook',
+      'Solve this integral problem for me',
+    ],
+    ethicsTitle: '⚠️ Academic Ethics Warning',
+    ethicsMsg1: 'AIaBLE encourages using AI to:',
+    ethicsL1: 'Understand the topic deeply',
+    ethicsL2: 'Get ideas and structural suggestions',
+    ethicsL3: 'Review and improve your writing',
+    ethicsL4: 'Do homework for you or cheat on exams',
+    close: 'Close',
+    iUnderstand: 'I Understand'
+  }
+};
 
 
 // ─── Mock optimize function ────────────────────────────────────────────────────
@@ -90,7 +180,6 @@ function CopyButton({ text }: { text: string }) {
         }`}
     >
       {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-      {copied ? 'Copied!' : 'Copy'}
     </button>
   );
 }
@@ -122,30 +211,29 @@ function ImprovementBar({ label, before, after, unit }: { label: string; before:
 }
 
 // ─── Ethics Dialog ─────────────────────────────────────────────────────────────
-function EthicsDialog({ reason, onDismiss }: { reason: string; onDismiss: () => void }) {
+function EthicsDialog({ reason, onDismiss, text }: { reason: string; onDismiss: () => void, text: any }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onDismiss} />
       <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-amber-200">
-        {/* Icon */}
         <div className="w-14 h-14 rounded-2xl bg-amber-50 border-2 border-amber-200 flex items-center justify-center mx-auto mb-4">
           <AlertTriangle className="w-7 h-7 text-amber-500" />
         </div>
 
         <h3 className="text-lg font-black text-slate-900 text-center mb-2">
-          ⚠️ Cảnh báo Đạo đức Học thuật
+          {text.ethicsTitle}
         </h3>
         <p className="text-sm text-slate-600 text-center mb-4 leading-relaxed">
           {reason}
         </p>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5 text-sm text-amber-800 space-y-2">
-          <p className="font-semibold">AIaBLE khuyến khích sử dụng AI để:</p>
+          <p className="font-semibold">{text.ethicsMsg1}</p>
           <ul className="space-y-1 text-amber-700">
-            <li className="flex items-start gap-2"><Check className="w-3.5 h-3.5 mt-0.5 text-emerald-500 shrink-0" /> Hiểu sâu hơn về chủ đề</li>
-            <li className="flex items-start gap-2"><Check className="w-3.5 h-3.5 mt-0.5 text-emerald-500 shrink-0" /> Lấy ý tưởng và gợi ý cấu trúc</li>
-            <li className="flex items-start gap-2"><Check className="w-3.5 h-3.5 mt-0.5 text-emerald-500 shrink-0" /> Review và cải thiện bài viết của mình</li>
-            <li className="flex items-start gap-2"><X className="w-3.5 h-3.5 mt-0.5 text-red-500 shrink-0" /> <span className="line-through opacity-60">Làm bài thay hoặc gian lận thi cử</span></li>
+            <li className="flex items-start gap-2"><Check className="w-3.5 h-3.5 mt-0.5 text-emerald-500 shrink-0" /> {text.ethicsL1}</li>
+            <li className="flex items-start gap-2"><Check className="w-3.5 h-3.5 mt-0.5 text-emerald-500 shrink-0" /> {text.ethicsL2}</li>
+            <li className="flex items-start gap-2"><Check className="w-3.5 h-3.5 mt-0.5 text-emerald-500 shrink-0" /> {text.ethicsL3}</li>
+            <li className="flex items-start gap-2"><X className="w-3.5 h-3.5 mt-0.5 text-red-500 shrink-0" /> <span className="line-through opacity-60">{text.ethicsL4}</span></li>
           </ul>
         </div>
 
@@ -154,13 +242,13 @@ function EthicsDialog({ reason, onDismiss }: { reason: string; onDismiss: () => 
             onClick={onDismiss}
             className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition"
           >
-            Đóng
+            {text.close}
           </button>
           <button
             onClick={onDismiss}
             className="flex-1 py-2.5 rounded-xl bg-violet-600 text-sm font-bold text-white hover:bg-violet-700 transition shadow-md shadow-violet-200"
           >
-            Tôi hiểu rồi
+            {text.iUnderstand}
           </button>
         </div>
       </div>
@@ -179,9 +267,23 @@ export default function OptimizerPage() {
   const [activeView, setActiveView] = useState<'split' | 'before' | 'after'>('split');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const [lang, setLang] = useState('vi');
+
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
+
+  const text = t[lang as 'en' | 'vi'] || t.vi;
+
   useEffect(() => {
     const prefill = sessionStorage.getItem('optimizer_prefill');
-
     if (prefill) {
       setRaw(prefill);
       sessionStorage.removeItem('optimizer_prefill');
@@ -215,11 +317,11 @@ export default function OptimizerPage() {
         if (json.ethicsFlag) setShowEthics(true);
       } else {
         console.error('Failed to optimize prompt:', json.message);
-        alert(json.message || 'Có lỗi xảy ra khi tối ưu prompt.');
+        alert(json.message || text.errGen);
       }
     } catch (error) {
       console.error('Error optimizing prompt:', error);
-      alert('Không thể kết nối đến server backend.');
+      alert(text.errConn);
     } finally {
       setLoading(false);
     }
@@ -241,10 +343,10 @@ export default function OptimizerPage() {
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center shadow-md shadow-violet-200">
               <Wand2 className="w-4 h-4 text-white" />
             </div>
-            <h1 className="text-2xl font-black text-slate-900">Prompt Optimizer</h1>
+            <h1 className="text-2xl font-black text-slate-900">{text.title}</h1>
           </div>
           <p className="text-sm text-slate-500">
-            Biến raw prompt thô thành prompt chuyên nghiệp với AI. Xem ngay sự khác biệt Before / After.
+            {text.desc}
           </p>
         </div>
         {result && (
@@ -252,7 +354,7 @@ export default function OptimizerPage() {
             onClick={handleReset}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 transition"
           >
-            <RotateCcw className="w-3.5 h-3.5" /> Reset
+            <RotateCcw className="w-3.5 h-3.5" /> {text.reset}
           </button>
         )}
       </div>
@@ -262,7 +364,7 @@ export default function OptimizerPage() {
 
         {/* AI Model */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-3">AI Model</p>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-3">{text.aiModel}</p>
           <div className="flex gap-2">
             {AI_MODELS.map((m) => (
               <button
@@ -285,7 +387,7 @@ export default function OptimizerPage() {
 
         {/* Tone */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-3">Output Tone</p>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-3">{text.outputTone}</p>
           <div className="grid grid-cols-2 gap-2">
             {TONES.map(({ id, label, icon: Icon, desc }) => (
               <button
@@ -298,8 +400,8 @@ export default function OptimizerPage() {
               >
                 <Icon className={`w-3.5 h-3.5 shrink-0 ${tone === id ? 'text-violet-600' : 'text-slate-400'}`} />
                 <div>
-                  <p className={`text-xs font-semibold ${tone === id ? 'text-violet-700' : 'text-slate-700'}`}>{label}</p>
-                  <p className="text-[10px] text-slate-400 leading-none">{desc}</p>
+                  <p className={`text-xs font-semibold ${tone === id ? 'text-violet-700' : 'text-slate-700'}`}>{(text.tones as any)[id]?.label || label}</p>
+                  <p className="text-[10px] text-slate-400 leading-none">{(text.tones as any)[id]?.desc || desc}</p>
                 </div>
               </button>
             ))}
@@ -312,19 +414,19 @@ export default function OptimizerPage() {
         <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100">
           <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-slate-300 inline-block" />
-            Raw Prompt
+            {text.rawPrompt}
           </span>
           <div className="flex items-center gap-3">
             <span className={`text-xs font-medium ${charCount > 1000 ? 'text-amber-500' : 'text-slate-400'}`}>
-              {charCount}/2000 ký tự · {wordCount} từ
+              {charCount}/2000 {text.chars} · {wordCount} {text.words}
             </span>
             {/* Example prompts */}
             <div className="relative group">
               <button className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-800 font-semibold transition">
-                Ví dụ <ChevronDown className="w-3 h-3" />
+                {text.example} <ChevronDown className="w-3 h-3" />
               </button>
               <div className="absolute right-0 top-6 w-64 bg-white border border-slate-100 rounded-xl shadow-lg py-1 hidden group-hover:block z-10">
-                {EXAMPLE_PROMPTS.map((ex) => (
+                {text.examples.map((ex) => (
                   <button
                     key={ex}
                     onClick={() => setRaw(ex)}
@@ -342,7 +444,7 @@ export default function OptimizerPage() {
           ref={textareaRef}
           value={raw}
           onChange={(e) => setRaw(e.target.value)}
-          placeholder="Nhập prompt thô của bạn vào đây...&#10;&#10;Ví dụ: 'Giải thích thuật toán quicksort cho tôi'"
+          placeholder={text.placeholder}
           maxLength={2000}
           rows={6}
           className="w-full px-5 py-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
@@ -351,7 +453,7 @@ export default function OptimizerPage() {
         <div className="flex items-center justify-between px-5 py-3 border-t border-slate-100 bg-slate-50/50">
           <div className="flex items-center gap-1.5 text-xs text-slate-400">
             <Info className="w-3.5 h-3.5" />
-            Nhập tối thiểu 10 ký tự để bắt đầu tối ưu
+            {text.hint}
           </div>
           <button
             onClick={handleOptimize}
@@ -364,12 +466,12 @@ export default function OptimizerPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                 </svg>
-                Đang tối ưu...
+                {text.optimizing}
               </>
             ) : (
               <>
                 <Wand2 className="w-4 h-4" />
-                Optimize Prompt
+                {text.optimizeBtn}
               </>
             )}
           </button>
@@ -398,7 +500,7 @@ export default function OptimizerPage() {
 
           {/* View toggle */}
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-500 mr-1">Xem:</span>
+            <span className="text-xs font-semibold text-slate-500 mr-1">{text.view}</span>
             {(['split', 'before', 'after'] as const).map((v) => (
               <button
                 key={v}
@@ -408,7 +510,7 @@ export default function OptimizerPage() {
                     : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
                   }`}
               >
-                {v === 'split' ? '⊟ Split' : v === 'before' ? '← Before' : '→ After'}
+                {v === 'split' ? '⊟ Split' : v === 'before' ? `← ${text.before}` : `→ ${text.after}`}
               </button>
             ))}
 
@@ -419,7 +521,7 @@ export default function OptimizerPage() {
                 className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-700 hover:bg-amber-100 transition"
               >
                 <AlertTriangle className="w-3.5 h-3.5" />
-                Cảnh báo đạo đức
+                {text.ethicsWarning}
               </button>
             )}
           </div>
@@ -433,7 +535,7 @@ export default function OptimizerPage() {
                 <div className="flex items-center justify-between px-5 py-3 bg-slate-50 border-b border-slate-100">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                    <span className="text-sm font-bold text-slate-700">Before</span>
+                    <span className="text-sm font-bold text-slate-700">{text.before}</span>
                     <span className="text-xs text-slate-400">Raw prompt</span>
                   </div>
                   <CopyButton text={raw} />
@@ -450,8 +552,8 @@ export default function OptimizerPage() {
                 <div className="flex items-center justify-between px-5 py-3 bg-violet-50 border-b border-violet-100">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-violet-500" />
-                    <span className="text-sm font-bold text-violet-800">After</span>
-                    <span className="text-xs text-violet-400">Optimized · {model}</span>
+                    <span className="text-sm font-bold text-violet-800">{text.after}</span>
+                    <span className="text-xs text-violet-400">{text.optimizedBy} · {model}</span>
                   </div>
                   <CopyButton text={result.optimized} />
                 </div>
@@ -469,7 +571,7 @@ export default function OptimizerPage() {
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
               <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-violet-500" />
-                Cải thiện đáng kể
+                {text.significantImprovement}
               </h3>
               <div className="space-y-4">
                 {result.improvements.map((imp) => (
@@ -482,7 +584,7 @@ export default function OptimizerPage() {
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
               <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-violet-500" />
-                Gợi ý cải thiện thêm
+                {text.suggestions}
               </h3>
               <ul className="space-y-3">
                 {result.suggestions.map((s, i) => (
@@ -501,7 +603,7 @@ export default function OptimizerPage() {
                   className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-purple-700 text-sm font-bold text-white hover:opacity-90 transition shadow-md shadow-violet-200"
                 >
                   <ArrowRight className="w-4 h-4" />
-                  Tối ưu lại với gợi ý này
+                  {text.reoptimize}
                 </button>
               </div>
             </div>
@@ -511,7 +613,7 @@ export default function OptimizerPage() {
 
       {/* ── Ethics Dialog ────────────────────────────────────────────────────── */}
       {showEthics && result?.ethicsReason && (
-        <EthicsDialog reason={result.ethicsReason} onDismiss={() => setShowEthics(false)} />
+        <EthicsDialog reason={result.ethicsReason} text={text} onDismiss={() => setShowEthics(false)} />
       )}
     </div>
   );

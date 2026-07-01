@@ -19,22 +19,20 @@ Dự án được cấu trúc dạng Monorepo (Next.js Frontend + Express/TypeSc
 
 ## ✅ Các Công Việc Vừa Hoàn Thành (Recent Updates)
 
-*Cập nhật gần nhất: 01/07/2026 (Phiên 2)*
+*Cập nhật gần nhất: 01/07/2026 (Phiên 3)*
 
-- **Sửa lỗi UI/UX & Điều hướng:**
-  - Cấu hình lại `GatewayGuard`: Bỏ qua xác minh Bot/Turnstile đối với các trang công khai (`/`, `/login`, `/register`, `/forgot-password`). Khắc phục triệt để lỗi màn hình đen/trắng (blank page) khi tải trang lần đầu mà không cần reload.
-- **Trang Cài đặt (Settings Page):**
-  - **Cải thiện luồng lưu trữ:** Đã bổ sung nút "Lưu thay đổi" (Save Changes) rõ ràng cho tab Giao diện & Ngôn ngữ và tab Thông báo thay vì tự động lưu ngay lập tức.
-  - Xóa tùy chọn Tiếng Nhật khỏi hệ thống.
-  - **Quản lý tài khoản:** Cấu trúc form Đổi mật khẩu chuẩn xác, bỏ nút Xóa tài khoản, sửa font chữ.
-- **Đa ngôn ngữ (i18n):** 
-  - Tính năng đa ngôn ngữ (Tiếng Việt/Tiếng Anh) giờ đây được đồng bộ hóa và lưu trữ trong `localStorage`. Các trang công khai (Landing Page, Navbar, Đăng nhập, Đăng ký) sẽ tự động ghi nhớ và hiển thị đúng ngôn ngữ bạn đã chọn từ màn Cài đặt ngay cả khi đã đăng xuất khỏi tài khoản.
+- **Quản lý Tài Khoản & Bảo mật:**
+  - **Quên mật khẩu (Forgot Password):** Tích hợp thành công thư viện `nodemailer` (Backend) để gửi email xác nhận.
+  - Xây dựng trang `/reset-password` (Frontend) hỗ trợ người dùng nhập token từ email và tiến hành đổi mật khẩu an toàn.
+  - Sửa lỗi màn hình trắng của `GatewayGuard` và thiết lập luồng điều hướng bảo mật.
+
+- **Đồng bộ Đa ngôn ngữ (Global i18n):** 
+  - Hoàn thiện luồng dịch thuật tự động (Tiếng Việt/Tiếng Anh) cho toàn bộ các module trong Dashboard: **AI Task-Matcher**, **AI Sandbox**, **Prompt Optimizer**, **Output Validator**, **Recipe Library**, và **Projects**.
+  - Các thành phần điều hướng chính như **Sidebar** và **Dropdown Avatar (AppNavbar)** cũng đã được liên kết với `localStorage`, đảm bảo giao diện lập tức thay đổi đồng bộ trên toàn trang khi ngôn ngữ được điều chỉnh mà không cần tải lại trang.
 
 ---
 
 ## 🚧 Công Việc Đề Xuất Tiếp Theo (Next Steps)
 
-1. Tích hợp logic xử lý API (Backend) cho thao tác Đổi mật khẩu trong Settings.
-2. Thiết kế và xử lý luồng Gửi Email/Reset khi nhấn vào "Quên mật khẩu".
-3. Thiết lập hệ thống Đa ngôn ngữ (i18n) cho toàn bộ ứng dụng (Next.js i18n hoặc next-intl) nếu cần thiết thay vì chỉ áp dụng ở trang Settings.
-4. Triển khai logic Backend cho các tính năng lõi (Validator, Sandbox, Optimizer,...).
+1. Tích hợp logic xử lý API cho thao tác Đổi mật khẩu trong Settings (hiện tại mới chỉ có frontend).
+2. Triển khai logic Backend AI cho các tính năng lõi (Validator, Sandbox, Optimizer,...).

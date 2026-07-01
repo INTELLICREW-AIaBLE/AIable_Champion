@@ -6,58 +6,126 @@ import { FeaturedRecipes } from '@/components/dashboard/FeaturedRecipes';
 import { RecentProjects } from '@/components/dashboard/RecentProjects';
 import { useAuth } from '@/hooks/useAuth';
 
-const quickAccessItems = [
-  {
-    title: 'Optimize Prompt',
-    description: 'Enhance your raw prompts.',
-    icon: <Wand2 className="w-5 h-5" />,
-    decorIcon: <Wand2 className="w-10 h-10" />,
-    iconBg: 'bg-violet-100',
-    iconColor: 'text-violet-600',
-    decorColor: 'text-violet-400',
-    href: '/optimizer',
+const t = {
+  vi: {
+    welcome: 'Xin chào',
+    welcomeSuffix: '!',
+    welcomeDefault: 'Chào mừng đến với AIaBLE!',
+    desc: 'Nền tảng tối ưu hoá năng suất bằng AI. Tối ưu prompt và lên luồng task tự động.',
+    quickAccess: 'Truy cập nhanh',
+    items: [
+      {
+        title: 'Tối ưu Prompt',
+        description: 'Cải thiện prompt thô của bạn.',
+        icon: <Wand2 className="w-5 h-5" />,
+        decorIcon: <Wand2 className="w-10 h-10" />,
+        iconBg: 'bg-violet-100',
+        iconColor: 'text-violet-600',
+        decorColor: 'text-violet-400',
+        href: '/optimizer',
+      },
+      {
+        title: 'Ghép Task',
+        description: 'Tạo quy trình làm việc từng bước cho bài tập của bạn.',
+        icon: <GitBranch className="w-5 h-5" />,
+        decorIcon: <GitBranch className="w-10 h-10" />,
+        iconBg: 'bg-blue-100',
+        iconColor: 'text-blue-600',
+        decorColor: 'text-blue-400',
+        href: '/task-matcher',
+      },
+      {
+        title: 'Thư viện Recipes',
+        description: 'Khám phá thư viện AI Recipe được tuyển chọn.',
+        icon: <BookOpen className="w-5 h-5" />,
+        decorIcon: <BookOpen className="w-10 h-10" />,
+        iconBg: 'bg-purple-100',
+        iconColor: 'text-purple-600',
+        decorColor: 'text-purple-400',
+        href: '/recipes',
+      },
+      {
+        title: 'Kiểm tra Output',
+        description: 'Kiểm tra kết quả AI để xác thực nguồn.',
+        icon: <ShieldCheck className="w-5 h-5" />,
+        decorIcon: <ShieldCheck className="w-10 h-10" />,
+        iconBg: 'bg-indigo-100',
+        iconColor: 'text-indigo-600',
+        decorColor: 'text-indigo-400',
+        href: '/validator',
+      },
+      {
+        title: 'AI Sandbox',
+        description: 'So sánh kết quả từ Groq, OpenRouter và Gemini.',
+        icon: <Sparkles className="w-5 h-5" />,
+        decorIcon: <Sparkles className="w-10 h-10" />,
+        iconBg: 'bg-fuchsia-100',
+        iconColor: 'text-fuchsia-600',
+        decorColor: 'text-fuchsia-400',
+        href: '/sandbox',
+      },
+    ]
   },
-  {
-    title: 'Match Task',
-    description: 'Get a step-by-step workflow for your assignment.',
-    icon: <GitBranch className="w-5 h-5" />,
-    decorIcon: <GitBranch className="w-10 h-10" />,
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-600',
-    decorColor: 'text-blue-400',
-    href: '/task-matcher',
-  },
-  {
-    title: 'Browse Recipes',
-    description: 'Explore our curated AI Recipe Library.',
-    icon: <BookOpen className="w-5 h-5" />,
-    decorIcon: <BookOpen className="w-10 h-10" />,
-    iconBg: 'bg-purple-100',
-    iconColor: 'text-purple-600',
-    decorColor: 'text-purple-400',
-    href: '/recipes',
-  },
-  {
-    title: 'Verify Output',
-    description: 'Check AI results for source validation.',
-    icon: <ShieldCheck className="w-5 h-5" />,
-    decorIcon: <ShieldCheck className="w-10 h-10" />,
-    iconBg: 'bg-indigo-100',
-    iconColor: 'text-indigo-600',
-    decorColor: 'text-indigo-400',
-    href: '/validator',
-  },
-  {
-    title: 'AI Sandbox',
-    description: 'Compare outputs from Groq, OpenRouter, and Gemini.',
-    icon: <Sparkles className="w-5 h-5" />,
-    decorIcon: <Sparkles className="w-10 h-10" />,
-    iconBg: 'bg-fuchsia-100',
-    iconColor: 'text-fuchsia-600',
-    decorColor: 'text-fuchsia-400',
-    href: '/sandbox',
-  },
-];
+  en: {
+    welcome: 'Welcome',
+    welcomeSuffix: ' san!',
+    welcomeDefault: 'Welcome to AIaBLE!',
+    desc: 'Your AI-powered productivity platform. Optimizing prompts and matching tasks.',
+    quickAccess: 'QUICK ACCESS',
+    items: [
+      {
+        title: 'Optimize Prompt',
+        description: 'Enhance your raw prompts.',
+        icon: <Wand2 className="w-5 h-5" />,
+        decorIcon: <Wand2 className="w-10 h-10" />,
+        iconBg: 'bg-violet-100',
+        iconColor: 'text-violet-600',
+        decorColor: 'text-violet-400',
+        href: '/optimizer',
+      },
+      {
+        title: 'Match Task',
+        description: 'Get a step-by-step workflow for your assignment.',
+        icon: <GitBranch className="w-5 h-5" />,
+        decorIcon: <GitBranch className="w-10 h-10" />,
+        iconBg: 'bg-blue-100',
+        iconColor: 'text-blue-600',
+        decorColor: 'text-blue-400',
+        href: '/task-matcher',
+      },
+      {
+        title: 'Browse Recipes',
+        description: 'Explore our curated AI Recipe Library.',
+        icon: <BookOpen className="w-5 h-5" />,
+        decorIcon: <BookOpen className="w-10 h-10" />,
+        iconBg: 'bg-purple-100',
+        iconColor: 'text-purple-600',
+        decorColor: 'text-purple-400',
+        href: '/recipes',
+      },
+      {
+        title: 'Verify Output',
+        description: 'Check AI results for source validation.',
+        icon: <ShieldCheck className="w-5 h-5" />,
+        decorIcon: <ShieldCheck className="w-10 h-10" />,
+        iconBg: 'bg-indigo-100',
+        iconColor: 'text-indigo-600',
+        decorColor: 'text-indigo-400',
+        href: '/validator',
+      },
+      {
+        title: 'AI Sandbox',
+        description: 'Compare outputs from Groq, OpenRouter, and Gemini.',
+        icon: <Sparkles className="w-5 h-5" />,
+        decorIcon: <Sparkles className="w-10 h-10" />,
+        iconBg: 'bg-fuchsia-100',
+        iconColor: 'text-fuchsia-600',
+        decorColor: 'text-fuchsia-400',
+        href: '/sandbox',
+      },
+    ]
+  }
+};
 
 // Lấy 2 từ cuối từ full name, ví dụ "Nguyễn Huy Hoàng Anh" → "Hoàng Anh"
 function getFirstName(fullName: string): string {
@@ -65,8 +133,25 @@ function getFirstName(fullName: string): string {
   return parts.slice(-2).join(' ') || fullName;
 }
 
+import { useState, useEffect } from 'react';
+
 export default function Home() {
   const { userProfile, loading } = useAuth();
+
+  const [lang, setLang] = useState('vi');
+
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
+
+  const text = t[lang as 'en' | 'vi'] || t.vi;
 
   const displayName = !loading && userProfile.name !== 'User' ? getFirstName(userProfile.name) : null;
 
@@ -84,24 +169,24 @@ export default function Home() {
       <div className="mb-6 pr-24">
         <h1 className="text-2xl font-bold text-slate-900">
           {displayName ? (
-            <>Welcome <span className="text-violet-600">{displayName}</span> san!</>
+            <>{text.welcome} <span className="text-violet-600">{displayName}</span>{text.welcomeSuffix}</>
           ) : (
-            'Welcome to Alable!'
+            text.welcomeDefault
           )}
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          Your AI-powered productivity platform. Optimizing prompts and matching tasks.
+          {text.desc}
         </p>
       </div>
 
       {/* Quick Access Section */}
       <section className="mb-8">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-slate-600 uppercase tracking-wide">Quick Access</h2>
+          <h2 className="text-sm font-semibold text-slate-600 uppercase tracking-wide">{text.quickAccess}</h2>
           <Zap className="w-3.5 h-3.5 text-violet-400" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {quickAccessItems.map((item) => (
+          {text.items.map((item) => (
             <QuickAccessCard key={item.title} {...item} />
           ))}
         </div>

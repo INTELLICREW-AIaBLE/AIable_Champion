@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
 import fetch from 'node-fetch'; // if needed, but Next/Node 18+ has fetch built-in, assuming Node 18+ because Express + Next14.
+import nodemailer from 'nodemailer';
+import crypto from 'crypto';
 
 const USERS_FILE = path.join(__dirname, '../data/users.json');
 
@@ -185,18 +187,104 @@ export const forgotPassword = async (req: Request, res: Response) => {
     }
 
     const users = readUsers();
-    const user = users.find(u => u.email === email);
+    const userIndex = users.findIndex(u => u.email === email);
     
     // Luôn trả về success để tránh dò rỉ email (security best practice)
-    if (!user) {
+    if (userIndex === -1) {
       return res.json({ success: true, message: 'Nếu email tồn tại, một hướng dẫn đã được gửi đi.' });
     }
 
-    // TODO: Send email here
-    console.log(`[Mock Email] Gửi link reset password tới ${email}`);
+    const user = users[userIndex];
+    
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
+
+    // Save token to user
+    users[userIndex] = { ...user, resetToken, resetTokenExpiry };
+    writeUsers(users);
+
+    // Prepare Nodemailer transport
+    const transporter = nodemailer.createTransport({
+      service: 'gmail', // or use host/port if not gmail
+      auth: {
+        user: process.env.SMTP_EMAIL,
+        pass: process.env.SMTP_PASSWORD // App Password
+      }
+    });
+
+    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+
+    const mailOptions = {
+      from: `"AIaBLE Support" <${process.env.SMTP_EMAIL}>`,
+      to: email,
+      subject: 'Khôi phục mật khẩu tài khoản AIaBLE',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #8B5CF6;">AIaBLE - Khôi phục mật khẩu</h2>
+          <p>Xin chào ${user.fullName},</p>
+          <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản AIaBLE của mình.</p>
+          <p>Vui lòng click vào nút bên dưới để tiến hành đặt lại mật khẩu. Link này sẽ hết hạn sau 1 giờ.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetLink}" style="background-color: #8B5CF6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+              Đặt Lại Mật Khẩu
+            </a>
+          </div>
+          <p>Nếu bạn không yêu cầu điều này, vui lòng bỏ qua email.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p style="color: #888; font-size: 12px;">Đội ngũ AIaBLE INTELLICREW</p>
+        </div>
+      `
+    };
+
+    if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
+      await transporter.sendMail(mailOptions);
+      console.log(`[Email Sent] Đã gửi link reset password tới ${email}`);
+    } else {
+      console.log(`[Mock Email] SMTP chưa được cấu hình. Gửi link reset password tới ${email}: ${resetLink}`);
+    }
 
     res.json({ success: true, message: 'Hướng dẫn khôi phục mật khẩu đã được gửi đến email của bạn.' });
   } catch (error: any) {
+    console.error('[Forgot Password Error]', error);
     res.status(500).json({ success: false, message: 'Lỗi server khi xử lý yêu cầu quên mật khẩu.' });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { token, email, newPassword } = req.body;
+    
+    if (!token || !email || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Thiếu thông tin yêu cầu.' });
+    }
+
+    const users = readUsers();
+    const userIndex = users.findIndex(u => u.email === email && u.resetToken === token);
+
+    if (userIndex === -1) {
+      return res.status(400).json({ success: false, message: 'Token không hợp lệ hoặc sai email.' });
+    }
+
+    const user = users[userIndex];
+
+    if (!user.resetTokenExpiry || Date.now() > user.resetTokenExpiry) {
+      return res.status(400).json({ success: false, message: 'Token đã hết hạn. Vui lòng yêu cầu lại.' });
+    }
+
+    // Update password and remove reset token
+    users[userIndex] = {
+      ...user,
+      password: newPassword,
+      resetToken: undefined,
+      resetTokenExpiry: undefined
+    };
+
+    writeUsers(users);
+
+    res.json({ success: true, message: 'Đổi mật khẩu thành công. Bạn có thể đăng nhập bằng mật khẩu mới.' });
+  } catch (error: any) {
+    console.error('[Reset Password Error]', error);
+    res.status(500).json({ success: false, message: 'Lỗi server khi đặt lại mật khẩu.' });
   }
 };
