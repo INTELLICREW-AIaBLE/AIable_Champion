@@ -96,14 +96,35 @@ function NeuralNetworkDecor({ flip = false }: { flip?: boolean }) {
   );
 }
 
+const t = {
+  vi: {
+    profile: 'Thông tin cá nhân',
+    notifications: 'Thông báo',
+    whatsNew: "What's New",
+    settings: 'Cài đặt',
+    shortcuts: 'Phím tắt',
+    help: 'Trợ giúp',
+    logout: 'Đăng xuất',
+  },
+  en: {
+    profile: 'Profile',
+    notifications: 'Notifications',
+    whatsNew: "What's New",
+    settings: 'Settings',
+    shortcuts: 'Shortcuts',
+    help: 'Help',
+    logout: 'Logout',
+  }
+};
+
 // ─── User menu items ──────────────────────────────────────────────────────────
-const menuItems = [
-  { icon: User, label: 'Thông tin cá nhân', href: '/profile', dividerAfter: false },
-  { icon: Bell, label: 'Thông báo', href: '/notifications', dividerAfter: false },
-  { icon: Sparkles, label: "What's New", href: '/changelog', dividerAfter: false },
-  { icon: Settings, label: 'Cài đặt', href: '/settings', dividerAfter: true },
-  { icon: Keyboard, label: 'Phím tắt', href: '/shortcuts', dividerAfter: false },
-  { icon: HelpCircle, label: 'Trợ giúp', href: '/help', dividerAfter: false },
+const getMenuItems = (langText: any) => [
+  { icon: User, label: langText.profile, href: '/profile', dividerAfter: false },
+  { icon: Bell, label: langText.notifications, href: '/notifications', dividerAfter: false },
+  { icon: Sparkles, label: langText.whatsNew, href: '/changelog', dividerAfter: false },
+  { icon: Settings, label: langText.settings, href: '/settings', dividerAfter: true },
+  { icon: Keyboard, label: langText.shortcuts, href: '/shortcuts', dividerAfter: false },
+  { icon: HelpCircle, label: langText.help, href: '/help', dividerAfter: false },
 ];
 
 // ─── AppNavbar ────────────────────────────────────────────────────────────────
@@ -117,6 +138,22 @@ export function AppNavbar() {
   // User Profile
   const { userProfile, loading: profileLoading } = useAuth();
   const initials = userProfile.name.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase() || 'U';
+
+  const [lang, setLang] = useState('vi');
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
+
+  const currentLang = (lang === 'en' ? 'en' : 'vi') as 'en' | 'vi';
+  const text = t[currentLang];
+  const menuItems = getMenuItems(text);
 
   // Search
   const [query, setQuery] = useState('');
@@ -357,7 +394,7 @@ export function AppNavbar() {
                   className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition group"
                 >
                   <LogOut className="w-4 h-4 group-hover:text-red-600 transition" />
-                  Logout
+                  {text.logout}
                 </button>
               </div>
             )}

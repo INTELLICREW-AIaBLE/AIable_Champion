@@ -9,8 +9,9 @@ export function GatewayGuard({ children }: { children: React.ReactNode }) {
   const [isHuman, setIsHuman] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // If we are already on the verify page, don't do anything to block it
-    if (pathname === '/verify') {
+    // Các trang công khai không cần verify bot ngay lập tức
+    const publicPaths = ['/', '/login', '/register', '/forgot-password'];
+    if (pathname === '/verify' || publicPaths.includes(pathname)) {
       setIsHuman(true);
       return;
     }
@@ -25,9 +26,7 @@ export function GatewayGuard({ children }: { children: React.ReactNode }) {
       localStorage.removeItem('is_human_expiry');
       
       // Remember where the user originally wanted to go
-      if (pathname !== '/' && pathname !== '/login') {
-        sessionStorage.setItem('redirect_after_verify', pathname);
-      }
+      sessionStorage.setItem('redirect_after_verify', pathname);
       
       setIsHuman(false);
       router.replace('/verify');
@@ -36,18 +35,16 @@ export function GatewayGuard({ children }: { children: React.ReactNode }) {
     }
   }, [pathname, router]);
 
-  // Prevent flash of unverified content
-  if (isHuman === null) {
-    return (
-      <div className="min-h-screen bg-black"></div>
-    );
+  // Prevent flash of unverified content only for protected routes
+  const publicPaths = ['/', '/login', '/register', '/forgot-password', '/verify'];
+  const isPublicRoute = publicPaths.includes(pathname);
+
+  if (isHuman === null && !isPublicRoute) {
+    return <div className="min-h-screen bg-slate-900 flex items-center justify-center"><div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div></div>;
   }
 
-  // If not human and not on verify page, render nothing until redirect happens
-  if (isHuman === false && pathname !== '/verify') {
-    return (
-      <div className="min-h-screen bg-black"></div>
-    );
+  if (isHuman === false && !isPublicRoute) {
+    return <div className="min-h-screen bg-slate-900 flex items-center justify-center"><div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div></div>;
   }
 
   return <>{children}</>;

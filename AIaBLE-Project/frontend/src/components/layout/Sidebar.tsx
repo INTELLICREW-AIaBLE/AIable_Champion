@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -9,37 +10,92 @@ import {
   FolderOpen, Bookmark, Clock, Sparkles,
 } from 'lucide-react';
 
-const NAV_GROUPS = [
+const t = {
+  vi: {
+    groups: {
+      nav: 'Điều hướng',
+      tools: 'Công cụ AI',
+      workspace: 'Không gian làm việc'
+    },
+    items: {
+      home: 'Trang chủ',
+      opt: 'Tối ưu Prompt',
+      match: 'Ghép Task',
+      recipes: 'Thư viện Recipes',
+      verify: 'Kiểm tra Output',
+      sandbox: 'AI Sandbox',
+      projects: 'Dự án',
+      saved: 'Recipe đã lưu',
+      history: 'Lịch sử'
+    }
+  },
+  en: {
+    groups: {
+      nav: 'Navigation',
+      tools: 'AI Tools',
+      workspace: 'Workspace'
+    },
+    items: {
+      home: 'Home',
+      opt: 'Optimize Prompt',
+      match: 'Match Task',
+      recipes: 'Browse Recipes',
+      verify: 'Verify Output',
+      sandbox: 'AI Sandbox',
+      projects: 'Projects',
+      saved: 'Saved Recipes',
+      history: 'History'
+    }
+  }
+};
+
+const getNavGroups = (text: any) => [
   {
-    label: 'Navigation',
+    label: text.groups.nav,
     items: [
-      { href: '/home', label: 'Home', icon: Home },
+      { href: '/home', label: text.items.home, icon: Home },
     ],
   },
   {
-    label: 'AI Tools',
+    label: text.groups.tools,
     items: [
-      { href: '/optimizer',    label: 'Optimize Prompt', icon: Wand2 },
-      { href: '/task-matcher', label: 'Match Task',       icon: GitBranch },
-      { href: '/recipes',      label: 'Browse Recipes',   icon: BookOpen },
-      { href: '/validator',    label: 'Verify Output',    icon: ShieldCheck },
-      { href: '/sandbox',      label: 'AI Sandbox',       icon: Sparkles },
+      { href: '/optimizer',    label: text.items.opt, icon: Wand2 },
+      { href: '/task-matcher', label: text.items.match,       icon: GitBranch },
+      { href: '/recipes',      label: text.items.recipes,   icon: BookOpen },
+      { href: '/validator',    label: text.items.verify,    icon: ShieldCheck },
+      { href: '/sandbox',      label: text.items.sandbox,       icon: Sparkles },
     ],
   },
   {
-    label: 'Workspace',
+    label: text.groups.workspace,
     items: [
-      { href: '/projects',      label: 'Projects',       icon: FolderOpen },
-      { href: '/recipes/saved', label: 'Saved Recipes',  icon: Bookmark },
-      { href: '/history',       label: 'History',         icon: Clock },
+      { href: '/projects',      label: text.items.projects,       icon: FolderOpen },
+      { href: '/recipes/saved', label: text.items.saved,  icon: Bookmark },
+      { href: '/history',       label: text.items.history,         icon: Clock },
     ],
   },
 ];
 
 export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
   const pathname = usePathname();
+  const [lang, setLang] = useState('vi');
+
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
 
   if (pathname === '/') return null;
+
+  const currentLang = (lang === 'en' ? 'en' : 'vi') as 'en' | 'vi';
+  const text = t[currentLang];
+  const NAV_GROUPS = getNavGroups(text);
 
   return (
     <div className={cn('pb-12 border-r min-h-[calc(100vh-3.5rem)] w-56 hidden md:block bg-white shrink-0', className)}>

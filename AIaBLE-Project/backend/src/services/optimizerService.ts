@@ -130,7 +130,7 @@ export const optimizePrompt = async (
     // Call the appropriate AI model service (with caching!)
     if (modelName === 'Groq') {
       if (process.env.GROQ_API_KEY) {
-        responseText = await callGroq(promptInput);
+        responseText = await callGroq(promptInput, { jsonMode: true });
       } else {
         // Fallback to Gemini with Groq style
         const groqStylePrompt = `You are Llama 3.1 via Groq. ${promptInput}`;
@@ -138,7 +138,7 @@ export const optimizePrompt = async (
       }
     } else if (modelName === 'OpenRouter') {
       if (process.env.OPENROUTER_API_KEY) {
-        responseText = await callOpenRouter(promptInput);
+        responseText = await callOpenRouter(promptInput, { jsonMode: true });
       } else {
         // Fallback to Gemini with OpenRouter style
         const openRouterStylePrompt = `You are an AI via OpenRouter. ${promptInput}`;
@@ -150,20 +150,26 @@ export const optimizePrompt = async (
     }
 
     // Try to parse JSON response
+    let jsonText = responseText.trim();
     try {
-      // Extract JSON from markdown code blocks if present
-      let jsonText = responseText.trim();
       if (jsonText.startsWith('```json')) {
         jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?$/g, '');
       } else if (jsonText.startsWith('```')) {
         jsonText = jsonText.replace(/```\n?/g, '');
       }
-
       const parsed: OptimizeResult = JSON.parse(jsonText.trim());
       return parsed;
     } catch (parseError) {
-      console.error('Failed to parse AI JSON output:', responseText.substring(0, 200));
-      throw new Error('AI response parser error');
+      console.warn('Initial JSON parse failed, trying regex cleanups for trailing duplicate braces...');
+      try {
+        let cleaned = jsonText.replace(/```json/gi, '').replace(/```/g, '').trim();
+        cleaned = cleaned.replace(/\}\s*\}$/, '}');
+        const parsed: OptimizeResult = JSON.parse(cleaned);
+        return parsed;
+      } catch (nestedError) {
+        console.error('Failed to parse AI JSON output:', responseText.substring(0, 200));
+        throw new Error('AI response parser error');
+      }
     }
   } catch (error: any) {
     console.warn('[Optimizer Service Error - Using Fallback]:', error.message);

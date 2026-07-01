@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -45,20 +46,34 @@ function NeuralNetworkDecor({ flip = false }: { flip?: boolean }) {
   );
 }
 
+const t = {
+  vi: { login: 'Đăng nhập', register: 'Đăng ký' },
+  en: { login: 'Log in', register: 'Register' }
+};
+
 export function Navbar() {
+  const [lang, setLang] = useState('vi');
+
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
+
+  const currentLang = (lang === 'en' ? 'en' : 'vi') as 'en' | 'vi';
+  const text = t[currentLang];
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
       <div className="flex h-14 items-center px-4 gap-2">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0 w-52 group">
-          <Image
-            src="/logo.png"
-            alt="AIaBLE Logo"
-            width={36}
-            height={36}
-            priority
-            className="rounded-lg"
-          />
+          <Image src="/logo.png" alt="AIaBLE Logo" width={36} height={36} priority className="rounded-lg" />
           <div className="font-bold text-xl">
             <span className="text-black">Ala</span>
             <span className="text-purple-600">BLE</span>
@@ -73,21 +88,19 @@ export function Navbar() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-2.5 shrink-0">
-
           {/* Login */}
           <Link
             href="/login"
             className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition duration-200 shadow-sm whitespace-nowrap"
           >
-            Login
+            {text.login}
           </Link>
-
           {/* Register */}
           <Link
             href="/register"
             className="inline-flex items-center justify-center rounded-lg bg-violet-600 px-4 py-1.5 text-sm font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-md shadow-violet-200 whitespace-nowrap"
           >
-            Register
+            {text.register}
           </Link>
         </div>
       </div>
