@@ -1,6 +1,6 @@
 import { callGemini } from './gemini';
-import { callGPT4 } from './openai';
-import { callClaude } from './claude';
+import { callGroq } from './groq';
+import { callOpenRouter } from './openrouter';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -65,64 +65,16 @@ Return ONLY a valid JSON object matching this schema:
 `;
 }
 
-<<<<<<< Updated upstream
-    const dynamicGenAI = new GoogleGenerativeAI(activeKey);
-    const model = dynamicGenAI.getGenerativeModel({
-      model: 'gemini-3.1-flash-lite',
-      generationConfig: {
-        responseMimeType: 'application/json',
-      },
-    });
-=======
 /**
  * Generate fallback result when AI fails
  */
 function generateFallback(rawPrompt: string, modelName: string, tone: string): OptimizeResult {
   const isEthics = /làm hộ|làm giùm|viết thay|làm bài|thi hộ|gian lận|lam ho|lam gium|viet thay|lam bai|thi ho|gian lan/i.test(rawPrompt);
->>>>>>> Stashed changes
 
   const toneRole = tone === 'academic' ? 'Chuyên gia Học thuật' : tone === 'technical' ? 'Kỹ sư Hệ thống' : tone === 'creative' ? 'Chuyên viên Sáng tạo' : 'Trợ lý Tinh gọn';
   const toneStyle = tone === 'academic' ? 'văn phong học thuật khoa học, rõ ràng' : tone === 'technical' ? 'chính xác, đặc tả kỹ thuật chi tiết' : tone === 'creative' ? 'sinh động, phong phú, gợi mở' : 'tập trung ngắn gọn vào ý chính';
 
-<<<<<<< Updated upstream
-    const result = await model.generateContent([
-      { text: systemInstruction },
-      { text: promptInput }
-    ]);
-    const responseText = result.response.text();
-
-    let jsonText = responseText.trim();
-    try {
-      const parsed: OptimizeResult = JSON.parse(jsonText);
-      return parsed;
-    } catch (error) {
-      console.warn('Initial JSON parse failed, trying regex cleanups for trailing duplicate braces...');
-      try {
-        // Strip markdown backticks if present
-        let cleaned = jsonText.replace(/```json/gi, '').replace(/```/g, '').trim();
-        // Remove trailing double closing braces (e.g. } } or }\n})
-        cleaned = cleaned.replace(/\}\s*\}$/, '}');
-        const parsed: OptimizeResult = JSON.parse(cleaned);
-        return parsed;
-      } catch (nestedError) {
-        console.error('Failed to parse Gemini JSON output, utilizing fallback parser:', responseText);
-        throw new Error('AI response parser error');
-      }
-    }
-  } catch (error: any) {
-    console.warn('[Gemini Optimizer Error - Using Fallback]:', error.message);
-    
-    // Check if the prompt has ethics violations
-    const isEthics = /làm hộ|làm giùm|viết thay|làm bài|thi hộ|gian lận|lam ho|lam gium|viet thay|lam bai|thi ho|gian lan/i.test(rawPrompt);
-    
-    // Generate a fallback structured prompt
-    const toneRole = tone === 'academic' ? 'Chuyên gia Học thuật' : tone === 'technical' ? 'Kỹ sư Hệ thống' : tone === 'creative' ? 'Chuyên viên Sáng tạo' : 'Trợ lý Tinh gọn';
-    const toneStyle = tone === 'academic' ? 'văn phong học thuật khoa học, rõ ràng' : tone === 'technical' ? 'chính xác, đặc tả kỹ thuật chi tiết' : tone === 'creative' ? 'sinh động, phong phú, gợi mở' : 'tập trung ngắn gọn vào ý chính';
-
-    const optimized = `[VAI TRÒ / ROLE]:
-=======
   const optimized = `[VAI TRÒ / ROLE]:
->>>>>>> Stashed changes
 Acting as an expert ${toneRole} optimizing for the ${modelName} model.
 
 [BỐI CẢNH / CONTEXT]:
@@ -176,21 +128,21 @@ export const optimizePrompt = async (
     let responseText: string;
 
     // Call the appropriate AI model service (with caching!)
-    if (modelName === 'Claude') {
-      if (process.env.CLAUDE_API_KEY) {
-        responseText = await callClaude(promptInput);
+    if (modelName === 'Groq') {
+      if (process.env.GROQ_API_KEY) {
+        responseText = await callGroq(promptInput);
       } else {
-        // Fallback to Gemini with Claude style
-        const claudeStylePrompt = `You are Claude by Anthropic. ${promptInput}`;
-        responseText = await callGemini(claudeStylePrompt, userKey);
+        // Fallback to Gemini with Groq style
+        const groqStylePrompt = `You are Llama 3.1 via Groq. ${promptInput}`;
+        responseText = await callGemini(groqStylePrompt, userKey);
       }
-    } else if (modelName === 'GPT-4') {
-      if (process.env.OPENAI_API_KEY) {
-        responseText = await callGPT4(promptInput);
+    } else if (modelName === 'OpenRouter') {
+      if (process.env.OPENROUTER_API_KEY) {
+        responseText = await callOpenRouter(promptInput);
       } else {
-        // Fallback to Gemini with GPT-4 style
-        const gptStylePrompt = `You are GPT-4 by OpenAI. ${promptInput}`;
-        responseText = await callGemini(gptStylePrompt, userKey);
+        // Fallback to Gemini with OpenRouter style
+        const openRouterStylePrompt = `You are an AI via OpenRouter. ${promptInput}`;
+        responseText = await callGemini(openRouterStylePrompt, userKey);
       }
     } else {
       // Default: Gemini

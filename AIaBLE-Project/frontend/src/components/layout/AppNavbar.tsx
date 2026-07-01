@@ -186,7 +186,7 @@ export function AppNavbar() {
       <div className="flex h-14 items-center px-4 gap-2">
 
         {/* Logo */}
-        <Link href="/home" className="flex items-center gap-2.5 shrink-0 w-52 group">
+        <Link href="/home" className="flex items-center gap-2.5 shrink-0 md:w-52 group">
           <Image src="/logo.png" alt="AIaBLE Logo" width={36} height={36} priority className="rounded-lg" />
           <div className="font-bold text-xl">
             <span className="text-black">Ala</span>
@@ -195,10 +195,13 @@ export function AppNavbar() {
         </Link>
 
         {/* Neural Network decoration */}
-        <div className="flex-1 flex items-center justify-center overflow-hidden">
+        <div className="flex-1 hidden md:flex items-center justify-center overflow-hidden">
           <NeuralNetworkDecor />
           <NeuralNetworkDecor flip />
         </div>
+
+        {/* Mobile Spacer */}
+        <div className="flex-1 md:hidden" />
 
         {/* Right Controls */}
         <div className="flex items-center gap-2.5 shrink-0">
@@ -221,7 +224,7 @@ export function AppNavbar() {
                 }}
                 onFocus={() => setSearchOpen(true)}
                 onKeyDown={handleKeyDown}
-                className="h-8 w-52 rounded-md border border-slate-200 bg-slate-50 pl-8 pr-8 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent focus:w-64 transition-all duration-200"
+                className="h-8 w-32 md:w-52 rounded-md border border-slate-200 bg-slate-50 pl-8 pr-8 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent focus:w-48 md:focus:w-64 transition-all duration-200"
               />
               {query && (
                 <button
