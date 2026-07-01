@@ -27,14 +27,17 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  * Call OpenRouter free model
  * @param prompt User instruction
  */
-export const callOpenRouter = async (prompt: string): Promise<string> => {
+export const callOpenRouter = async (
+  prompt: string,
+  options?: { jsonMode?: boolean }
+): Promise<string> => {
   if (!openrouter) {
     throw new Error('OpenRouter client is not initialized because OPENROUTER_API_KEY is missing.');
   }
 
   try {
     // Check cache
-    const cacheKey = prompt.substring(0, 200);
+    const cacheKey = prompt;
     const cached = cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
       console.log('[OpenRouter Cache Hit]');
@@ -44,6 +47,7 @@ export const callOpenRouter = async (prompt: string): Promise<string> => {
     const response = await openrouter.chat.completions.create({
       model: 'openrouter/free',
       messages: [{ role: 'user', content: prompt }],
+      ...(options?.jsonMode ? { response_format: { type: 'json_object' } } : {}),
     });
 
     const text = response.choices[0]?.message?.content || '';
