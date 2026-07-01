@@ -11,6 +11,7 @@ import sandboxRoutes from './routes/sandbox';
 import authRoutes from './routes/auth';
 import profileRoutes from './routes/profile';
 import validatorRoutes from './routes/validator';
+import projectRoutes from './routes/projects';
 import { apiLimiter } from './middleware/rateLimiter';
 
 // Load environment variables
@@ -60,6 +61,9 @@ app.use('/api/sandbox', apiLimiter, sandboxRoutes);
 
 // Validator routes
 app.use('/api/validator', validatorRoutes);
+
+// Projects routes
+app.use('/api/projects', projectRoutes);
 
 // Basic health check route
 app.get('/api/health', (req, res) => {

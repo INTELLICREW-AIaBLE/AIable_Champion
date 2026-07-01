@@ -29,5 +29,11 @@
     "fullName": "Hoàng Nguyễn",
     "email": "0107hoanguyen@gmail.com",
     "password": "google-oauth-dummy-password"
+  },
+  {
+    "id": "1782880110254",
+    "fullName": "Nguyen Van An",
+    "email": "annv",
+    "password": "123456"
   }
 ]
