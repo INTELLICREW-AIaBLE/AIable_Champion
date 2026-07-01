@@ -1,10 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Eye, EyeOff } from 'lucide-react';
+
+const t = {
+  vi: {
+    title: 'Đăng ký tài khoản AIaBLE',
+    name: 'Họ và tên',
+    email: 'Email hoặc Tên đăng nhập',
+    pw: 'Mật khẩu',
+    confirm: 'Xác nhận mật khẩu',
+    mismatch: 'Mật khẩu không khớp',
+    terms: 'Tôi đồng ý với các',
+    termsLink: 'Điều khoản & Điều kiện',
+    registerBtn: 'Đăng ký',
+    loading: 'Đang tạo tài khoản...',
+    hasAccount: 'Đã có tài khoản?',
+    login: 'Đăng nhập ngay',
+    errFail: 'Đăng ký thất bại. Vui lòng thử lại.',
+    errServer: 'Không thể kết nối server. Vui lòng thử lại.'
+  },
+  en: {
+    title: 'Register for AIaBLE',
+    name: 'Full Name',
+    email: 'Email or Username',
+    pw: 'Password',
+    confirm: 'Confirm Password',
+    mismatch: 'Passwords do not match',
+    terms: 'I agree to the',
+    termsLink: 'Terms & Conditions',
+    registerBtn: 'Register',
+    loading: 'Creating account...',
+    hasAccount: 'Already have an account?',
+    login: 'Log in now',
+    errFail: 'Registration failed. Please try again.',
+    errServer: 'Cannot connect to server. Please try again.'
+  }
+};
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -13,6 +48,21 @@ export default function RegisterPage() {
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [lang, setLang] = useState('vi');
+
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
+
+  const text = t[lang as 'en' | 'vi'] || t.vi;
+
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -43,14 +93,14 @@ export default function RegisterPage() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+        setError(data.message || text.errFail);
         setLoading(false);
         return;
       }
       // Đăng ký thành công → chuyển về trang Login
       router.push('/login');
     } catch {
-      setError('Không thể kết nối server. Vui lòng thử lại.');
+      setError(text.errServer);
       setLoading(false);
     }
   };
@@ -78,7 +128,7 @@ export default function RegisterPage() {
 
         {/* Title */}
         <h1 className="text-2xl font-black text-slate-900 text-center mb-7">
-          Đăng ký tài khoản AlaBLE
+          {text.title}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -86,7 +136,7 @@ export default function RegisterPage() {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label htmlFor="reg-fullname" className="text-sm font-semibold text-slate-700">
-                Họ và tên
+                {text.name}
               </label>
               <input
                 id="reg-fullname"
@@ -100,7 +150,7 @@ export default function RegisterPage() {
             </div>
             <div className="space-y-1.5">
               <label htmlFor="reg-email" className="text-sm font-semibold text-slate-700">
-                Email hoặc Tên đăng nhập
+                {text.email}
               </label>
               <input
                 id="reg-email"
@@ -118,7 +168,7 @@ export default function RegisterPage() {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label htmlFor="reg-password" className="text-sm font-semibold text-slate-700">
-                Mật khẩu
+                {text.pw}
               </label>
               <div className="relative">
                 <input
@@ -142,7 +192,7 @@ export default function RegisterPage() {
             </div>
             <div className="space-y-1.5">
               <label htmlFor="reg-confirm" className="text-sm font-semibold text-slate-700">
-                Xác nhận mật khẩu
+                {text.confirm}
               </label>
               <div className="relative">
                 <input
@@ -192,9 +242,9 @@ export default function RegisterPage() {
               </div>
             </div>
             <span className="text-sm text-slate-600 leading-snug">
-              Tôi đồng ý với các{' '}
+              {text.terms}{' '}
               <Link href="/terms" target="_blank" className="text-violet-600 font-semibold hover:underline">
-                Điều khoản & Điều kiện
+                {text.termsLink}
               </Link>
               .
             </span>
@@ -220,20 +270,19 @@ export default function RegisterPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                 </svg>
-                Đang tạo tài khoản...
+                {text.loading}
               </>
             ) : (
-              'Đăng ký'
+              text.registerBtn
             )}
           </button>
         </form>
 
-
         {/* Login link */}
         <p className="text-center text-sm text-slate-500 mt-6">
-          Đã có tài khoản?{' '}
+          {text.hasAccount}{' '}
           <Link href="/login" className="font-bold text-violet-600 hover:text-violet-700 transition">
-            Đăng nhập ngay
+            {text.login}
           </Link>
         </p>
       </div>

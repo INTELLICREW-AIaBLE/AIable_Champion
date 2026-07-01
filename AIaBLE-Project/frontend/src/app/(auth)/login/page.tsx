@@ -1,11 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Eye, EyeOff } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
+
+const t = {
+  vi: {
+    title: 'Đăng nhập vào AIaBLE',
+    userOrEmail: 'Tên đăng nhập hoặc Email',
+    pw: 'Mật khẩu',
+    forgot: 'Quên mật khẩu?',
+    loginBtn: 'Đăng nhập',
+    loading: 'Đăng nhập...',
+    or: 'Hoặc',
+    google: 'Đăng nhập bằng Gmail',
+    noAccount: 'Chưa có tài khoản?',
+    register: 'Đăng ký ngay',
+    errFail: 'Đăng nhập thất bại.',
+    errServer: 'Không thể kết nối đến server.'
+  },
+  en: {
+    title: 'Log in to AIaBLE',
+    userOrEmail: 'Username or Email',
+    pw: 'Password',
+    forgot: 'Forgot password?',
+    loginBtn: 'Log in',
+    loading: 'Logging in...',
+    or: 'Or',
+    google: 'Log in with Gmail',
+    noAccount: 'Don\'t have an account?',
+    register: 'Register now',
+    errFail: 'Login failed.',
+    errServer: 'Cannot connect to server.'
+  }
+};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,8 +44,22 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState('');
+
+  const [lang, setLang] = useState('vi');
+
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
+
+  const text = t[lang as 'en' | 'vi'] || t.vi;
 
   const loginWithGoogle = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -85,14 +130,7 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className="flex items-center justify-center gap-2.5 mb-6">
-          <Image
-            src="/logo.png"
-            alt="AIaBLE Logo"
-            width={44}
-            height={44}
-            priority
-            className="rounded-xl"
-          />
+          <Image src="/logo.png" alt="AIaBLE Logo" width={44} height={44} priority className="rounded-xl" />
           <div className="font-bold text-2xl">
             <span className="text-black">Ala</span>
             <span className="text-purple-600">BLE</span>
@@ -101,14 +139,14 @@ export default function LoginPage() {
 
         {/* Title */}
         <h1 className="text-2xl font-black text-slate-900 text-center mb-7">
-          Đăng nhập vào AlaBLE
+          {text.title}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Username / Email */}
           <div className="space-y-1.5">
             <label htmlFor="login-username" className="text-sm font-semibold text-slate-700">
-              Tên đăng nhập hoặc Email
+              {text.userOrEmail}
             </label>
             <input
               id="login-username"
@@ -125,13 +163,10 @@ export default function LoginPage() {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <label htmlFor="login-password" className="text-sm font-semibold text-slate-700">
-                Mật khẩu
+                {text.pw}
               </label>
-              <Link
-                href="/forgot-password"
-                className="text-sm font-semibold text-violet-600 hover:text-violet-700 transition"
-              >
-                Quên mật khẩu?
+              <Link href="/forgot-password" className="text-sm font-semibold text-violet-600 hover:text-violet-700 transition">
+                {text.forgot}
               </Link>
             </div>
             <div className="relative">
@@ -175,10 +210,10 @@ export default function LoginPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                 </svg>
-                Đang đăng nhập...
+                {text.loading}
               </>
             ) : (
-              'Đăng nhập'
+              text.loginBtn
             )}
           </button>
         </form>
@@ -186,7 +221,7 @@ export default function LoginPage() {
         {/* Divider */}
         <div className="flex items-center gap-3 my-5">
           <div className="flex-1 h-px bg-slate-200" />
-          <span className="text-xs text-slate-400 font-medium">Hoặc</span>
+          <span className="text-xs text-slate-400 font-medium">{text.or}</span>
           <div className="flex-1 h-px bg-slate-200" />
         </div>
 
@@ -202,17 +237,14 @@ export default function LoginPage() {
             <path fill="#4CAF50" d="M24 44c5.3 0 10.1-2 13.7-5.3l-6.3-5.3C29.5 35.2 26.9 36 24 36c-5.3 0-9.6-3.3-11.3-8l-6.6 5.1C9.6 39.5 16.3 44 24 44z"/>
             <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.3 5.5l6.3 5.3C37 37.3 44 32 44 24c0-1.3-.1-2.6-.4-3.9z"/>
           </svg>
-          Đăng nhập bằng Gmail
+          {text.google}
         </button>
 
         {/* Register link */}
         <p className="text-center text-sm text-slate-500 mt-6">
-          Chưa có tài khoản?{' '}
-          <Link
-            href="/register"
-            className="font-bold text-violet-600 hover:text-violet-700 transition"
-          >
-            Đăng ký ngay
+          {text.noAccount}{' '}
+          <Link href="/register" className="font-bold text-violet-600 hover:text-violet-700 transition">
+            {text.register}
           </Link>
         </p>
       </div>

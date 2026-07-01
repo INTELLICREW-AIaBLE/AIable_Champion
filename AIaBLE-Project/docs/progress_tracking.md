@@ -19,15 +19,16 @@ Dự án được cấu trúc dạng Monorepo (Next.js Frontend + Express/TypeSc
 
 ## ✅ Các Công Việc Vừa Hoàn Thành (Recent Updates)
 
-*Cập nhật gần nhất: 01/07/2026*
+*Cập nhật gần nhất: 01/07/2026 (Phiên 2)*
 
-- **Giao diện cốt lõi (Core UI):** Sửa lỗi hiển thị font tiếng Việt không đồng nhất (thêm subset `vietnamese` cho Google Font `Inter` trong `layout.tsx`).
+- **Sửa lỗi UI/UX & Điều hướng:**
+  - Cấu hình lại `GatewayGuard`: Bỏ qua xác minh Bot/Turnstile đối với các trang công khai (`/`, `/login`, `/register`, `/forgot-password`). Khắc phục triệt để lỗi màn hình đen/trắng (blank page) khi tải trang lần đầu mà không cần reload.
 - **Trang Cài đặt (Settings Page):**
-  - **Đa ngôn ngữ (Local i18n):** Tích hợp tính năng chuyển đổi ngôn ngữ Anh/Việt hoạt động tức thời không cần tải lại trang.
-  - **Quản lý tài khoản (Account Tab):** 
-    - Gỡ bỏ hoàn toàn cảnh báo và nút "Xoá tài khoản".
-    - Bổ sung cấu trúc form Đổi mật khẩu mới (có thêm trường Xác nhận mật khẩu mới, bắt lỗi UI nếu không khớp hoặc để trống).
-    - Thêm nút "Quên mật khẩu hiện tại?" vào ngay trên form nhập.
+  - **Cải thiện luồng lưu trữ:** Đã bổ sung nút "Lưu thay đổi" (Save Changes) rõ ràng cho tab Giao diện & Ngôn ngữ và tab Thông báo thay vì tự động lưu ngay lập tức.
+  - Xóa tùy chọn Tiếng Nhật khỏi hệ thống.
+  - **Quản lý tài khoản:** Cấu trúc form Đổi mật khẩu chuẩn xác, bỏ nút Xóa tài khoản, sửa font chữ.
+- **Đa ngôn ngữ (i18n):** 
+  - Tính năng đa ngôn ngữ (Tiếng Việt/Tiếng Anh) giờ đây được đồng bộ hóa và lưu trữ trong `localStorage`. Các trang công khai (Landing Page, Navbar, Đăng nhập, Đăng ký) sẽ tự động ghi nhớ và hiển thị đúng ngôn ngữ bạn đã chọn từ màn Cài đặt ngay cả khi đã đăng xuất khỏi tài khoản.
 
 ---
 

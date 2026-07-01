@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Navbar } from '@/components/layout/Navbar';
 import { 
@@ -21,7 +24,48 @@ import {
   AlertCircle
 } from 'lucide-react';
 
+const t = {
+  vi: {
+    badge: 'Dự án AIaBLE bởi INTELLICREW',
+    h1_1: 'Tương tác AI thông minh hơn',
+    h1_2: 'Dành cho',
+    h1_3: 'Sinh viên hiện đại',
+    sub: 'AIaBLE là không gian làm việc và quản lý prompt thông minh dành riêng cho sinh viên. Học cách viết prompt, lập kế hoạch, khám phá thư viện mẫu và kiểm chứng AI.',
+    btnStart: 'Bắt đầu ngay (Miễn phí)',
+    btnExplore: 'Khám phá tính năng',
+    btnEnter: 'Vào không gian làm việc AIaBLE',
+    ready: 'Sẵn sàng học tập hiệu quả cùng AI?',
+    readySub: 'Không còn sao chép mù quáng. Xây dựng kỹ năng viết prompt và đảm bảo bài tập đạt chuẩn học thuật với AIaBLE.'
+  },
+  en: {
+    badge: 'Project AIaBLE by INTELLICREW',
+    h1_1: 'Smarter AI Interaction',
+    h1_2: 'For',
+    h1_3: 'Modern Students',
+    sub: 'AIaBLE is a smart prompt management & learning workspace built specifically for university students. Learn how to write prompts, plan assignments, explore prompt recipes, and fact-check AI outputs.',
+    btnStart: 'Get Started Now (Free)',
+    btnExplore: 'Explore Features',
+    btnEnter: 'Enter AIaBLE Workspace',
+    ready: 'Ready to learn effectively alongside AI?',
+    readySub: 'No more blind copying. Build prompt engineering skills and ensure your assignments match academic standards with AIaBLE.'
+  }
+};
+
 export default function LandingPage() {
+  const [lang, setLang] = useState('vi');
+
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
+
+  const text = t[lang as 'en' | 'vi'] || t.vi;
   return (
     <div className="bg-slate-50 min-h-screen overflow-hidden pb-16">
       <Navbar />
@@ -34,18 +78,18 @@ export default function LandingPage() {
         {/* Team & Pitch Badge */}
         <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-100/60 border border-violet-200 text-violet-800 text-xs font-semibold mb-8 hover:bg-violet-100 transition duration-300">
           <Sparkles className="w-3.5 h-3.5 text-violet-600 animate-pulse" />
-          <span>Project AIaBLE by INTELLICREW</span>
+          <span>{text.badge}</span>
         </div>
 
         {/* Hero Title */}
         <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-none mb-6">
-          Smarter AI Interaction <br />
-          For <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">Modern Students</span>
+          {text.h1_1} <br />
+          {text.h1_2} <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">{text.h1_3}</span>
         </h1>
 
         {/* Hero Subtitle */}
         <p className="text-lg md:text-xl text-slate-500 max-w-3xl mx-auto mb-10 font-medium leading-relaxed">
-          AIaBLE is a smart prompt management & learning workspace built specifically for university students. Learn how to write prompts, plan assignments, explore prompt recipes, and fact-check AI outputs.
+          {text.sub}
         </p>
 
         {/* CTA Actions */}
@@ -54,14 +98,14 @@ export default function LandingPage() {
             href="/login"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-8 py-4 text-base font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-lg shadow-violet-200 hover:-translate-y-0.5"
           >
-            Get Started Now (Free)
+            {text.btnStart}
             <ArrowRight className="w-4 h-4" />
           </Link>
           <a
             href="#features"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-slate-200 px-8 py-4 text-base font-bold text-slate-700 hover:bg-slate-50 transition duration-200 shadow-sm"
           >
-            Explore Features
+            {text.btnExplore}
           </a>
         </div>
       </section>
@@ -267,16 +311,16 @@ export default function LandingPage() {
           <GraduationCap className="w-4 h-4" /> Academic Excellence
         </div>
         <h3 className="text-3xl font-extrabold text-slate-900 mb-4">
-          Ready to learn effectively alongside AI?
+          {text.ready}
         </h3>
         <p className="text-slate-500 mb-8 max-w-lg mx-auto text-sm">
-          No more blind copying. Build prompt engineering skills and ensure your assignments match academic standards with AIaBLE.
+          {text.readySub}
         </p>
         <Link
           href="/login"
           className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-8 py-4 text-base font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-lg shadow-violet-200"
         >
-          Enter AIaBLE Workspace
+          {text.btnEnter}
           <ArrowRight className="w-4 h-4" />
         </Link>
       </section>

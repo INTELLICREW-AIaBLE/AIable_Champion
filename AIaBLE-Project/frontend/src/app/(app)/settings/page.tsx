@@ -25,6 +25,8 @@ const t = {
       light: 'Sáng (Light)',
       dark: 'Tối (Dark)',
       langTitle: 'Ngôn ngữ (Language)',
+      saveBtn: 'Lưu thay đổi',
+      success: 'Đã lưu cài đặt giao diện và ngôn ngữ!'
     },
     keys: {
       title: 'Cấu hình API Keys',
@@ -42,7 +44,9 @@ const t = {
       ai: 'Hoạt động AI',
       aiDesc: 'Khi Optimize hoặc Match task hoàn tất',
       marketing: 'Email Marketing',
-      marketingDesc: 'Nhận tips và recipes AI mới nhất qua email'
+      marketingDesc: 'Nhận tips và recipes AI mới nhất qua email',
+      saveBtn: 'Lưu tuỳ chọn',
+      success: 'Đã lưu cấu hình thông báo!'
     },
     alertLang: 'Ngôn ngữ đã được cập nhật cho trang này.'
   },
@@ -66,6 +70,8 @@ const t = {
       light: 'Light',
       dark: 'Dark',
       langTitle: 'Language',
+      saveBtn: 'Save Changes',
+      success: 'Appearance and language settings saved!'
     },
     keys: {
       title: 'API Keys Configuration',
@@ -83,7 +89,9 @@ const t = {
       ai: 'AI Activity',
       aiDesc: 'When Optimize or Match task completes',
       marketing: 'Email Marketing',
-      marketingDesc: 'Receive latest AI tips and recipes via email'
+      marketingDesc: 'Receive latest AI tips and recipes via email',
+      saveBtn: 'Save Preferences',
+      success: 'Notification settings saved!'
     },
     alertLang: 'Language has been updated for this page.'
   }
@@ -95,6 +103,12 @@ export default function SettingsPage() {
   
   const [theme, setTheme] = useState('light');
   const [lang, setLang] = useState('vi');
+
+  // Draft states for forms that need explicit save
+  const [draftTheme, setDraftTheme] = useState('light');
+  const [draftLang, setDraftLang] = useState('vi');
+  
+  const [notifs, setNotifs] = useState({ sys: true, ai: true, marketing: false });
 
   // Password state
   const [currentPassword, setCurrentPassword] = useState('');
@@ -119,24 +133,36 @@ export default function SettingsPage() {
     };
     fetchProfile();
 
-    setTheme(localStorage.getItem('app_theme') || 'light');
-    setLang(localStorage.getItem('app_lang') || 'vi');
+    const savedTheme = localStorage.getItem('app_theme') || 'light';
+    const savedLang = localStorage.getItem('app_lang') || 'vi';
+    setTheme(savedTheme);
+    setDraftTheme(savedTheme);
+    
+    setLang(savedLang);
+    setDraftLang(savedLang);
   }, []);
 
-  const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme);
-    localStorage.setItem('app_theme', newTheme);
-    if (newTheme === 'dark') {
+  const handleSavePreferences = () => {
+    setTheme(draftTheme);
+    localStorage.setItem('app_theme', draftTheme);
+    if (draftTheme === 'dark') {
       document.documentElement.classList.add('dark-mode-active');
     } else {
       document.documentElement.classList.remove('dark-mode-active');
     }
+
+    setLang(draftLang);
+    localStorage.setItem('app_lang', draftLang);
+    window.dispatchEvent(new Event('app_lang_changed'));
+
+    const currentText = t[draftLang as 'en' | 'vi'];
+    alert(currentText.prefs.success);
   };
 
-  const handleLangChange = (newLang: string) => {
-    setLang(newLang);
-    localStorage.setItem('app_lang', newLang);
-    window.dispatchEvent(new Event('app_lang_changed'));
+  const handleSaveNotifs = () => {
+    // In a real app, send `notifs` to backend here
+    const currentText = t[lang as 'en' | 'vi'];
+    alert(currentText.notifs.success);
   };
 
   const currentLang = (lang === 'en' ? 'en' : 'vi') as 'en' | 'vi';
@@ -265,20 +291,20 @@ export default function SettingsPage() {
                 <h2 className="text-lg font-bold text-slate-900 mb-4">{text.prefs.themeTitle}</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   <div 
-                    onClick={() => handleThemeChange('light')}
-                    className={`border-2 rounded-2xl p-4 cursor-pointer relative overflow-hidden transition ${theme === 'light' ? 'border-violet-500 bg-slate-50' : 'border-slate-100 hover:border-slate-300 bg-white'}`}
+                    onClick={() => setDraftTheme('light')}
+                    className={`border-2 rounded-2xl p-4 cursor-pointer relative overflow-hidden transition ${draftTheme === 'light' ? 'border-violet-500 bg-slate-50' : 'border-slate-100 hover:border-slate-300 bg-white'}`}
                   >
-                    {theme === 'light' && <div className="absolute inset-0 bg-gradient-to-br from-violet-100/50 to-transparent pointer-events-none" />}
-                    <Monitor className={`w-6 h-6 mb-2 ${theme === 'light' ? 'text-violet-600' : 'text-slate-400'}`} />
-                    <p className={`font-semibold text-sm ${theme === 'light' ? 'text-slate-900' : 'text-slate-500'}`}>{text.prefs.light}</p>
+                    {draftTheme === 'light' && <div className="absolute inset-0 bg-gradient-to-br from-violet-100/50 to-transparent pointer-events-none" />}
+                    <Monitor className={`w-6 h-6 mb-2 ${draftTheme === 'light' ? 'text-violet-600' : 'text-slate-400'}`} />
+                    <p className={`font-semibold text-sm ${draftTheme === 'light' ? 'text-slate-900' : 'text-slate-500'}`}>{text.prefs.light}</p>
                   </div>
                   
                   <div 
-                    onClick={() => handleThemeChange('dark')}
-                    className={`border-2 rounded-2xl p-4 cursor-pointer relative overflow-hidden transition ${theme === 'dark' ? 'border-violet-500 bg-slate-900' : 'border-slate-100 hover:border-slate-800 hover:bg-slate-800 bg-slate-900'}`}
+                    onClick={() => setDraftTheme('dark')}
+                    className={`border-2 rounded-2xl p-4 cursor-pointer relative overflow-hidden transition ${draftTheme === 'dark' ? 'border-violet-500 bg-slate-900' : 'border-slate-100 hover:border-slate-800 hover:bg-slate-800 bg-slate-900'}`}
                   >
-                    <Moon className={`w-6 h-6 mb-2 ${theme === 'dark' ? 'text-violet-400' : 'text-slate-400'}`} />
-                    <p className={`font-semibold text-sm ${theme === 'dark' ? 'text-white' : 'text-slate-300'}`}>{text.prefs.dark}</p>
+                    <Moon className={`w-6 h-6 mb-2 ${draftTheme === 'dark' ? 'text-violet-400' : 'text-slate-400'}`} />
+                    <p className={`font-semibold text-sm ${draftTheme === 'dark' ? 'text-white' : 'text-slate-300'}`}>{text.prefs.dark}</p>
                   </div>
                 </div>
               </div>
@@ -288,14 +314,19 @@ export default function SettingsPage() {
               <div>
                 <h2 className="text-lg font-bold text-slate-900 mb-4">{text.prefs.langTitle}</h2>
                 <select 
-                  value={lang}
-                  onChange={(e) => handleLangChange(e.target.value)}
+                  value={draftLang}
+                  onChange={(e) => setDraftLang(e.target.value)}
                   className="w-full max-w-sm px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm font-medium bg-white text-slate-900"
                 >
                   <option value="vi">Tiếng Việt (Vietnamese)</option>
                   <option value="en">English (US)</option>
-                  <option value="ja">日本語 (Japanese)</option>
                 </select>
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <button onClick={handleSavePreferences} className="px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold rounded-xl transition shadow-md shadow-violet-200">
+                  {text.prefs.saveBtn}
+                </button>
               </div>
             </div>
           )}
@@ -384,13 +415,18 @@ export default function SettingsPage() {
               
               <div className="space-y-4">
                 {[
-                  { title: text.notifs.sys, desc: text.notifs.sysDesc, checked: true },
-                  { title: text.notifs.ai, desc: text.notifs.aiDesc, checked: true },
-                  { title: text.notifs.marketing, desc: text.notifs.marketingDesc, checked: false },
-                ].map((item, idx) => (
-                  <label key={idx} className="flex items-start gap-3 cursor-pointer group">
+                  { id: 'sys', title: text.notifs.sys, desc: text.notifs.sysDesc },
+                  { id: 'ai', title: text.notifs.ai, desc: text.notifs.aiDesc },
+                  { id: 'marketing', title: text.notifs.marketing, desc: text.notifs.marketingDesc },
+                ].map((item) => (
+                  <label key={item.id} className="flex items-start gap-3 cursor-pointer group">
                     <div className="relative flex items-center justify-center mt-1">
-                      <input type="checkbox" className="peer sr-only" defaultChecked={item.checked} />
+                      <input 
+                        type="checkbox" 
+                        className="peer sr-only" 
+                        checked={notifs[item.id as keyof typeof notifs]} 
+                        onChange={(e) => setNotifs({...notifs, [item.id]: e.target.checked})}
+                      />
                       <div className="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-violet-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
                     </div>
                     <div>
@@ -399,6 +435,12 @@ export default function SettingsPage() {
                     </div>
                   </label>
                 ))}
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <button onClick={handleSaveNotifs} className="px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold rounded-xl transition shadow-md shadow-violet-200">
+                  {text.notifs.saveBtn}
+                </button>
               </div>
             </div>
           )}
