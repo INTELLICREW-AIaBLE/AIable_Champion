@@ -92,12 +92,23 @@ Raw Prompt to optimize: "${rawPrompt}"
     ]);
     const responseText = result.response.text();
 
+    let jsonText = responseText.trim();
     try {
-      const parsed: OptimizeResult = JSON.parse(responseText.trim());
+      const parsed: OptimizeResult = JSON.parse(jsonText);
       return parsed;
     } catch (error) {
-      console.error('Failed to parse Gemini JSON output, utilizing fallback parser:', responseText);
-      throw new Error('AI response parser error');
+      console.warn('Initial JSON parse failed, trying regex cleanups for trailing duplicate braces...');
+      try {
+        // Strip markdown backticks if present
+        let cleaned = jsonText.replace(/```json/gi, '').replace(/```/g, '').trim();
+        // Remove trailing double closing braces (e.g. } } or }\n})
+        cleaned = cleaned.replace(/\}\s*\}$/, '}');
+        const parsed: OptimizeResult = JSON.parse(cleaned);
+        return parsed;
+      } catch (nestedError) {
+        console.error('Failed to parse Gemini JSON output, utilizing fallback parser:', responseText);
+        throw new Error('AI response parser error');
+      }
     }
   } catch (error: any) {
     console.warn('[Gemini Optimizer Error - Using Fallback]:', error.message);
