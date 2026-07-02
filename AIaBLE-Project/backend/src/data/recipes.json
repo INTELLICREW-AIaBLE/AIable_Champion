@@ -1,552 +1,83 @@
 [
-  {
-    "id": "coding-001",
-    "title": "Debug & giải thích lỗi code chi tiết",
-    "category": "CODING",
-    "description": "Phân tích lỗi runtime/compile, giải thích nguyên nhân và đề xuất cách sửa đúng.",
-    "prompt": "Đoạn code sau đang gặp lỗi:\n\n[CODE]\n\nLỗi hoặc hành vi sai gặp phải:\n\n[ERROR]\n\nHãy phân tích theo cấu trúc:\n1. Lỗi nằm ở đâu\n2. Vì sao lỗi xảy ra\n3. Cách sửa đúng\n4. Code đã sửa\n5. Cách tránh lỗi tương tự trong tương lai.",
-    "bestAI": "Groq",
-    "variables": [
-      { "name": "CODE", "label": "Đoạn code cần debug", "type": "textarea", "required": true },
-      { "name": "ERROR", "label": "Lỗi hoặc mô tả hành vi sai", "type": "textarea", "required": true }
-    ],
-    "tags": ["debug", "code", "giải thích"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "report-001",
-    "title": "Viết báo cáo học thuật chuẩn APA",
-    "category": "REPORT",
-    "description": "Tạo cấu trúc báo cáo đúng format học thuật với trích dẫn, luận điểm và kết luận rõ ràng.",
-    "prompt": "Bạn là một sinh viên đại học. Hãy viết báo cáo học thuật về chủ đề [TOPIC].\n\nYêu cầu:\n1. Có mở đầu, nội dung chính và kết luận\n2. Văn phong học thuật, trang trọng\n3. Có luận điểm rõ ràng\n4. Gợi ý nguồn tham khảo theo chuẩn APA\n5. Tránh viết chung chung, ưu tiên lập luận có chiều sâu.",
-    "bestAI": "OpenRouter",
-    "variables": [
-      { "name": "TOPIC", "label": "Chủ đề báo cáo", "type": "text", "required": true }
-    ],
-    "tags": ["báo cáo", "học thuật", "APA"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "slide-001",
-    "title": "Outline slide thuyết trình 10 phút",
-    "category": "SLIDE",
-    "description": "Phân bổ nội dung hợp lý cho bài thuyết trình ngắn, có hook mở đầu và call-to-action kết thúc.",
-    "prompt": "Tạo outline cho bài thuyết trình 10 phút về chủ đề:\n\n[TOPIC]\n\nYêu cầu:\n1. Chia thành từng slide\n2. Mỗi slide có tiêu đề và 3 ý chính\n3. Gợi ý thời lượng cho từng phần\n4. Có phần mở đầu thu hút\n5. Có kết luận và lời kêu gọi hành động.",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "TOPIC", "label": "Chủ đề thuyết trình", "type": "text", "required": true }
-    ],
-    "tags": ["slide", "presentation", "outline"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  }
-  ,
-  {
-    "id": "research-001",
-    "title": "Tổng hợp literature review",
-    "category": "RESEARCH",
-    "description": "Tóm tắt và so sánh nhiều bài báo khoa học theo chủ đề, xu hướng nghiên cứu và khoảng trống nghiên cứu.",
-    "prompt": "Hãy hỗ trợ tổng hợp literature review cho chủ đề:\n\n[TOPIC]\n\nDanh sách tài liệu hoặc ghi chú:\n\n[SOURCES]\n\nYêu cầu:\n1. Tóm tắt từng nguồn\n2. Nhóm các nghiên cứu theo hướng tiếp cận\n3. So sánh điểm giống và khác nhau\n4. Chỉ ra research gap\n5. Đề xuất hướng nghiên cứu tiếp theo.",
-    "bestAI": "Groq",
-    "variables": [
-      { "name": "TOPIC", "label": "Chủ đề nghiên cứu", "type": "text", "required": true },
-      { "name": "SOURCES", "label": "Nguồn tài liệu hoặc ghi chú", "type": "textarea", "required": true }
-    ],
-    "tags": ["research", "literature review", "paper"],
-    "difficulty": "advanced",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "coding-002",
-    "title": "Review & tối ưu code hiện tại",
-    "category": "CODING",
-    "description": "Đánh giá code hiện tại, gợi ý cải thiện performance, readability và best practices.",
-    "prompt": "Hãy review đoạn code sau:\n\n[CODE]\n\nNgôn ngữ: [LANGUAGE]\n\nYêu cầu:\n1. Nhận xét readability\n2. Tìm vấn đề về performance\n3. Tìm bug tiềm ẩn\n4. Đề xuất refactor\n5. Viết lại phiên bản tốt hơn nếu cần.",
-    "bestAI": "Groq",
-    "variables": [
-      { "name": "CODE", "label": "Đoạn code cần review", "type": "textarea", "required": true },
-      { "name": "LANGUAGE", "label": "Ngôn ngữ lập trình", "type": "text", "required": true }
-    ],
-    "tags": ["review", "optimization", "clean code"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "report-002",
-    "title": "Viết kết luận & đề xuất học thuật",
-    "category": "REPORT",
-    "description": "Tổng hợp kết quả nghiên cứu thành phần kết luận sắc bén và đề xuất thực tiễn có căn cứ.",
-    "prompt": "Dựa trên nội dung nghiên cứu sau:\n\n[CONTENT]\n\nHãy viết phần kết luận và đề xuất theo cấu trúc:\n1. Tóm tắt phát hiện chính\n2. Ý nghĩa của kết quả\n3. Hạn chế của nghiên cứu\n4. Đề xuất giải pháp hoặc hướng phát triển\n5. Kết luận ngắn gọn, thuyết phục.",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "CONTENT", "label": "Nội dung nghiên cứu", "type": "textarea", "required": true }
-    ],
-    "tags": ["kết luận", "đề xuất", "học thuật"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "coding-003",
-    "title": "Viết unit test cho function",
-    "category": "CODING",
-    "description": "Tạo bộ test case đầy đủ cho một hàm, bao gồm happy path, edge case và error case.",
-    "prompt": "Viết unit test cho hàm sau:\n\n[CODE]\n\nNgôn ngữ / Framework test: [FRAMEWORK]\n\nYêu cầu:\n1. Test happy path (đầu vào hợp lệ)\n2. Test edge case (giá trị biên)\n3. Test error case (đầu vào sai)\n4. Mỗi test có tên mô tả rõ ràng\n5. Comment giải thích mục đích từng test.",
-    "bestAI": "Groq",
-    "variables": [
-      { "name": "CODE", "label": "Hàm cần viết test", "type": "textarea", "required": true },
-      { "name": "FRAMEWORK", "label": "Ngôn ngữ / Framework (VD: Jest, PyTest)", "type": "text", "required": true }
-    ],
-    "tags": ["unit test", "testing", "TDD"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "coding-004",
-    "title": "Giải thích thuật toán từng bước",
-    "category": "CODING",
-    "description": "Phân tích và giải thích cách hoạt động của thuật toán theo từng bước dễ hiểu.",
-    "prompt": "Hãy giải thích thuật toán [ALGORITHM] theo từng bước:\n\n1. Ý tưởng cốt lõi là gì\n2. Các bước thực hiện chi tiết\n3. Ví dụ minh họa với input cụ thể\n4. Độ phức tạp thời gian và không gian (Big O)\n5. Khi nào nên dùng thuật toán này\n6. Code mẫu bằng [LANGUAGE].",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "ALGORITHM", "label": "Tên thuật toán (VD: QuickSort, BFS)", "type": "text", "required": true },
-      { "name": "LANGUAGE", "label": "Ngôn ngữ lập trình", "type": "text", "required": true }
-    ],
-    "tags": ["algorithm", "giải thích", "data structure"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  }
-  ,
-  {
-    "id": "coding-005",
-    "title": "Thiết kế database schema",
-    "category": "CODING",
-    "description": "Tạo ERD và schema SQL tối ưu cho hệ thống từ mô tả yêu cầu.",
-    "prompt": "Thiết kế database schema cho hệ thống:\n\n[DESCRIPTION]\n\nYêu cầu:\n1. Liệt kê các bảng cần thiết\n2. Xác định primary key và foreign key\n3. Chỉ ra các mối quan hệ (1-1, 1-N, N-N)\n4. Viết SQL CREATE TABLE đầy đủ\n5. Gợi ý index để tối ưu query.",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "DESCRIPTION", "label": "Mô tả hệ thống cần thiết kế DB", "type": "textarea", "required": true }
-    ],
-    "tags": ["database", "SQL", "ERD", "schema"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "coding-006",
-    "title": "Viết API endpoint RESTful",
-    "category": "CODING",
-    "description": "Tạo code API endpoint đầy đủ với validation, error handling và response chuẩn.",
-    "prompt": "Viết API endpoint RESTful cho chức năng:\n\n[FEATURE]\n\nFramework: [FRAMEWORK]\n\nYêu cầu:\n1. Validate input đầy đủ\n2. Xử lý lỗi và trả về HTTP status code phù hợp\n3. Response JSON chuẩn\n4. Có comment giải thích logic\n5. Bao gồm middleware authentication nếu cần.",
-    "bestAI": "Groq",
-    "variables": [
-      { "name": "FEATURE", "label": "Mô tả chức năng API", "type": "textarea", "required": true },
-      { "name": "FRAMEWORK", "label": "Framework (VD: Express, FastAPI, Spring)", "type": "text", "required": true }
-    ],
-    "tags": ["API", "REST", "backend"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "slide-002",
-    "title": "Script thuyết trình kèm speaker notes",
-    "category": "SLIDE",
-    "description": "Viết nội dung chi tiết cho từng slide kèm ghi chú người thuyết trình.",
-    "prompt": "Dựa trên outline sau:\n\n[OUTLINE]\n\nViết script thuyết trình đầy đủ:\n1. Nội dung chính mỗi slide (3-5 bullet points)\n2. Speaker notes chi tiết cho người trình bày\n3. Gợi ý ví dụ hoặc câu chuyện minh họa\n4. Câu chuyển tiếp giữa các slide\n5. Gợi ý thiết kế visual (màu sắc, hình ảnh).",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "OUTLINE", "label": "Outline bài thuyết trình", "type": "textarea", "required": true }
-    ],
-    "tags": ["slide", "script", "speaker notes"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "slide-003",
-    "title": "Tạo slide pitch startup / dự án",
-    "category": "SLIDE",
-    "description": "Cấu trúc bài pitch deck chuẩn cho startup hoặc dự án cần gọi vốn / thuyết phục.",
-    "prompt": "Tạo pitch deck cho dự án:\n\n[PROJECT]\n\nĐối tượng nghe: [AUDIENCE]\n\nXây dựng theo cấu trúc:\n1. Problem — Vấn đề đang giải quyết\n2. Solution — Giải pháp của bạn\n3. Market Size — Quy mô thị trường\n4. Business Model — Cách tạo ra doanh thu\n5. Traction — Kết quả đã đạt được\n6. Team — Đội ngũ\n7. Ask — Bạn cần gì từ người nghe.",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "PROJECT", "label": "Mô tả dự án / startup", "type": "textarea", "required": true },
-      { "name": "AUDIENCE", "label": "Đối tượng (VD: nhà đầu tư, giảng viên)", "type": "text", "required": true }
-    ],
-    "tags": ["pitch", "startup", "presentation"],
-    "difficulty": "advanced",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "slide-004",
-    "title": "Chuẩn bị Q&A phòng thủ cho thuyết trình",
-    "category": "SLIDE",
-    "description": "Dự đoán câu hỏi khó từ hội đồng và gợi ý cách trả lời thuyết phục.",
-    "prompt": "Bài thuyết trình của tôi về:\n\n[TOPIC]\n\nNội dung chính:\n\n[SUMMARY]\n\nHãy:\n1. Dự đoán 10 câu hỏi khó nhất từ hội đồng / giảng viên\n2. Phân loại câu hỏi theo nhóm (nội dung, phương pháp, ứng dụng)\n3. Gợi ý cách trả lời thuyết phục cho từng câu\n4. Chỉ ra điểm yếu cần chuẩn bị thêm.",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "TOPIC", "label": "Chủ đề thuyết trình", "type": "text", "required": true },
-      { "name": "SUMMARY", "label": "Tóm tắt nội dung chính", "type": "textarea", "required": true }
-    ],
-    "tags": ["Q&A", "phòng thủ", "thuyết trình"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  }
-  ,
-  {
-    "id": "report-003",
-    "title": "Viết phần Introduction cho báo cáo",
-    "category": "REPORT",
-    "description": "Tạo phần mở đầu hút người đọc, nêu rõ bối cảnh, vấn đề và mục tiêu nghiên cứu.",
-    "prompt": "Viết phần Introduction cho báo cáo về:\n\n[TOPIC]\n\nBối cảnh nghiên cứu: [CONTEXT]\n\nYêu cầu:\n1. Đặt vấn đề hấp dẫn\n2. Nêu tầm quan trọng của chủ đề\n3. Xác định mục tiêu nghiên cứu\n4. Phạm vi và giới hạn\n5. Cấu trúc bài báo cáo.",
-    "bestAI": "OpenRouter",
-    "variables": [
-      { "name": "TOPIC", "label": "Chủ đề báo cáo", "type": "text", "required": true },
-      { "name": "CONTEXT", "label": "Bối cảnh / lý do chọn đề tài", "type": "textarea", "required": true }
-    ],
-    "tags": ["introduction", "báo cáo", "mở đầu"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "report-004",
-    "title": "Tóm tắt báo cáo (Executive Summary)",
-    "category": "REPORT",
-    "description": "Viết phần tóm tắt điều hành ngắn gọn, đủ ý cho báo cáo dài.",
-    "prompt": "Dựa trên nội dung báo cáo sau:\n\n[CONTENT]\n\nViết Executive Summary (tóm tắt điều hành) khoảng 300-500 từ:\n1. Mục tiêu của báo cáo\n2. Phương pháp thực hiện\n3. Kết quả chính đạt được\n4. Kết luận và khuyến nghị\nViết súc tích, người đọc không cần đọc toàn bộ vẫn nắm được nội dung.",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "CONTENT", "label": "Nội dung toàn bộ báo cáo", "type": "textarea", "required": true }
-    ],
-    "tags": ["tóm tắt", "executive summary", "báo cáo"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "report-005",
-    "title": "Phân tích SWOT cho doanh nghiệp / dự án",
-    "category": "REPORT",
-    "description": "Tạo ma trận SWOT đầy đủ và gợi ý chiến lược từ kết quả phân tích.",
-    "prompt": "Thực hiện phân tích SWOT cho:\n\n[SUBJECT]\n\nThông tin hiện có:\n[INFO]\n\nYêu cầu:\n1. Strengths — Điểm mạnh nội tại\n2. Weaknesses — Điểm yếu cần cải thiện\n3. Opportunities — Cơ hội từ môi trường bên ngoài\n4. Threats — Thách thức và rủi ro\n5. Đề xuất chiến lược SO, ST, WO, WT.",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "SUBJECT", "label": "Doanh nghiệp / dự án cần phân tích", "type": "text", "required": true },
-      { "name": "INFO", "label": "Thông tin nền về đối tượng", "type": "textarea", "required": true }
-    ],
-    "tags": ["SWOT", "phân tích", "chiến lược"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "research-002",
-    "title": "Đặt câu hỏi nghiên cứu & hypothesis",
-    "category": "RESEARCH",
-    "description": "Xây dựng câu hỏi nghiên cứu rõ ràng và giả thuyết có thể kiểm chứng.",
-    "prompt": "Chủ đề nghiên cứu của tôi là: [TOPIC]\n\nHãy giúp tôi:\n1. Xây dựng 3-5 câu hỏi nghiên cứu SMART\n2. Đề xuất 2-3 giả thuyết nghiên cứu (hypothesis)\n3. Xác định biến độc lập và biến phụ thuộc\n4. Gợi ý phương pháp nghiên cứu phù hợp\n5. Chỉ ra tiêu chí đánh giá giả thuyết.",
-    "bestAI": "Groq",
-    "variables": [
-      { "name": "TOPIC", "label": "Chủ đề nghiên cứu", "type": "text", "required": true }
-    ],
-    "tags": ["research question", "hypothesis", "methodology"],
-    "difficulty": "advanced",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "research-003",
-    "title": "Thiết kế bảng khảo sát (survey)",
-    "category": "RESEARCH",
-    "description": "Tạo bộ câu hỏi khảo sát khoa học, tránh bias và dễ phân tích dữ liệu.",
-    "prompt": "Tôi cần thiết kế bảng khảo sát để nghiên cứu:\n\n[TOPIC]\n\nĐối tượng khảo sát: [TARGET]\n\nYêu cầu:\n1. Phần giới thiệu và hướng dẫn điền\n2. 10-15 câu hỏi theo thang Likert 5 điểm\n3. Tránh leading question và double-barreled question\n4. Sắp xếp câu hỏi logic từ dễ đến khó\n5. Câu hỏi nhân khẩu học ở cuối.",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "TOPIC", "label": "Mục tiêu nghiên cứu của khảo sát", "type": "textarea", "required": true },
-      { "name": "TARGET", "label": "Đối tượng khảo sát", "type": "text", "required": true }
-    ],
-    "tags": ["survey", "khảo sát", "Likert"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  }
-  ,
-  {
-    "id": "research-004",
-    "title": "Phân tích dữ liệu định tính",
-    "category": "RESEARCH",
-    "description": "Hỗ trợ mã hóa và phân tích dữ liệu từ phỏng vấn hoặc quan sát.",
-    "prompt": "Tôi có dữ liệu định tính từ [SOURCE]:\n\n[DATA]\n\nHãy hỗ trợ phân tích:\n1. Xác định các theme (chủ đề) nổi bật\n2. Mã hóa (coding) các đoạn trích dẫn\n3. Nhóm code thành category\n4. Rút ra insight chính\n5. Gợi ý trích dẫn tiêu biểu để minh chứng.",
-    "bestAI": "Groq",
-    "variables": [
-      { "name": "SOURCE", "label": "Nguồn dữ liệu (VD: phỏng vấn, quan sát)", "type": "text", "required": true },
-      { "name": "DATA", "label": "Dữ liệu thô cần phân tích", "type": "textarea", "required": true }
-    ],
-    "tags": ["qualitative", "coding", "thematic analysis"],
-    "difficulty": "advanced",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "writing-001",
-    "title": "Viết email chuyên nghiệp",
-    "category": "WRITING",
-    "description": "Soạn email đúng tone, đúng format cho các tình huống học thuật và công việc.",
-    "prompt": "Viết email chuyên nghiệp với thông tin:\n\nNgười gửi: [SENDER]\nNgười nhận: [RECEIVER]\nMục đích: [PURPOSE]\nThông tin cần truyền đạt: [INFO]\n\nYêu cầu:\n1. Subject line rõ ràng\n2. Mở đầu lịch sự phù hợp văn hoá\n3. Nội dung súc tích, rõ ý\n4. Call-to-action cụ thể\n5. Kết thư chuyên nghiệp.",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "SENDER", "label": "Vai trò người gửi", "type": "text", "required": true },
-      { "name": "RECEIVER", "label": "Vai trò người nhận", "type": "text", "required": true },
-      { "name": "PURPOSE", "label": "Mục đích email", "type": "text", "required": true },
-      { "name": "INFO", "label": "Nội dung cần truyền đạt", "type": "textarea", "required": true }
-    ],
-    "tags": ["email", "viết lách", "giao tiếp"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "writing-002",
-    "title": "Paraphrase & tránh đạo văn",
-    "category": "WRITING",
-    "description": "Viết lại đoạn văn bằng ngôn từ của mình, giữ nguyên ý nghĩa nhưng tránh copy nguyên văn.",
-    "prompt": "Hãy paraphrase đoạn văn sau để tránh đạo văn:\n\n[TEXT]\n\nYêu cầu:\n1. Giữ nguyên ý nghĩa gốc\n2. Thay đổi cấu trúc câu và từ ngữ\n3. Không copy quá 3 từ liên tiếp từ bản gốc\n4. Vẫn giữ giọng văn học thuật\n5. Thêm câu dẫn nguồn (in-text citation) nếu cần.",
-    "bestAI": "OpenRouter",
-    "variables": [
-      { "name": "TEXT", "label": "Đoạn văn gốc cần paraphrase", "type": "textarea", "required": true }
-    ],
-    "tags": ["paraphrase", "đạo văn", "viết lại"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "writing-003",
-    "title": "Viết đoạn mở bài ấn tượng",
-    "category": "WRITING",
-    "description": "Tạo phần mở bài hút người đọc ngay từ câu đầu tiên với nhiều kỹ thuật hook.",
-    "prompt": "Viết 3 phiên bản mở bài khác nhau cho bài luận về:\n\n[TOPIC]\n\nSử dụng 3 kỹ thuật:\n1. Hook bằng câu hỏi gây tò mò\n2. Hook bằng số liệu thống kê gây sốc\n3. Hook bằng câu chuyện ngắn (anecdote)\n\nMỗi phiên bản 50-80 từ, kết thúc bằng thesis statement rõ ràng.",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "TOPIC", "label": "Chủ đề bài luận", "type": "text", "required": true }
-    ],
-    "tags": ["mở bài", "hook", "writing"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "writing-004",
-    "title": "Feedback & chỉnh sửa bài viết",
-    "category": "WRITING",
-    "description": "Nhận phản hồi chi tiết về bài viết và gợi ý cải thiện cụ thể.",
-    "prompt": "Hãy đọc và phản hồi bài viết sau:\n\n[ESSAY]\n\nCho feedback theo 4 tiêu chí:\n1. Nội dung & luận điểm (0-10 điểm)\n2. Cấu trúc & mạch lạc (0-10 điểm)\n3. Ngôn ngữ & từ vựng (0-10 điểm)\n4. Format & trình bày (0-10 điểm)\n\nVới mỗi tiêu chí: cho điểm, nhận xét điểm mạnh, chỉ ra điểm cần cải thiện và đề xuất cụ thể.",
-    "bestAI": "Groq",
-    "variables": [
-      { "name": "ESSAY", "label": "Bài viết cần nhận feedback", "type": "textarea", "required": true }
-    ],
-    "tags": ["feedback", "chỉnh sửa", "writing"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  }
-  ,
-  {
-    "id": "planning-001",
-    "title": "Lập kế hoạch học tập theo tuần",
-    "category": "PLANNING",
-    "description": "Tạo lịch học chi tiết cân bằng giữa các môn và thời gian nghỉ ngơi.",
-    "prompt": "Lập kế hoạch học tập tuần cho tôi:\n\nCác môn cần học: [SUBJECTS]\nThời gian có thể học mỗi ngày: [HOURS] giờ\nHạn nộp bài / thi quan trọng: [DEADLINES]\n\nYêu cầu:\n1. Phân bổ thời gian theo mức độ ưu tiên\n2. Xen kẽ môn khó và môn dễ\n3. Có thời gian ôn tập\n4. Đảm bảo nghỉ ngơi hợp lý\n5. Format dạng bảng theo ngày trong tuần.",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "SUBJECTS", "label": "Danh sách môn học", "type": "textarea", "required": true },
-      { "name": "HOURS", "label": "Số giờ học mỗi ngày", "type": "text", "required": true },
-      { "name": "DEADLINES", "label": "Deadline quan trọng", "type": "textarea", "required": false }
-    ],
-    "tags": ["lịch học", "planning", "time management"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "planning-002",
-    "title": "Breakdown bài tập lớn thành subtask",
-    "category": "PLANNING",
-    "description": "Phân rã bài tập lớn phức tạp thành các task nhỏ có thể thực hiện ngay.",
-    "prompt": "Bài tập lớn của tôi:\n\n[ASSIGNMENT]\n\nDeadline: [DEADLINE]\n\nHãy:\n1. Phân tích yêu cầu và xác định output cần nộp\n2. Chia thành các task nhỏ (tối đa 2 giờ mỗi task)\n3. Sắp xếp theo thứ tự phụ thuộc\n4. Ước tính thời gian cho từng task\n5. Lập lịch ngược từ deadline.",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "ASSIGNMENT", "label": "Mô tả bài tập lớn", "type": "textarea", "required": true },
-      { "name": "DEADLINE", "label": "Ngày deadline", "type": "text", "required": true }
-    ],
-    "tags": ["breakdown", "task", "deadline", "planning"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "planning-003",
-    "title": "Ôn tập trước kỳ thi",
-    "category": "PLANNING",
-    "description": "Tạo kế hoạch ôn thi chiến lược, tập trung vào điểm trọng tâm và dạng đề thường gặp.",
-    "prompt": "Tôi cần ôn thi môn: [SUBJECT]\n\nNội dung chương trình: [CONTENT]\n\nThời gian còn lại: [DAYS] ngày\n\nHãy:\n1. Xác định trọng tâm 20% kiến thức ra 80% điểm thi\n2. Lập lịch ôn tập ngày theo ngày\n3. Gợi ý dạng câu hỏi thường gặp\n4. Phương pháp ôn hiệu quả (active recall, spaced repetition)\n5. Tạo 10 câu hỏi ôn tập tự kiểm tra.",
-    "bestAI": "Gemini",
-    "variables": [
-      { "name": "SUBJECT", "label": "Môn thi", "type": "text", "required": true },
-      { "name": "CONTENT", "label": "Nội dung / chương đã học", "type": "textarea", "required": true },
-      { "name": "DAYS", "label": "Số ngày còn lại", "type": "text", "required": true }
-    ],
-    "tags": ["ôn thi", "study plan", "exam"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "coding-007",
-    "title": "Giải thích code có sẵn dễ hiểu",
-    "category": "CODING",
-    "description": "Phân tích và giải thích từng dòng code giúp hiểu logic mà không cần tra Google.",
-    "prompt": "Giải thích đoạn code sau theo từng bước:\n\n[CODE]\n\nYêu cầu:\n1. Giải thích mục đích tổng thể của đoạn code\n2. Giải thích từng block / function quan trọng\n3. Chỉ ra các pattern hoặc design được sử dụng\n4. Giải thích các dòng khó hiểu nhất\n5. Nêu khi nào nên dùng đoạn code này.",
-    "bestAI": "Groq",
-    "variables": [
-      { "name": "CODE", "label": "Đoạn code cần giải thích", "type": "textarea", "required": true }
-    ],
-    "tags": ["giải thích", "code", "learning"],
-    "difficulty": "beginner",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "coding-008",
-    "title": "Viết regex cho pattern cụ thể",
-    "category": "CODING",
-    "description": "Tạo biểu thức chính quy chính xác và giải thích từng phần của pattern.",
-    "prompt": "Viết regex để match pattern sau:\n\n[PATTERN_DESC]\n\nVí dụ input hợp lệ: [VALID_EXAMPLES]\nVí dụ input không hợp lệ: [INVALID_EXAMPLES]\n\nYêu cầu:\n1. Viết regex hoàn chỉnh\n2. Giải thích từng phần của regex\n3. Test với các ví dụ trên\n4. Gợi ý cách dùng trong code ([LANGUAGE])\n5. Nêu edge case cần lưu ý.",
-    "bestAI": "Groq",
-    "variables": [
-      { "name": "PATTERN_DESC", "label": "Mô tả pattern cần match", "type": "textarea", "required": true },
-      { "name": "VALID_EXAMPLES", "label": "Ví dụ hợp lệ", "type": "text", "required": true },
-      { "name": "INVALID_EXAMPLES", "label": "Ví dụ không hợp lệ", "type": "text", "required": false },
-      { "name": "LANGUAGE", "label": "Ngôn ngữ lập trình", "type": "text", "required": true }
-    ],
-    "tags": ["regex", "pattern", "string"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  },
-  {
-    "id": "research-005",
-    "title": "Tóm tắt bài báo khoa học",
-    "category": "RESEARCH",
-    "description": "Đọc và tóm tắt nhanh paper khoa học theo format chuẩn, rút ra điểm mấu chốt.",
-    "prompt": "Tóm tắt bài báo khoa học sau:\n\n[PAPER_CONTENT]\n\nTheo cấu trúc:\n1. Tên tác giả & năm xuất bản\n2. Research question / mục tiêu nghiên cứu\n3. Phương pháp nghiên cứu\n4. Kết quả chính (bullet points)\n5. Hạn chế của nghiên cứu\n6. Đóng góp / ứng dụng thực tiễn\n7. Đánh giá độ tin cậy (1-5 sao).",
-    "bestAI": "Groq",
-    "variables": [
-      { "name": "PAPER_CONTENT", "label": "Nội dung bài báo hoặc abstract", "type": "textarea", "required": true }
-    ],
-    "tags": ["paper", "tóm tắt", "academic"],
-    "difficulty": "intermediate",
-    "language": "vi",
-    "version": "1.0",
-    "author": "AIaBLE Team",
-    "createdAt": "2026-06-27",
-    "updatedAt": "2026-06-27"
-  }
+  { "id": "coding-001", "title": "Debug & giải thích lỗi code chi tiết", "category": "CODING", "description": "Phân tích lỗi runtime/compile, giải thích nguyên nhân và đề xuất cách sửa đúng.", "prompt": "Đoạn code sau đang gặp lỗi:\n\n[CODE]\n\nLỗi gặp phải: [ERROR]\n\nPhân tích:\n1. Lỗi nằm ở đâu\n2. Vì sao lỗi xảy ra\n3. Cách sửa đúng\n4. Code đã sửa\n5. Cách tránh lỗi tương tự.", "bestAI": "Groq", "variables": [{ "name": "CODE", "label": "Đoạn code cần debug", "type": "textarea", "required": true }, { "name": "ERROR", "label": "Lỗi hoặc mô tả hành vi sai", "type": "textarea", "required": true }], "tags": ["debug", "code", "giải thích"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "coding-002", "title": "Review & tối ưu code hiện tại", "category": "CODING", "description": "Đánh giá code hiện tại, gợi ý cải thiện performance, readability và best practices.", "prompt": "Review đoạn code sau:\n\n[CODE]\n\nNgôn ngữ: [LANGUAGE]\n\n1. Nhận xét readability\n2. Tìm vấn đề performance\n3. Tìm bug tiềm ẩn\n4. Đề xuất refactor\n5. Viết lại phiên bản tốt hơn.", "bestAI": "Groq", "variables": [{ "name": "CODE", "label": "Đoạn code cần review", "type": "textarea", "required": true }, { "name": "LANGUAGE", "label": "Ngôn ngữ lập trình", "type": "text", "required": true }], "tags": ["review", "optimization", "clean code"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "coding-003", "title": "Viết unit test cho function", "category": "CODING", "description": "Tạo bộ test case đầy đủ bao gồm happy path, edge case và error case.", "prompt": "Viết unit test cho hàm sau:\n\n[CODE]\n\nFramework: [FRAMEWORK]\n\n1. Test happy path\n2. Test edge case\n3. Test error case\n4. Tên test mô tả rõ ràng\n5. Comment mục đích từng test.", "bestAI": "Groq", "variables": [{ "name": "CODE", "label": "Hàm cần viết test", "type": "textarea", "required": true }, { "name": "FRAMEWORK", "label": "Framework (VD: Jest, PyTest)", "type": "text", "required": true }], "tags": ["unit test", "testing", "TDD"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "coding-004", "title": "Giải thích thuật toán từng bước", "category": "CODING", "description": "Phân tích cách hoạt động của thuật toán theo từng bước dễ hiểu kèm Big O.", "prompt": "Giải thích thuật toán [ALGORITHM]:\n\n1. Ý tưởng cốt lõi\n2. Các bước thực hiện chi tiết\n3. Ví dụ minh họa\n4. Độ phức tạp Big O\n5. Khi nào nên dùng\n6. Code mẫu bằng [LANGUAGE].", "bestAI": "Gemini", "variables": [{ "name": "ALGORITHM", "label": "Tên thuật toán (VD: QuickSort, BFS)", "type": "text", "required": true }, { "name": "LANGUAGE", "label": "Ngôn ngữ lập trình", "type": "text", "required": true }], "tags": ["algorithm", "data structure"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "coding-005", "title": "Thiết kế database schema", "category": "CODING", "description": "Tạo ERD và schema SQL tối ưu từ mô tả yêu cầu hệ thống.", "prompt": "Thiết kế database schema cho:\n\n[DESCRIPTION]\n\n1. Liệt kê các bảng cần thiết\n2. Primary key và foreign key\n3. Mối quan hệ (1-1, 1-N, N-N)\n4. SQL CREATE TABLE đầy đủ\n5. Gợi ý index tối ưu query.", "bestAI": "Gemini", "variables": [{ "name": "DESCRIPTION", "label": "Mô tả hệ thống cần thiết kế DB", "type": "textarea", "required": true }], "tags": ["database", "SQL", "ERD"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "coding-006", "title": "Viết API endpoint RESTful", "category": "CODING", "description": "Tạo code API endpoint đầy đủ với validation, error handling và response chuẩn.", "prompt": "Viết API endpoint RESTful cho:\n\n[FEATURE]\n\nFramework: [FRAMEWORK]\n\n1. Validate input đầy đủ\n2. HTTP status code phù hợp\n3. Response JSON chuẩn\n4. Comment giải thích logic\n5. Middleware authentication nếu cần.", "bestAI": "Groq", "variables": [{ "name": "FEATURE", "label": "Mô tả chức năng API", "type": "textarea", "required": true }, { "name": "FRAMEWORK", "label": "Framework (VD: Express, FastAPI)", "type": "text", "required": true }], "tags": ["API", "REST", "backend"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "coding-007", "title": "Giải thích code có sẵn dễ hiểu", "category": "CODING", "description": "Phân tích từng dòng code để hiểu logic mà không cần tra Google.", "prompt": "Giải thích đoạn code sau:\n\n[CODE]\n\n1. Mục đích tổng thể\n2. Từng block/function quan trọng\n3. Design pattern được dùng\n4. Các dòng khó hiểu nhất\n5. Khi nào nên dùng code này.", "bestAI": "Groq", "variables": [{ "name": "CODE", "label": "Đoạn code cần giải thích", "type": "textarea", "required": true }], "tags": ["giải thích", "learning"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "coding-008", "title": "Viết regex cho pattern cụ thể", "category": "CODING", "description": "Tạo biểu thức chính quy và giải thích từng phần của pattern.", "prompt": "Viết regex để match:\n\n[PATTERN_DESC]\n\nVí dụ hợp lệ: [VALID]\nVí dụ không hợp lệ: [INVALID]\n\n1. Regex hoàn chỉnh\n2. Giải thích từng phần\n3. Test với ví dụ\n4. Dùng trong [LANGUAGE]\n5. Edge case cần lưu ý.", "bestAI": "Groq", "variables": [{ "name": "PATTERN_DESC", "label": "Mô tả pattern cần match", "type": "textarea", "required": true }, { "name": "VALID", "label": "Ví dụ hợp lệ", "type": "text", "required": true }, { "name": "INVALID", "label": "Ví dụ không hợp lệ", "type": "text", "required": false }, { "name": "LANGUAGE", "label": "Ngôn ngữ lập trình", "type": "text", "required": true }], "tags": ["regex", "pattern"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "coding-009", "title": "Thiết kế hệ thống microservices", "category": "CODING", "description": "Phân tách monolith thành microservices và thiết kế giao tiếp giữa các service.", "prompt": "Thiết kế microservices cho hệ thống:\n\n[SYSTEM]\n\n1. Phân tách thành các service độc lập\n2. API gateway và routing\n3. Giao tiếp giữa services (REST/gRPC/message queue)\n4. Xử lý authentication/authorization\n5. Strategy deployment và scaling.", "bestAI": "Gemini", "variables": [{ "name": "SYSTEM", "label": "Mô tả hệ thống hiện tại", "type": "textarea", "required": true }], "tags": ["microservices", "architecture", "system design"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "coding-010", "title": "Viết script tự động hóa", "category": "CODING", "description": "Tạo script để tự động hóa các tác vụ lặp đi lặp lại.", "prompt": "Viết script tự động hóa tác vụ:\n\n[TASK]\n\nNgôn ngữ: [LANGUAGE]\n\n1. Script hoàn chỉnh có thể chạy ngay\n2. Xử lý lỗi và logging\n3. Comment giải thích từng bước\n4. Hướng dẫn cấu hình\n5. Cách chạy định kỳ (cron job nếu cần).", "bestAI": "Groq", "variables": [{ "name": "TASK", "label": "Mô tả tác vụ cần tự động hóa", "type": "textarea", "required": true }, { "name": "LANGUAGE", "label": "Ngôn ngữ (Python/Bash/PowerShell)", "type": "text", "required": true }], "tags": ["automation", "script", "DevOps"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "report-001", "title": "Viết báo cáo học thuật chuẩn APA", "category": "REPORT", "description": "Tạo cấu trúc báo cáo đúng format học thuật với trích dẫn và kết luận rõ ràng.", "prompt": "Viết báo cáo học thuật về [TOPIC].\n\n1. Mở đầu, nội dung chính, kết luận\n2. Văn phong học thuật, trang trọng\n3. Luận điểm rõ ràng\n4. Nguồn tham khảo chuẩn APA\n5. Tránh viết chung chung.", "bestAI": "OpenRouter", "variables": [{ "name": "TOPIC", "label": "Chủ đề báo cáo", "type": "text", "required": true }], "tags": ["báo cáo", "APA"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "report-002", "title": "Viết kết luận & đề xuất học thuật", "category": "REPORT", "description": "Tổng hợp kết quả nghiên cứu thành phần kết luận sắc bén.", "prompt": "Dựa trên nội dung:\n\n[CONTENT]\n\nViết kết luận và đề xuất:\n1. Tóm tắt phát hiện chính\n2. Ý nghĩa kết quả\n3. Hạn chế nghiên cứu\n4. Đề xuất giải pháp\n5. Kết luận thuyết phục.", "bestAI": "Gemini", "variables": [{ "name": "CONTENT", "label": "Nội dung nghiên cứu", "type": "textarea", "required": true }], "tags": ["kết luận", "đề xuất"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "report-003", "title": "Viết phần Introduction cho báo cáo", "category": "REPORT", "description": "Tạo phần mở đầu hút người đọc, nêu rõ bối cảnh và mục tiêu nghiên cứu.", "prompt": "Viết Introduction cho báo cáo về:\n\n[TOPIC]\n\nBối cảnh: [CONTEXT]\n\n1. Đặt vấn đề hấp dẫn\n2. Tầm quan trọng của chủ đề\n3. Mục tiêu nghiên cứu\n4. Phạm vi và giới hạn\n5. Cấu trúc bài báo cáo.", "bestAI": "OpenRouter", "variables": [{ "name": "TOPIC", "label": "Chủ đề báo cáo", "type": "text", "required": true }, { "name": "CONTEXT", "label": "Bối cảnh / lý do chọn đề tài", "type": "textarea", "required": true }], "tags": ["introduction", "mở đầu"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "report-004", "title": "Tóm tắt báo cáo (Executive Summary)", "category": "REPORT", "description": "Viết phần tóm tắt điều hành ngắn gọn, đủ ý cho báo cáo dài.", "prompt": "Viết Executive Summary từ nội dung:\n\n[CONTENT]\n\nKhoảng 300-500 từ:\n1. Mục tiêu báo cáo\n2. Phương pháp thực hiện\n3. Kết quả chính\n4. Kết luận và khuyến nghị.", "bestAI": "Gemini", "variables": [{ "name": "CONTENT", "label": "Nội dung toàn bộ báo cáo", "type": "textarea", "required": true }], "tags": ["tóm tắt", "executive summary"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "report-005", "title": "Phân tích SWOT", "category": "REPORT", "description": "Tạo ma trận SWOT đầy đủ và gợi ý chiến lược từ kết quả phân tích.", "prompt": "Phân tích SWOT cho:\n\n[SUBJECT]\n\nThông tin: [INFO]\n\n1. Strengths — Điểm mạnh\n2. Weaknesses — Điểm yếu\n3. Opportunities — Cơ hội\n4. Threats — Thách thức\n5. Chiến lược SO, ST, WO, WT.", "bestAI": "Gemini", "variables": [{ "name": "SUBJECT", "label": "Đối tượng phân tích", "type": "text", "required": true }, { "name": "INFO", "label": "Thông tin nền", "type": "textarea", "required": true }], "tags": ["SWOT", "chiến lược"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "report-006", "title": "Viết phương pháp nghiên cứu (Methodology)", "category": "REPORT", "description": "Trình bày phương pháp nghiên cứu rõ ràng, có thể tái hiện và phù hợp chuẩn học thuật.", "prompt": "Viết phần Methodology cho nghiên cứu về:\n\n[TOPIC]\n\nPhương pháp dự kiến: [METHOD]\n\n1. Thiết kế nghiên cứu\n2. Đối tượng và mẫu nghiên cứu\n3. Công cụ và quy trình thu thập dữ liệu\n4. Phương pháp phân tích\n5. Đảm bảo độ tin cậy và hợp lệ.", "bestAI": "OpenRouter", "variables": [{ "name": "TOPIC", "label": "Chủ đề nghiên cứu", "type": "text", "required": true }, { "name": "METHOD", "label": "Phương pháp dự kiến (định tính/định lượng)", "type": "text", "required": true }], "tags": ["methodology", "phương pháp"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "report-007", "title": "Viết báo cáo thực tập", "category": "REPORT", "description": "Cấu trúc báo cáo thực tập đầy đủ từ mô tả công việc đến bài học kinh nghiệm.", "prompt": "Viết báo cáo thực tập tại:\n\nCông ty: [COMPANY]\nVị trí: [POSITION]\nCông việc đã làm: [TASKS]\nThời gian: [DURATION]\n\n1. Giới thiệu công ty\n2. Mô tả công việc và nhiệm vụ\n3. Kiến thức & kỹ năng học được\n4. Khó khăn và cách giải quyết\n5. Bài học kinh nghiệm và đề xuất.", "bestAI": "Gemini", "variables": [{ "name": "COMPANY", "label": "Tên công ty thực tập", "type": "text", "required": true }, { "name": "POSITION", "label": "Vị trí thực tập", "type": "text", "required": true }, { "name": "TASKS", "label": "Công việc đã thực hiện", "type": "textarea", "required": true }, { "name": "DURATION", "label": "Thời gian thực tập", "type": "text", "required": true }], "tags": ["thực tập", "internship report"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "slide-001", "title": "Outline slide thuyết trình 10 phút", "category": "SLIDE", "description": "Phân bổ nội dung hợp lý cho bài thuyết trình ngắn.", "prompt": "Tạo outline thuyết trình 10 phút về:\n\n[TOPIC]\n\n1. Chia từng slide\n2. Tiêu đề và 3 ý chính mỗi slide\n3. Thời lượng từng phần\n4. Mở đầu thu hút\n5. Kết luận và call-to-action.", "bestAI": "Gemini", "variables": [{ "name": "TOPIC", "label": "Chủ đề thuyết trình", "type": "text", "required": true }], "tags": ["slide", "outline"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "slide-002", "title": "Script thuyết trình kèm speaker notes", "category": "SLIDE", "description": "Viết nội dung chi tiết từng slide kèm ghi chú người thuyết trình.", "prompt": "Viết script thuyết trình từ outline:\n\n[OUTLINE]\n\n1. 3-5 bullet points mỗi slide\n2. Speaker notes chi tiết\n3. Ví dụ minh họa\n4. Câu chuyển tiếp giữa slides\n5. Gợi ý visual.", "bestAI": "Gemini", "variables": [{ "name": "OUTLINE", "label": "Outline bài thuyết trình", "type": "textarea", "required": true }], "tags": ["script", "speaker notes"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "slide-003", "title": "Tạo slide pitch startup / dự án", "category": "SLIDE", "description": "Cấu trúc pitch deck chuẩn cho startup hoặc dự án cần thuyết phục.", "prompt": "Tạo pitch deck cho:\n\n[PROJECT]\n\nĐối tượng: [AUDIENCE]\n\n1. Problem\n2. Solution\n3. Market Size\n4. Business Model\n5. Traction\n6. Team\n7. Ask.", "bestAI": "Gemini", "variables": [{ "name": "PROJECT", "label": "Mô tả dự án", "type": "textarea", "required": true }, { "name": "AUDIENCE", "label": "Đối tượng nghe", "type": "text", "required": true }], "tags": ["pitch", "startup"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "slide-004", "title": "Chuẩn bị Q&A phòng thủ", "category": "SLIDE", "description": "Dự đoán câu hỏi khó từ hội đồng và gợi ý cách trả lời.", "prompt": "Thuyết trình về:\n\n[TOPIC]\n\nTóm tắt: [SUMMARY]\n\n1. 10 câu hỏi khó nhất\n2. Phân loại theo nhóm\n3. Cách trả lời thuyết phục\n4. Điểm yếu cần chuẩn bị thêm.", "bestAI": "Gemini", "variables": [{ "name": "TOPIC", "label": "Chủ đề", "type": "text", "required": true }, { "name": "SUMMARY", "label": "Tóm tắt nội dung", "type": "textarea", "required": true }], "tags": ["Q&A", "phòng thủ"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "slide-005", "title": "Thiết kế infographic concept", "category": "SLIDE", "description": "Lên ý tưởng bố cục và nội dung cho infographic trực quan.", "prompt": "Thiết kế concept infographic về:\n\n[TOPIC]\n\nDữ liệu chính: [DATA]\n\n1. Headline và sub-headline\n2. Bố cục tổng thể (layout)\n3. Các section và nội dung\n4. Số liệu và biểu đồ nên dùng\n5. Màu sắc và font gợi ý.", "bestAI": "Gemini", "variables": [{ "name": "TOPIC", "label": "Chủ đề infographic", "type": "text", "required": true }, { "name": "DATA", "label": "Dữ liệu / thông tin chính", "type": "textarea", "required": true }], "tags": ["infographic", "design", "visual"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "research-001", "title": "Tổng hợp literature review", "category": "RESEARCH", "description": "Tóm tắt và so sánh nhiều bài báo theo chủ đề, xu hướng và research gap.", "prompt": "Tổng hợp literature review về:\n\n[TOPIC]\n\nTài liệu: [SOURCES]\n\n1. Tóm tắt từng nguồn\n2. Nhóm theo hướng tiếp cận\n3. So sánh điểm giống/khác\n4. Research gap\n5. Hướng nghiên cứu tiếp theo.", "bestAI": "Groq", "variables": [{ "name": "TOPIC", "label": "Chủ đề nghiên cứu", "type": "text", "required": true }, { "name": "SOURCES", "label": "Nguồn tài liệu", "type": "textarea", "required": true }], "tags": ["literature review", "paper"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "research-002", "title": "Đặt câu hỏi nghiên cứu & hypothesis", "category": "RESEARCH", "description": "Xây dựng câu hỏi nghiên cứu rõ ràng và giả thuyết có thể kiểm chứng.", "prompt": "Chủ đề nghiên cứu: [TOPIC]\n\n1. 3-5 câu hỏi nghiên cứu SMART\n2. 2-3 giả thuyết\n3. Biến độc lập và phụ thuộc\n4. Phương pháp nghiên cứu phù hợp\n5. Tiêu chí đánh giá giả thuyết.", "bestAI": "Groq", "variables": [{ "name": "TOPIC", "label": "Chủ đề nghiên cứu", "type": "text", "required": true }], "tags": ["hypothesis", "research question"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "research-003", "title": "Thiết kế bảng khảo sát", "category": "RESEARCH", "description": "Tạo bộ câu hỏi khảo sát khoa học, tránh bias và dễ phân tích.", "prompt": "Bảng khảo sát nghiên cứu về:\n\n[TOPIC]\n\nĐối tượng: [TARGET]\n\n1. Phần giới thiệu\n2. 10-15 câu Likert 5 điểm\n3. Tránh leading question\n4. Sắp xếp logic\n5. Câu nhân khẩu học ở cuối.", "bestAI": "Gemini", "variables": [{ "name": "TOPIC", "label": "Mục tiêu khảo sát", "type": "textarea", "required": true }, { "name": "TARGET", "label": "Đối tượng khảo sát", "type": "text", "required": true }], "tags": ["survey", "Likert"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "research-004", "title": "Phân tích dữ liệu định tính", "category": "RESEARCH", "description": "Mã hóa và phân tích dữ liệu từ phỏng vấn hoặc quan sát.", "prompt": "Dữ liệu từ [SOURCE]:\n\n[DATA]\n\n1. Xác định theme nổi bật\n2. Mã hóa các trích dẫn\n3. Nhóm code thành category\n4. Rút ra insight chính\n5. Trích dẫn tiêu biểu minh chứng.", "bestAI": "Groq", "variables": [{ "name": "SOURCE", "label": "Nguồn dữ liệu", "type": "text", "required": true }, { "name": "DATA", "label": "Dữ liệu thô", "type": "textarea", "required": true }], "tags": ["qualitative", "thematic analysis"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "research-005", "title": "Tóm tắt bài báo khoa học", "category": "RESEARCH", "description": "Đọc và tóm tắt paper theo format chuẩn, rút ra điểm mấu chốt.", "prompt": "Tóm tắt bài báo:\n\n[PAPER_CONTENT]\n\n1. Tác giả & năm\n2. Research question\n3. Phương pháp\n4. Kết quả chính\n5. Hạn chế\n6. Đóng góp thực tiễn\n7. Đánh giá tin cậy (1-5 sao).", "bestAI": "Groq", "variables": [{ "name": "PAPER_CONTENT", "label": "Nội dung bài báo hoặc abstract", "type": "textarea", "required": true }], "tags": ["paper", "tóm tắt"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "writing-001", "title": "Viết email chuyên nghiệp", "category": "WRITING", "description": "Soạn email đúng tone cho các tình huống học thuật và công việc.", "prompt": "Viết email:\n\nGửi: [SENDER] → Nhận: [RECEIVER]\nMục đích: [PURPOSE]\nNội dung: [INFO]\n\n1. Subject line rõ ràng\n2. Mở đầu lịch sự\n3. Nội dung súc tích\n4. Call-to-action cụ thể\n5. Kết thư chuyên nghiệp.", "bestAI": "Gemini", "variables": [{ "name": "SENDER", "label": "Vai trò người gửi", "type": "text", "required": true }, { "name": "RECEIVER", "label": "Vai trò người nhận", "type": "text", "required": true }, { "name": "PURPOSE", "label": "Mục đích email", "type": "text", "required": true }, { "name": "INFO", "label": "Nội dung cần truyền đạt", "type": "textarea", "required": true }], "tags": ["email", "giao tiếp"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "writing-002", "title": "Paraphrase & tránh đạo văn", "category": "WRITING", "description": "Viết lại đoạn văn bằng ngôn từ của mình, giữ nguyên ý nghĩa.", "prompt": "Paraphrase đoạn văn sau:\n\n[TEXT]\n\n1. Giữ nguyên ý nghĩa gốc\n2. Thay đổi cấu trúc câu và từ ngữ\n3. Không copy quá 3 từ liên tiếp\n4. Giữ giọng văn học thuật\n5. Thêm in-text citation nếu cần.", "bestAI": "OpenRouter", "variables": [{ "name": "TEXT", "label": "Đoạn văn gốc", "type": "textarea", "required": true }], "tags": ["paraphrase", "đạo văn"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "writing-003", "title": "Viết đoạn mở bài ấn tượng", "category": "WRITING", "description": "Tạo mở bài hút người đọc với nhiều kỹ thuật hook khác nhau.", "prompt": "Viết 3 phiên bản mở bài cho:\n\n[TOPIC]\n\n1. Hook câu hỏi gây tò mò\n2. Hook số liệu gây sốc\n3. Hook câu chuyện ngắn\n\nMỗi phiên bản 50-80 từ, kết bằng thesis statement.", "bestAI": "Gemini", "variables": [{ "name": "TOPIC", "label": "Chủ đề bài luận", "type": "text", "required": true }], "tags": ["mở bài", "hook"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "writing-004", "title": "Feedback & chỉnh sửa bài viết", "category": "WRITING", "description": "Nhận phản hồi chi tiết và gợi ý cải thiện cụ thể cho bài viết.", "prompt": "Feedback bài viết sau:\n\n[ESSAY]\n\nTheo 4 tiêu chí:\n1. Nội dung & luận điểm /10\n2. Cấu trúc & mạch lạc /10\n3. Ngôn ngữ & từ vựng /10\n4. Format & trình bày /10\n\nMỗi tiêu chí: điểm, điểm mạnh, điểm cần cải thiện, đề xuất cụ thể.", "bestAI": "Groq", "variables": [{ "name": "ESSAY", "label": "Bài viết cần feedback", "type": "textarea", "required": true }], "tags": ["feedback", "chỉnh sửa"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "writing-005", "title": "Viết CV xin việc / thực tập", "category": "WRITING", "description": "Tạo CV chuyên nghiệp phù hợp với vị trí ứng tuyển.", "prompt": "Viết CV cho:\n\nVị trí: [POSITION]\nKinh nghiệm: [EXPERIENCE]\nKỹ năng: [SKILLS]\nHọc vấn: [EDUCATION]\n\n1. Summary/Objective ấn tượng\n2. Experience với kết quả đo lường được\n3. Skills phù hợp JD\n4. Format ATS-friendly\n5. Gợi ý điểm nổi bật cần nhấn mạnh.", "bestAI": "Gemini", "variables": [{ "name": "POSITION", "label": "Vị trí ứng tuyển", "type": "text", "required": true }, { "name": "EXPERIENCE", "label": "Kinh nghiệm làm việc", "type": "textarea", "required": true }, { "name": "SKILLS", "label": "Kỹ năng", "type": "textarea", "required": true }, { "name": "EDUCATION", "label": "Học vấn", "type": "textarea", "required": true }], "tags": ["CV", "xin việc", "career"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "writing-006", "title": "Viết cover letter thuyết phục", "category": "WRITING", "description": "Soạn thư xin việc nổi bật, kết nối điểm mạnh với yêu cầu JD.", "prompt": "Viết cover letter cho:\n\nCông ty: [COMPANY]\nVị trí: [POSITION]\nĐiểm mạnh của tôi: [STRENGTHS]\nLý do muốn ứng tuyển: [MOTIVATION]\n\n1. Opening hook\n2. Kết nối kinh nghiệm với JD\n3. Giá trị mang lại cho công ty\n4. Thể hiện sự nghiên cứu về công ty\n5. Closing call-to-action.", "bestAI": "Gemini", "variables": [{ "name": "COMPANY", "label": "Tên công ty", "type": "text", "required": true }, { "name": "POSITION", "label": "Vị trí ứng tuyển", "type": "text", "required": true }, { "name": "STRENGTHS", "label": "Điểm mạnh bản thân", "type": "textarea", "required": true }, { "name": "MOTIVATION", "label": "Lý do ứng tuyển", "type": "textarea", "required": true }], "tags": ["cover letter", "xin việc"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "planning-001", "title": "Lập kế hoạch học tập theo tuần", "category": "PLANNING", "description": "Tạo lịch học chi tiết cân bằng giữa các môn và thời gian nghỉ ngơi.", "prompt": "Lập kế hoạch học:\n\nMôn học: [SUBJECTS]\nGiờ/ngày: [HOURS]\nDeadline: [DEADLINES]\n\n1. Phân bổ theo ưu tiên\n2. Xen kẽ môn khó/dễ\n3. Thời gian ôn tập\n4. Nghỉ ngơi hợp lý\n5. Bảng theo ngày trong tuần.", "bestAI": "Gemini", "variables": [{ "name": "SUBJECTS", "label": "Danh sách môn học", "type": "textarea", "required": true }, { "name": "HOURS", "label": "Số giờ học mỗi ngày", "type": "text", "required": true }, { "name": "DEADLINES", "label": "Deadline quan trọng", "type": "textarea", "required": false }], "tags": ["lịch học", "time management"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "planning-002", "title": "Breakdown bài tập lớn thành subtask", "category": "PLANNING", "description": "Phân rã bài tập lớn phức tạp thành các task nhỏ có thể thực hiện ngay.", "prompt": "Bài tập lớn:\n\n[ASSIGNMENT]\n\nDeadline: [DEADLINE]\n\n1. Phân tích output cần nộp\n2. Chia task nhỏ ≤2 giờ\n3. Sắp xếp theo phụ thuộc\n4. Ước tính thời gian\n5. Lịch ngược từ deadline.", "bestAI": "Gemini", "variables": [{ "name": "ASSIGNMENT", "label": "Mô tả bài tập lớn", "type": "textarea", "required": true }, { "name": "DEADLINE", "label": "Ngày deadline", "type": "text", "required": true }], "tags": ["breakdown", "task", "deadline"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "planning-003", "title": "Ôn tập trước kỳ thi", "category": "PLANNING", "description": "Kế hoạch ôn thi chiến lược, tập trung vào trọng tâm và dạng đề thường gặp.", "prompt": "Ôn thi môn: [SUBJECT]\n\nNội dung: [CONTENT]\nThời gian còn: [DAYS] ngày\n\n1. 20% kiến thức ra 80% điểm\n2. Lịch ôn từng ngày\n3. Dạng câu hỏi thường gặp\n4. Active recall, spaced repetition\n5. 10 câu hỏi tự kiểm tra.", "bestAI": "Gemini", "variables": [{ "name": "SUBJECT", "label": "Môn thi", "type": "text", "required": true }, { "name": "CONTENT", "label": "Nội dung đã học", "type": "textarea", "required": true }, { "name": "DAYS", "label": "Số ngày còn lại", "type": "text", "required": true }], "tags": ["ôn thi", "study plan"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "planning-004", "title": "Lên kế hoạch dự án nhóm", "category": "PLANNING", "description": "Phân chia công việc, deadline và trách nhiệm rõ ràng cho dự án nhóm.", "prompt": "Dự án nhóm:\n\nTên dự án: [PROJECT]\nThành viên: [MEMBERS]\nDeadline: [DEADLINE]\nYêu cầu: [REQUIREMENTS]\n\n1. Phân công vai trò\n2. WBS chi tiết\n3. Timeline Gantt\n4. Quy trình check-in hàng tuần\n5. Kế hoạch xử lý rủi ro.", "bestAI": "Gemini", "variables": [{ "name": "PROJECT", "label": "Tên dự án", "type": "text", "required": true }, { "name": "MEMBERS", "label": "Danh sách thành viên & kỹ năng", "type": "textarea", "required": true }, { "name": "DEADLINE", "label": "Deadline nộp bài", "type": "text", "required": true }, { "name": "REQUIREMENTS", "label": "Yêu cầu dự án", "type": "textarea", "required": true }], "tags": ["group project", "WBS", "Gantt"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "math-001", "title": "Giải bài tập Giải tích", "category": "MATH", "description": "Giải từng bước bài tập tích phân, đạo hàm, giới hạn kèm giải thích lý thuyết.", "prompt": "Giải bài tập Giải tích sau:\n\n[PROBLEM]\n\n1. Nhận dạng dạng bài\n2. Lý thuyết / công thức áp dụng\n3. Giải từng bước chi tiết\n4. Kết quả cuối cùng\n5. Kiểm tra lại kết quả.", "bestAI": "Gemini", "variables": [{ "name": "PROBLEM", "label": "Đề bài cần giải", "type": "textarea", "required": true }], "tags": ["giải tích", "calculus", "math"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "math-002", "title": "Giải bài tập Đại số tuyến tính", "category": "MATH", "description": "Giải ma trận, vector, hệ phương trình tuyến tính kèm giải thích từng bước.", "prompt": "Giải bài Đại số tuyến tính:\n\n[PROBLEM]\n\n1. Nhận dạng dạng bài\n2. Phương pháp giải phù hợp\n3. Các bước tính toán chi tiết\n4. Kết quả và ý nghĩa hình học (nếu có)\n5. Kiểm tra lại.", "bestAI": "Gemini", "variables": [{ "name": "PROBLEM", "label": "Bài toán cần giải", "type": "textarea", "required": true }], "tags": ["đại số", "ma trận", "linear algebra"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "math-003", "title": "Giải bài tập Xác suất & Thống kê", "category": "MATH", "description": "Giải các bài tập xác suất, phân phối, kiểm định giả thuyết.", "prompt": "Giải bài Xác suất & Thống kê:\n\n[PROBLEM]\n\n1. Xác định loại bài (xác suất / thống kê suy diễn)\n2. Công thức và định lý áp dụng\n3. Tính toán từng bước\n4. Kết quả và diễn giải\n5. Lưu ý điều kiện áp dụng.", "bestAI": "Gemini", "variables": [{ "name": "PROBLEM", "label": "Bài toán cần giải", "type": "textarea", "required": true }], "tags": ["xác suất", "thống kê", "probability"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "math-004", "title": "Giải thích khái niệm Toán học", "category": "MATH", "description": "Giải thích khái niệm toán học phức tạp bằng ngôn ngữ đơn giản kèm ví dụ.", "prompt": "Giải thích khái niệm: [CONCEPT]\n\nMức độ hiểu biết của tôi: [LEVEL]\n\n1. Định nghĩa đơn giản\n2. Trực giác / ý tưởng cốt lõi\n3. Ví dụ cụ thể dễ hiểu\n4. Ứng dụng thực tế\n5. Liên hệ với khái niệm đã biết.", "bestAI": "Gemini", "variables": [{ "name": "CONCEPT", "label": "Khái niệm toán học", "type": "text", "required": true }, { "name": "LEVEL", "label": "Mức hiểu biết (VD: chưa biết gì / đã học cơ bản)", "type": "text", "required": true }], "tags": ["giải thích", "toán học", "concept"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "english-001", "title": "Viết bài luận tiếng Anh học thuật", "category": "ENGLISH", "description": "Tạo bài luận tiếng Anh chuẩn học thuật với cấu trúc rõ ràng.", "prompt": "Viết bài luận tiếng Anh về:\n\n[TOPIC]\n\nDạng bài: [TYPE]\nSố từ: [WORD_COUNT]\n\n1. Thesis statement rõ ràng\n2. Body paragraphs có topic sentence\n3. Linking words đa dạng\n4. Academic vocabulary B2-C1\n5. Conclusion tổng hợp mạnh.", "bestAI": "OpenRouter", "variables": [{ "name": "TOPIC", "label": "Chủ đề bài luận", "type": "text", "required": true }, { "name": "TYPE", "label": "Dạng bài (argumentative/descriptive/report)", "type": "text", "required": true }, { "name": "WORD_COUNT", "label": "Số từ yêu cầu", "type": "text", "required": true }], "tags": ["English", "essay", "academic writing"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "english-002", "title": "Chấm điểm IELTS Writing", "category": "ENGLISH", "description": "Đánh giá bài viết theo tiêu chí IELTS và gợi ý cải thiện band score.", "prompt": "Chấm bài IELTS Writing:\n\n[ESSAY]\n\nTheo 4 tiêu chí IELTS:\n1. Task Achievement /9\n2. Coherence & Cohesion /9\n3. Lexical Resource /9\n4. Grammatical Range & Accuracy /9\n\nMỗi tiêu chí: điểm, nhận xét, gợi ý cải thiện cụ thể.", "bestAI": "OpenRouter", "variables": [{ "name": "ESSAY", "label": "Bài viết cần chấm", "type": "textarea", "required": true }], "tags": ["IELTS", "writing", "band score"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "english-003", "title": "Luyện nói tiếng Anh qua tình huống", "category": "ENGLISH", "description": "Tạo tình huống thực tế để luyện speaking và gợi ý cách diễn đạt tự nhiên.", "prompt": "Luyện nói tiếng Anh về:\n\n[SITUATION]\n\nMục tiêu: [GOAL]\n\n1. Tạo 5 tình huống hội thoại thực tế\n2. Sample dialogue cho từng tình huống\n3. Key phrases cần nhớ\n4. Lỗi phổ biến người Việt mắc\n5. Gợi ý cách phát âm tự nhiên hơn.", "bestAI": "Gemini", "variables": [{ "name": "SITUATION", "label": "Chủ đề / tình huống", "type": "text", "required": true }, { "name": "GOAL", "label": "Mục tiêu luyện tập", "type": "text", "required": true }], "tags": ["speaking", "luyện nói", "IELTS"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "english-004", "title": "Dịch thuật chính xác Anh-Việt", "category": "ENGLISH", "description": "Dịch văn bản kỹ thuật / học thuật chính xác kèm giải thích thuật ngữ.", "prompt": "Dịch đoạn văn sau sang [TARGET_LANG]:\n\n[TEXT]\n\n1. Bản dịch chính xác, tự nhiên\n2. Giải thích thuật ngữ chuyên ngành khó\n3. Các cách dịch thay thế (nếu có)\n4. Lưu ý sắc thái nghĩa quan trọng\n5. Gợi ý từ vựng liên quan.", "bestAI": "OpenRouter", "variables": [{ "name": "TEXT", "label": "Đoạn văn cần dịch", "type": "textarea", "required": true }, { "name": "TARGET_LANG", "label": "Ngôn ngữ đích (Tiếng Việt/Tiếng Anh)", "type": "text", "required": true }], "tags": ["dịch thuật", "translation"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "business-001", "title": "Phân tích thị trường và đối thủ cạnh tranh", "category": "BUSINESS", "description": "Đánh giá thị trường mục tiêu và lập hồ sơ đối thủ chi tiết.", "prompt": "Phân tích thị trường cho:\n\nSản phẩm/dịch vụ: [PRODUCT]\nThị trường mục tiêu: [MARKET]\n\n1. Quy mô và tốc độ tăng trưởng thị trường\n2. Top 3-5 đối thủ cạnh tranh (điểm mạnh/yếu)\n3. Customer persona chi tiết\n4. Xu hướng thị trường 2024-2026\n5. Cơ hội và khoảng trống thị trường.", "bestAI": "Gemini", "variables": [{ "name": "PRODUCT", "label": "Sản phẩm / dịch vụ", "type": "text", "required": true }, { "name": "MARKET", "label": "Thị trường mục tiêu", "type": "text", "required": true }], "tags": ["market analysis", "competitor", "business"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "business-002", "title": "Viết Business Plan cơ bản", "category": "BUSINESS", "description": "Tạo kế hoạch kinh doanh đầy đủ các mục cơ bản cho startup hay dự án học thuật.", "prompt": "Viết Business Plan cho:\n\n[BUSINESS_IDEA]\n\n1. Executive Summary\n2. Mô tả sản phẩm/dịch vụ\n3. Phân tích thị trường\n4. Chiến lược Marketing\n5. Kế hoạch tài chính (doanh thu, chi phí dự kiến)\n6. Đội ngũ và tổ chức.", "bestAI": "Gemini", "variables": [{ "name": "BUSINESS_IDEA", "label": "Ý tưởng kinh doanh", "type": "textarea", "required": true }], "tags": ["business plan", "startup"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "business-003", "title": "Lên chiến lược Marketing 4P", "category": "BUSINESS", "description": "Xây dựng chiến lược marketing toàn diện theo mô hình 4P.", "prompt": "Chiến lược Marketing 4P cho:\n\nSản phẩm: [PRODUCT]\nKhách hàng: [TARGET]\nNgân sách: [BUDGET]\n\n1. Product — định vị, USP\n2. Price — chiến lược giá\n3. Place — kênh phân phối\n4. Promotion — kế hoạch truyền thông 3 tháng.", "bestAI": "Gemini", "variables": [{ "name": "PRODUCT", "label": "Sản phẩm / dịch vụ", "type": "text", "required": true }, { "name": "TARGET", "label": "Khách hàng mục tiêu", "type": "text", "required": true }, { "name": "BUDGET", "label": "Ngân sách marketing", "type": "text", "required": false }], "tags": ["marketing", "4P", "chiến lược"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "business-004", "title": "Phân tích báo cáo tài chính", "category": "BUSINESS", "description": "Đọc hiểu và phân tích các chỉ số tài chính quan trọng từ báo cáo.", "prompt": "Phân tích báo cáo tài chính:\n\nCông ty: [COMPANY]\nDữ liệu: [DATA]\n\n1. Chỉ số thanh khoản (Current/Quick ratio)\n2. Chỉ số hiệu quả (ROA, ROE)\n3. Chỉ số đòn bẩy (D/E ratio)\n4. Xu hướng 3 năm gần nhất\n5. So sánh với trung bình ngành và đề xuất.", "bestAI": "Gemini", "variables": [{ "name": "COMPANY", "label": "Tên công ty", "type": "text", "required": true }, { "name": "DATA", "label": "Dữ liệu tài chính", "type": "textarea", "required": true }], "tags": ["tài chính", "financial analysis"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "design-001", "title": "Lên ý tưởng thiết kế UI/UX", "category": "DESIGN", "description": "Brainstorm concept thiết kế giao diện người dùng và trải nghiệm.", "prompt": "Lên ý tưởng UI/UX cho:\n\nỨng dụng: [APP]\nNgười dùng: [USERS]\n\n1. User journey chính\n2. Wireframe concept từng màn hình\n3. Color palette và typography gợi ý\n4. Micro-interactions quan trọng\n5. Accessibility considerations.", "bestAI": "Gemini", "variables": [{ "name": "APP", "label": "Loại ứng dụng", "type": "text", "required": true }, { "name": "USERS", "label": "Đối tượng người dùng", "type": "text", "required": true }], "tags": ["UI", "UX", "design"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "design-002", "title": "Viết UX copy & microcopy", "category": "DESIGN", "description": "Tạo nội dung cho button, placeholder, error message và onboarding.", "prompt": "Viết UX copy cho ứng dụng:\n\n[APP_DESCRIPTION]\n\nCần viết:\n[COPY_TYPES]\n\n1. Button labels ngắn gọn, action-oriented\n2. Placeholder text gợi ý\n3. Error messages thân thiện\n4. Empty state messages\n5. Onboarding tooltips.", "bestAI": "Gemini", "variables": [{ "name": "APP_DESCRIPTION", "label": "Mô tả ứng dụng", "type": "textarea", "required": true }, { "name": "COPY_TYPES", "label": "Loại copy cần viết", "type": "text", "required": true }], "tags": ["UX copy", "microcopy", "content design"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "design-003", "title": "Phân tích và cải thiện UX hiện tại", "category": "DESIGN", "description": "Đánh giá UX hiện tại theo heuristics và đề xuất cải tiến.", "prompt": "Đánh giá UX cho:\n\n[PRODUCT]\n\nVấn đề người dùng phản ánh: [ISSUES]\n\n1. Đánh giá theo 10 heuristics của Nielsen\n2. Xác định pain points chính\n3. Quick wins (cải thiện ngay)\n4. Long-term improvements\n5. A/B test suggestions.", "bestAI": "Gemini", "variables": [{ "name": "PRODUCT", "label": "Sản phẩm / tính năng cần đánh giá", "type": "text", "required": true }, { "name": "ISSUES", "label": "Vấn đề người dùng phản ánh", "type": "textarea", "required": false }], "tags": ["UX audit", "heuristics", "usability"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "data-001", "title": "Viết code EDA (Exploratory Data Analysis)", "category": "DATA", "description": "Tạo code Python phân tích khám phá dữ liệu hoàn chỉnh.", "prompt": "Viết code EDA cho dataset:\n\n[DATASET_DESC]\n\n1. Load và kiểm tra dữ liệu cơ bản\n2. Distribution plot cho biến số\n3. Correlation heatmap\n4. Boxplot phát hiện outlier\n5. Nhận xét phát hiện chính từng biểu đồ.", "bestAI": "Groq", "variables": [{ "name": "DATASET_DESC", "label": "Mô tả dataset", "type": "textarea", "required": true }], "tags": ["EDA", "Python", "data science"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "data-002", "title": "So sánh và chọn mô hình Machine Learning", "category": "DATA", "description": "Viết code so sánh nhiều mô hình ML và chọn mô hình tốt nhất.", "prompt": "So sánh mô hình ML cho bài toán:\n\n[PROBLEM]\n\nDataset: [DATASET]\n\n1. Viết code so sánh 4 mô hình (LogReg, RF, XGBoost, SVM)\n2. Cross-validation 5-fold\n3. Metric đánh giá: [METRIC]\n4. Biểu đồ so sánh\n5. Kết luận và lý do chọn mô hình tốt nhất.", "bestAI": "Groq", "variables": [{ "name": "PROBLEM", "label": "Mô tả bài toán ML", "type": "textarea", "required": true }, { "name": "DATASET", "label": "Mô tả dataset", "type": "text", "required": true }, { "name": "METRIC", "label": "Metric đánh giá (accuracy/F1/RMSE)", "type": "text", "required": true }], "tags": ["machine learning", "model comparison"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "data-003", "title": "Làm sạch dữ liệu (Data Cleaning)", "category": "DATA", "description": "Viết code xử lý missing values, outliers và chuẩn hóa dữ liệu.", "prompt": "Viết code data cleaning cho:\n\n[DATASET_DESC]\n\nVấn đề đã phát hiện: [ISSUES]\n\n1. Xử lý missing values (imputation/drop)\n2. Phát hiện và xử lý outliers (IQR/Z-score)\n3. Encode categorical variables\n4. Chuẩn hóa / normalize numerical features\n5. Kiểm tra data quality sau khi làm sạch.", "bestAI": "Groq", "variables": [{ "name": "DATASET_DESC", "label": "Mô tả dataset", "type": "textarea", "required": true }, { "name": "ISSUES", "label": "Vấn đề dữ liệu đã phát hiện", "type": "textarea", "required": false }], "tags": ["data cleaning", "preprocessing", "Python"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "data-004", "title": "Viết SQL query phức tạp", "category": "DATA", "description": "Tạo câu truy vấn SQL với JOIN, subquery, window function để phân tích dữ liệu.", "prompt": "Viết SQL query để:\n\n[REQUIREMENT]\n\nSchema database: [SCHEMA]\n\n1. Query hoàn chỉnh chạy được\n2. Giải thích logic từng phần\n3. Tối ưu performance (index, avoid SELECT *)\n4. Xử lý NULL values\n5. Gợi ý cách kiểm tra kết quả.", "bestAI": "Groq", "variables": [{ "name": "REQUIREMENT", "label": "Yêu cầu truy vấn dữ liệu", "type": "textarea", "required": true }, { "name": "SCHEMA", "label": "Mô tả cấu trúc bảng", "type": "textarea", "required": true }], "tags": ["SQL", "query", "database"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "law-001", "title": "Phân tích tình huống pháp lý", "category": "LAW", "description": "Phân tích tình huống và xác định các vấn đề pháp lý cần giải quyết.", "prompt": "Phân tích tình huống pháp lý:\n\n[SITUATION]\n\n1. Xác định vấn đề pháp lý chính\n2. Văn bản pháp luật áp dụng\n3. Phân tích quyền và nghĩa vụ các bên\n4. Hướng giải quyết đề xuất\n5. Rủi ro pháp lý cần lưu ý.", "bestAI": "Gemini", "variables": [{ "name": "SITUATION", "label": "Mô tả tình huống", "type": "textarea", "required": true }], "tags": ["pháp lý", "law", "tình huống"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "law-002", "title": "Soạn thảo hợp đồng cơ bản", "category": "LAW", "description": "Tạo template hợp đồng với các điều khoản bảo vệ quyền lợi cơ bản.", "prompt": "Soạn hợp đồng [CONTRACT_TYPE] cho:\n\nBên A: [PARTY_A]\nBên B: [PARTY_B]\nNội dung giao dịch: [CONTENT]\n\n1. Các điều khoản bắt buộc theo luật VN\n2. Điều khoản bảo vệ quyền lợi\n3. Điều khoản xử lý vi phạm\n4. Cơ chế giải quyết tranh chấp\n5. Hiệu lực và chấm dứt hợp đồng.", "bestAI": "Gemini", "variables": [{ "name": "CONTRACT_TYPE", "label": "Loại hợp đồng", "type": "text", "required": true }, { "name": "PARTY_A", "label": "Bên A", "type": "text", "required": true }, { "name": "PARTY_B", "label": "Bên B", "type": "text", "required": true }, { "name": "CONTENT", "label": "Nội dung giao dịch", "type": "textarea", "required": true }], "tags": ["hợp đồng", "contract", "pháp lý"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "economics-001", "title": "Phân tích kinh tế vĩ mô", "category": "ECONOMICS", "description": "Phân tích các chỉ số kinh tế vĩ mô và dự báo xu hướng.", "prompt": "Phân tích kinh tế vĩ mô:\n\nQuốc gia/Khu vực: [REGION]\nChỉ số cần phân tích: [INDICATORS]\nGiai đoạn: [PERIOD]\n\n1. Phân tích GDP, lạm phát, thất nghiệp\n2. Chính sách tiền tệ và tài khóa\n3. Tác động đến doanh nghiệp và người dân\n4. So sánh với các nước trong khu vực\n5. Dự báo xu hướng ngắn hạn.", "bestAI": "Gemini", "variables": [{ "name": "REGION", "label": "Quốc gia / khu vực", "type": "text", "required": true }, { "name": "INDICATORS", "label": "Chỉ số cần phân tích", "type": "text", "required": true }, { "name": "PERIOD", "label": "Giai đoạn thời gian", "type": "text", "required": true }], "tags": ["kinh tế vĩ mô", "macroeconomics", "GDP"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "economics-002", "title": "Viết đề xuất chính sách kinh tế", "category": "ECONOMICS", "description": "Xây dựng đề xuất chính sách dựa trên phân tích kinh tế có căn cứ.", "prompt": "Đề xuất chính sách kinh tế cho:\n\nVấn đề: [PROBLEM]\nBối cảnh: [CONTEXT]\n\n1. Phân tích nguyên nhân gốc rễ\n2. Kinh nghiệm quốc tế tương tự\n3. 3 phương án chính sách\n4. Phân tích chi phí-lợi ích\n5. Lộ trình triển khai và KPI đánh giá.", "bestAI": "Gemini", "variables": [{ "name": "PROBLEM", "label": "Vấn đề kinh tế cần giải quyết", "type": "textarea", "required": true }, { "name": "CONTEXT", "label": "Bối cảnh kinh tế hiện tại", "type": "textarea", "required": true }], "tags": ["chính sách", "policy", "economics"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "creative-001", "title": "Viết truyện ngắn sáng tạo", "category": "CREATIVE", "description": "Tạo truyện ngắn có cốt truyện hấp dẫn, nhân vật sâu sắc và kết mở ý nghĩa.", "prompt": "Viết truyện ngắn:\n\nThể loại: [GENRE]\nChủ đề: [THEME]\nĐộ dài: [LENGTH] từ\n\n1. Nhân vật chính với conflict nội tâm\n2. Setting cụ thể và sống động\n3. Plot twist hoặc turning point\n4. Dialogue tự nhiên\n5. Kết thúc để lại ấn tượng.", "bestAI": "OpenRouter", "variables": [{ "name": "GENRE", "label": "Thể loại (khoa học viễn tưởng, tâm lý...)", "type": "text", "required": true }, { "name": "THEME", "label": "Chủ đề chính", "type": "text", "required": true }, { "name": "LENGTH", "label": "Độ dài (số từ)", "type": "text", "required": true }], "tags": ["creative writing", "truyện", "fiction"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "creative-002", "title": "Viết kịch bản video / podcast", "category": "CREATIVE", "description": "Tạo script video YouTube hoặc podcast hấp dẫn, giữ chân người xem.", "prompt": "Viết script [FORMAT] về:\n\nChủ đề: [TOPIC]\nĐộ dài: [DURATION] phút\nTone giọng: [TONE]\n\n1. Hook 15 giây đầu\n2. Cấu trúc nội dung rõ ràng\n3. Transitions mượt mà\n4. Call-to-action cuối\n5. Gợi ý B-roll / visual nếu là video.", "bestAI": "Gemini", "variables": [{ "name": "FORMAT", "label": "Video YouTube / Podcast / TikTok", "type": "text", "required": true }, { "name": "TOPIC", "label": "Chủ đề nội dung", "type": "text", "required": true }, { "name": "DURATION", "label": "Độ dài (phút)", "type": "text", "required": true }, { "name": "TONE", "label": "Tone giọng (vui vẻ / nghiêm túc / giáo dục)", "type": "text", "required": true }], "tags": ["script", "video", "podcast", "content"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "creative-003", "title": "Brainstorm ý tưởng sáng tạo", "category": "CREATIVE", "description": "Tạo ra nhiều ý tưởng đột phá cho project, campaign hoặc sản phẩm.", "prompt": "Brainstorm ý tưởng cho:\n\nVấn đề / cơ hội: [CHALLENGE]\nRàng buộc: [CONSTRAINTS]\n\n1. 20 ý tưởng không lọc (quantity over quality)\n2. Nhóm ý tưởng theo hướng tiếp cận\n3. Top 5 ý tưởng tiềm năng nhất\n4. Phát triển chi tiết 2 ý tưởng hay nhất\n5. Gợi ý cách validate ý tưởng.", "bestAI": "Gemini", "variables": [{ "name": "CHALLENGE", "label": "Vấn đề cần giải quyết / cơ hội", "type": "textarea", "required": true }, { "name": "CONSTRAINTS", "label": "Ràng buộc (ngân sách, thời gian...)", "type": "text", "required": false }], "tags": ["brainstorm", "creative", "ideation"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "marketing-001", "title": "Viết caption mạng xã hội viral", "category": "MARKETING", "description": "Tạo caption hấp dẫn cho Facebook, Instagram, LinkedIn tăng engagement.", "prompt": "Viết caption cho:\n\nNền tảng: [PLATFORM]\nSản phẩm/chủ đề: [TOPIC]\nMục tiêu: [GOAL]\n\n1. Hook đầu tiên dưới 3 giây\n2. Nội dung giá trị\n3. Storytelling hoặc số liệu\n4. Hashtags phù hợp\n5. Call-to-action rõ ràng.", "bestAI": "Gemini", "variables": [{ "name": "PLATFORM", "label": "Nền tảng (Facebook/Instagram/LinkedIn)", "type": "text", "required": true }, { "name": "TOPIC", "label": "Sản phẩm / chủ đề", "type": "text", "required": true }, { "name": "GOAL", "label": "Mục tiêu (awareness/engagement/sale)", "type": "text", "required": true }], "tags": ["social media", "caption", "marketing"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "marketing-002", "title": "Lên content calendar 1 tháng", "category": "MARKETING", "description": "Tạo kế hoạch nội dung 30 ngày cân bằng các loại bài đăng.", "prompt": "Content calendar 1 tháng cho:\n\nThương hiệu: [BRAND]\nNền tảng: [PLATFORM]\nMục tiêu: [GOAL]\n\n1. Tần suất đăng bài khuyến nghị\n2. Content pillars (trụ cột nội dung)\n3. Lịch 4 tuần với topic từng ngày\n4. Mix content: educate/entertain/promote\n5. Key dates và campaign đặc biệt.", "bestAI": "Gemini", "variables": [{ "name": "BRAND", "label": "Thương hiệu / sản phẩm", "type": "text", "required": true }, { "name": "PLATFORM", "label": "Nền tảng social media", "type": "text", "required": true }, { "name": "GOAL", "label": "Mục tiêu marketing", "type": "text", "required": true }], "tags": ["content calendar", "social media", "marketing"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "marketing-003", "title": "Viết quảng cáo Google/Facebook Ads", "category": "MARKETING", "description": "Tạo copy quảng cáo có CTR cao theo cấu trúc AIDA.", "prompt": "Viết ads copy cho:\n\nSản phẩm: [PRODUCT]\nĐối tượng: [AUDIENCE]\nUSP: [USP]\nPlatform: [PLATFORM]\n\n3 phiên bản theo:\n1. AIDA framework\n2. Pain/Agitate/Solution\n3. Social proof focus\n\nMỗi phiên bản: headline, description, CTA.", "bestAI": "Gemini", "variables": [{ "name": "PRODUCT", "label": "Sản phẩm / dịch vụ", "type": "text", "required": true }, { "name": "AUDIENCE", "label": "Đối tượng mục tiêu", "type": "text", "required": true }, { "name": "USP", "label": "Điểm khác biệt (USP)", "type": "text", "required": true }, { "name": "PLATFORM", "label": "Google Ads / Facebook Ads", "type": "text", "required": true }], "tags": ["ads", "copywriting", "AIDA"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "hr-001", "title": "Viết Job Description hấp dẫn", "category": "HR", "description": "Tạo JD chuyên nghiệp thu hút ứng viên chất lượng cao.", "prompt": "Viết Job Description cho:\n\nVị trí: [POSITION]\nCông ty: [COMPANY]\nNgành: [INDUSTRY]\n\n1. Job summary ấn tượng\n2. Responsibilities chi tiết\n3. Requirements (must-have vs nice-to-have)\n4. Benefits hấp dẫn\n5. Văn hóa công ty.", "bestAI": "Gemini", "variables": [{ "name": "POSITION", "label": "Tên vị trí", "type": "text", "required": true }, { "name": "COMPANY", "label": "Loại công ty", "type": "text", "required": true }, { "name": "INDUSTRY", "label": "Ngành nghề", "type": "text", "required": true }], "tags": ["JD", "tuyển dụng", "HR"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "hr-002", "title": "Tạo câu hỏi phỏng vấn STAR", "category": "HR", "description": "Bộ câu hỏi phỏng vấn theo STAR method kèm rubric đánh giá.", "prompt": "Câu hỏi phỏng vấn cho:\n\nVị trí: [POSITION]\nKỹ năng cần đánh giá: [SKILLS]\n\n1. 10 câu hỏi STAR\n2. Chia 3 nhóm (chuyên môn/soft skills/culture fit)\n3. Red flags cần chú ý\n4. Rubric chấm điểm 1-5\n5. Follow-up questions.", "bestAI": "Gemini", "variables": [{ "name": "POSITION", "label": "Vị trí cần tuyển", "type": "text", "required": true }, { "name": "SKILLS", "label": "Kỹ năng cần đánh giá", "type": "textarea", "required": true }], "tags": ["phỏng vấn", "STAR", "interview"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "psychology-001", "title": "Phân tích hành vi và tâm lý học", "category": "PSYCHOLOGY", "description": "Ứng dụng lý thuyết tâm lý để phân tích hành vi con người.", "prompt": "Phân tích từ góc độ tâm lý học:\n\nHiện tượng / hành vi: [BEHAVIOR]\nBối cảnh: [CONTEXT]\n\n1. Lý thuyết tâm lý học liên quan\n2. Nguyên nhân tiềm ẩn\n3. Cognitive biases liên quan\n4. Ảnh hưởng môi trường và văn hóa\n5. Gợi ý can thiệp hoặc cải thiện.", "bestAI": "Gemini", "variables": [{ "name": "BEHAVIOR", "label": "Hành vi / hiện tượng cần phân tích", "type": "textarea", "required": true }, { "name": "CONTEXT", "label": "Bối cảnh", "type": "text", "required": false }], "tags": ["tâm lý học", "psychology", "behavior"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "psychology-002", "title": "Kỹ thuật cải thiện sức khỏe tâm thần", "category": "PSYCHOLOGY", "description": "Gợi ý kỹ thuật dựa trên bằng chứng để cải thiện wellbeing.", "prompt": "Gợi ý kỹ thuật cho:\n\nVấn đề: [ISSUE]\nMức độ: [SEVERITY]\n\n1. Kỹ thuật CBT phù hợp\n2. Mindfulness exercises cụ thể\n3. Thói quen hàng ngày hỗ trợ\n4. Khi nào nên tìm chuyên gia\n5. Tài nguyên tự học thêm.", "bestAI": "Gemini", "variables": [{ "name": "ISSUE", "label": "Vấn đề cần cải thiện (stress/lo âu/burn out)", "type": "text", "required": true }, { "name": "SEVERITY", "label": "Mức độ (nhẹ / trung bình)", "type": "text", "required": true }], "tags": ["wellbeing", "mental health", "CBT"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "science-001", "title": "Giải thích khái niệm khoa học", "category": "SCIENCE", "description": "Giải thích khái niệm vật lý, hóa học, sinh học bằng ngôn ngữ dễ hiểu.", "prompt": "Giải thích khái niệm khoa học:\n\n[CONCEPT]\n\nMôn học: [SUBJECT]\nMức độ: [LEVEL]\n\n1. Định nghĩa đơn giản\n2. Giải thích bằng ví dụ thực tế\n3. Mô tả cơ chế hoạt động\n4. Ứng dụng trong cuộc sống\n5. Câu hỏi tự kiểm tra.", "bestAI": "Gemini", "variables": [{ "name": "CONCEPT", "label": "Khái niệm cần giải thích", "type": "text", "required": true }, { "name": "SUBJECT", "label": "Môn học (Vật lý/Hóa/Sinh)", "type": "text", "required": true }, { "name": "LEVEL", "label": "Cấp độ (phổ thông / đại học)", "type": "text", "required": true }], "tags": ["khoa học", "giải thích", "STEM"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "science-002", "title": "Viết tường trình thí nghiệm", "category": "SCIENCE", "description": "Tạo tường trình thí nghiệm khoa học chuẩn format học thuật.", "prompt": "Viết tường trình thí nghiệm:\n\nTên thí nghiệm: [EXPERIMENT]\nKết quả đo được: [RESULTS]\n\n1. Mục tiêu thí nghiệm\n2. Cơ sở lý thuyết\n3. Dụng cụ và hóa chất\n4. Quy trình thực hiện\n5. Kết quả, nhận xét và kết luận\n6. Nguồn sai số.", "bestAI": "Gemini", "variables": [{ "name": "EXPERIMENT", "label": "Tên / mô tả thí nghiệm", "type": "text", "required": true }, { "name": "RESULTS", "label": "Số liệu đo được", "type": "textarea", "required": true }], "tags": ["tường trình", "thí nghiệm", "lab report"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "history-001", "title": "Phân tích sự kiện lịch sử", "category": "HISTORY", "description": "Phân tích sự kiện lịch sử đa chiều từ nguyên nhân đến hệ quả.", "prompt": "Phân tích sự kiện lịch sử:\n\n[EVENT]\n\n1. Bối cảnh lịch sử trước sự kiện\n2. Nguyên nhân trực tiếp và gián tiếp\n3. Diễn biến chính\n4. Các bên liên quan và góc nhìn khác nhau\n5. Hệ quả ngắn hạn và dài hạn\n6. Bài học lịch sử.", "bestAI": "Gemini", "variables": [{ "name": "EVENT", "label": "Sự kiện lịch sử cần phân tích", "type": "text", "required": true }], "tags": ["lịch sử", "history", "phân tích"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "history-002", "title": "So sánh các giai đoạn lịch sử", "category": "HISTORY", "description": "So sánh điểm tương đồng và khác biệt giữa các giai đoạn / triều đại lịch sử.", "prompt": "So sánh:\n\nGiai đoạn A: [PERIOD_A]\nGiai đoạn B: [PERIOD_B]\n\nTheo các khía cạnh:\n1. Chính trị và quyền lực\n2. Kinh tế và xã hội\n3. Văn hóa và tư tưởng\n4. Điểm tương đồng nổi bật\n5. Điểm khác biệt quyết định\n6. Bài học cho hiện tại.", "bestAI": "Gemini", "variables": [{ "name": "PERIOD_A", "label": "Giai đoạn / triều đại thứ nhất", "type": "text", "required": true }, { "name": "PERIOD_B", "label": "Giai đoạn / triều đại thứ hai", "type": "text", "required": true }], "tags": ["so sánh", "lịch sử", "history"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "career-001", "title": "Chuẩn bị phỏng vấn xin việc", "category": "CAREER", "description": "Luyện tập trả lời câu hỏi phỏng vấn và chuẩn bị cho buổi phỏng vấn.", "prompt": "Chuẩn bị phỏng vấn cho:\n\nVị trí: [POSITION]\nCông ty: [COMPANY]\nKinh nghiệm của tôi: [EXPERIENCE]\n\n1. 10 câu hỏi phổ biến + câu trả lời mẫu\n2. Câu hỏi về điểm mạnh/yếu\n3. Câu hỏi tình huống khó\n4. Câu hỏi nên hỏi lại nhà tuyển dụng\n5. Gợi ý trang phục và thái độ.", "bestAI": "Gemini", "variables": [{ "name": "POSITION", "label": "Vị trí ứng tuyển", "type": "text", "required": true }, { "name": "COMPANY", "label": "Tên / loại công ty", "type": "text", "required": true }, { "name": "EXPERIENCE", "label": "Tóm tắt kinh nghiệm bản thân", "type": "textarea", "required": true }], "tags": ["phỏng vấn", "xin việc", "career"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "career-002", "title": "Lên kế hoạch phát triển sự nghiệp", "category": "CAREER", "description": "Xây dựng lộ trình career 3-5 năm với mục tiêu và hành động cụ thể.", "prompt": "Lên kế hoạch sự nghiệp:\n\nNgành: [INDUSTRY]\nVị trí hiện tại: [CURRENT]\nMục tiêu 5 năm: [GOAL]\nĐiểm mạnh: [STRENGTHS]\n\n1. Gap analysis: hiện tại vs mục tiêu\n2. Kỹ năng cần phát triển\n3. Lộ trình từng năm\n4. Cách build network ngành\n5. Nguồn học tập khuyến nghị.", "bestAI": "Gemini", "variables": [{ "name": "INDUSTRY", "label": "Ngành nghề", "type": "text", "required": true }, { "name": "CURRENT", "label": "Vị trí / kinh nghiệm hiện tại", "type": "text", "required": true }, { "name": "GOAL", "label": "Mục tiêu sự nghiệp 5 năm", "type": "text", "required": true }, { "name": "STRENGTHS", "label": "Điểm mạnh bản thân", "type": "textarea", "required": true }], "tags": ["career planning", "sự nghiệp", "phát triển bản thân"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "career-003", "title": "Xây dựng LinkedIn profile ấn tượng", "category": "CAREER", "description": "Tối ưu hóa hồ sơ LinkedIn để được nhà tuyển dụng tìm thấy.", "prompt": "Tối ưu LinkedIn cho:\n\nNgành: [INDUSTRY]\nMục tiêu: [GOAL]\nKinh nghiệm: [EXPERIENCE]\n\n1. Headline 120 ký tự keyword-rich\n2. About section kể câu chuyện\n3. Experience bullets với kết quả đo lường\n4. Skills cần add\n5. Chiến lược build network và content.", "bestAI": "Gemini", "variables": [{ "name": "INDUSTRY", "label": "Ngành nghề", "type": "text", "required": true }, { "name": "GOAL", "label": "Mục tiêu LinkedIn (tìm việc/network/branding)", "type": "text", "required": true }, { "name": "EXPERIENCE", "label": "Tóm tắt kinh nghiệm", "type": "textarea", "required": true }], "tags": ["LinkedIn", "personal branding", "career"], "difficulty": "beginner", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
+  ,{ "id": "ai-001", "title": "Thiết kế system prompt cho AI agent", "category": "AI_PROMPTING", "description": "Viết system prompt mạnh mẽ để AI có persona và hành vi nhất quán.", "prompt": "Thiết kế system prompt cho AI agent:\n\nMục đích: [PURPOSE]\nĐối tượng người dùng: [USERS]\nTone và persona: [PERSONA]\n\n1. Role definition rõ ràng\n2. Quy tắc hành vi (dos and don'ts)\n3. Format output mong muốn\n4. Edge cases cần xử lý\n5. Safety guardrails.", "bestAI": "Gemini", "variables": [{ "name": "PURPOSE", "label": "Mục đích của AI agent", "type": "textarea", "required": true }, { "name": "USERS", "label": "Đối tượng người dùng", "type": "text", "required": true }, { "name": "PERSONA", "label": "Tone và cá tính mong muốn", "type": "text", "required": true }], "tags": ["system prompt", "AI agent", "prompt engineering"], "difficulty": "advanced", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "ai-002", "title": "Chain-of-thought prompting", "category": "AI_PROMPTING", "description": "Sử dụng kỹ thuật chain-of-thought để AI giải quyết vấn đề phức tạp từng bước.", "prompt": "Áp dụng chain-of-thought để giải:\n\nVấn đề: [PROBLEM]\n\nYêu cầu AI:\n1. Chia nhỏ vấn đề thành các bước\n2. Suy luận từng bước một cách minh bạch\n3. Kiểm tra lại từng bước\n4. Tổng hợp kết quả cuối\n5. Nêu độ chắc chắn và giới hạn.", "bestAI": "Gemini", "variables": [{ "name": "PROBLEM", "label": "Vấn đề cần giải quyết", "type": "textarea", "required": true }], "tags": ["chain-of-thought", "reasoning", "prompt engineering"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "ai-003", "title": "Few-shot prompting với ví dụ mẫu", "category": "AI_PROMPTING", "description": "Dạy AI làm nhiệm vụ mới bằng cách cung cấp ví dụ input-output.", "prompt": "Thiết kế few-shot prompt cho:\n\nNhiệm vụ: [TASK]\n\nTạo:\n1. 3-5 cặp ví dụ input → output chất lượng\n2. Pattern nhất quán giữa các ví dụ\n3. Edge cases được cover\n4. Format output rõ ràng\n5. Instruction cuối dẫn dắt AI.", "bestAI": "Gemini", "variables": [{ "name": "TASK", "label": "Nhiệm vụ muốn AI thực hiện", "type": "textarea", "required": true }], "tags": ["few-shot", "prompt engineering", "in-context learning"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" },
+  { "id": "ai-004", "title": "Đánh giá và so sánh output AI", "category": "AI_PROMPTING", "description": "Tạo rubric đánh giá chất lượng output từ các mô hình AI khác nhau.", "prompt": "Đánh giá output AI cho:\n\nTask: [TASK]\nOutput A: [OUTPUT_A]\nOutput B: [OUTPUT_B]\n\n1. Rubric đánh giá (accuracy/relevance/clarity/safety)\n2. Điểm chi tiết từng tiêu chí\n3. Điểm mạnh/yếu từng output\n4. Kết luận output nào tốt hơn và lý do\n5. Gợi ý cải thiện prompt.", "bestAI": "Gemini", "variables": [{ "name": "TASK", "label": "Mô tả task yêu cầu AI", "type": "textarea", "required": true }, { "name": "OUTPUT_A", "label": "Output từ AI thứ nhất", "type": "textarea", "required": true }, { "name": "OUTPUT_B", "label": "Output từ AI thứ hai", "type": "textarea", "required": true }], "tags": ["evaluation", "AI comparison", "quality"], "difficulty": "intermediate", "language": "vi", "version": "1.0", "author": "AIaBLE Team", "createdAt": "2026-06-27", "updatedAt": "2026-06-27" }
 ]
