@@ -370,5 +370,19 @@
         "model": "Groq"
       }
     ]
+  },
+  {
+    "id": "google-106177353591241501744",
+    "fullName": "Hoang Anh Nguyễn",
+    "email": "nguyenhoanganh2n6@gmail.com",
+    "password": "google-oauth-dummy-password",
+    "username": "nguyenhoanganh2n6",
+    "bio": "",
+    "location": "Nhật Bản",
+    "website": "",
+    "avatar": "",
+    "cover": "",
+    "birthday": "2008-07-23",
+    "skills": []
   }
 ]

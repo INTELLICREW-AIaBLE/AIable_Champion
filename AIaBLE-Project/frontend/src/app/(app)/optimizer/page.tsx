@@ -318,13 +318,35 @@ export default function OptimizerPage() {
     if (prefill) {
       setRaw(prefill);
       sessionStorage.removeItem('optimizer_prefill');
+    } else {
+      const savedRaw = sessionStorage.getItem('optimizer_raw');
+      if (savedRaw) setRaw(savedRaw);
     }
 
     if (prefillAI && ['Groq', 'OpenRouter', 'Gemini'].includes(prefillAI)) {
       setModel(prefillAI);
       sessionStorage.removeItem('optimizer_prefill_AI');
     }
+
+    const savedResult = sessionStorage.getItem('optimizer_result');
+    if (!prefill && savedResult) {
+      try {
+        setResult(JSON.parse(savedResult));
+      } catch (e) {}
+    }
   }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem('optimizer_raw', raw);
+  }, [raw]);
+
+  useEffect(() => {
+    if (result) {
+      sessionStorage.setItem('optimizer_result', JSON.stringify(result));
+    } else {
+      sessionStorage.removeItem('optimizer_result');
+    }
+  }, [result]);
   
   const charCount = raw.length;
   const wordCount = raw.trim() ? raw.trim().split(/\s+/).length : 0;

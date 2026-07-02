@@ -31,21 +31,18 @@ export const getProfile = (req: Request, res: Response) => {
       name: user.fullName,
       username: user.username || user.email.split('@')[0],
       email: user.email,
-      bio: user.bio || 'AI enthusiast & Computer Science student.',
-      location: user.location || 'Ho Chi Minh City, Vietnam',
-      website: user.website || 'github.com',
+      bio: user.bio || '',
+      location: user.location || '',
+      website: user.website || '',
       avatar: user.avatar || '',
       cover: user.cover || '',
-      birthday: user.birthday || '01/01/2000',
+      birthday: user.birthday || '',
       apiKeys: user.apiKeys || {
         openai: process.env.OPENAI_API_KEY || '',
         anthropic: process.env.ANTHROPIC_API_KEY || '',
         gemini: process.env.GEMINI_API_KEY || ''
       },
-      skills: user.skills || [
-        'Python', 'Machine Learning', 'Prompt Engineering', 'Data Analysis',
-        'React', 'TypeScript', 'SQL', 'Technical Writing', 'AI Research',
-      ]
+      skills: user.skills || []
     };
 
     res.json({ success: true, data: profile });

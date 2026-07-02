@@ -162,6 +162,27 @@ export default function SandboxPage() {
     fetchHistory();
   }, []);
 
+  // Restore state from sessionStorage
+  useEffect(() => {
+    const savedPrompt = sessionStorage.getItem('sandbox_prompt');
+    const savedResults = sessionStorage.getItem('sandbox_results');
+    if (savedPrompt) setPrompt(savedPrompt);
+    if (savedResults) {
+      try {
+        setResults(JSON.parse(savedResults));
+      } catch (e) {}
+    }
+  }, []);
+
+  // Save state to sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem('sandbox_prompt', prompt);
+  }, [prompt]);
+
+  useEffect(() => {
+    sessionStorage.setItem('sandbox_results', JSON.stringify(results));
+  }, [results]);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleRun = async () => {
