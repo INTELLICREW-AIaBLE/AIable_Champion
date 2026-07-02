@@ -19,7 +19,12 @@ import { apiLimiter } from './middleware/rateLimiter';
 // Load environment variables
 dotenv.config();
 
+import { connectDB } from './config/db';
+
 const app = express();
+
+// Kết nối MongoDB
+connectDB();
 app.set('trust proxy', 1);
 const PORT = process.env.PORT || 5000;
 

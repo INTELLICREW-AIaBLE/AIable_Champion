@@ -1,49 +1,33 @@
 import { Request, Response } from 'express';
-import fs from 'fs';
-import path from 'path';
+import User from '../models/User';
 
-const USERS_FILE = path.join(__dirname, '../data/users.json');
-
-const readUsers = (): any[] => {
-  try {
-    if (!fs.existsSync(USERS_FILE)) { return []; }
-    return JSON.parse(fs.readFileSync(USERS_FILE, 'utf-8'));
-  } catch (err) {
-    return [];
-  }
-};
-
-const writeUsers = (users: any[]) => {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-};
-
-export const getProfile = (req: Request, res: Response) => {
+export const getProfile = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const users = readUsers();
-    const user = users.find(u => u.id === userId);
+    const user = await User.findOne({ id: userId });
 
     if (!user) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
     }
 
+    const doc = user as any;
     const profile = {
-      name: user.fullName,
-      username: user.username || user.email.split('@')[0],
-      email: user.email,
-      role: user.role || 'user',
-      bio: user.bio || '',
-      location: user.location || '',
-      website: user.website || '',
-      avatar: user.avatar || '',
-      cover: user.cover || '',
-      birthday: user.birthday || '',
-      apiKeys: user.apiKeys || {
+      name: doc.fullName,
+      username: doc.username || doc.email.split('@')[0],
+      email: doc.email,
+      role: doc.role || 'user',
+      bio: doc.bio || '',
+      location: doc.location || '',
+      website: doc.website || '',
+      avatar: doc.avatar || '',
+      cover: doc.cover || '',
+      birthday: doc.birthday || '',
+      apiKeys: doc.apiKeys || {
         openai: process.env.OPENAI_API_KEY || '',
         anthropic: process.env.ANTHROPIC_API_KEY || '',
         gemini: process.env.GEMINI_API_KEY || ''
       },
-      skills: user.skills || []
+      skills: doc.skills || []
     };
 
     res.json({ success: true, data: profile });
@@ -52,43 +36,43 @@ export const getProfile = (req: Request, res: Response) => {
   }
 };
 
-export const updateProfile = (req: Request, res: Response) => {
+export const updateProfile = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
     const updates = req.body;
 
-    const users = readUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
-
-    if (userIndex === -1) {
+    const user = await User.findOne({ id: userId });
+    if (!user) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
     }
 
+    const doc = user as any;
+
     // Update fields
-    if (updates.name !== undefined) users[userIndex].fullName = updates.name;
-    if (updates.username !== undefined) users[userIndex].username = updates.username;
-    if (updates.bio !== undefined) users[userIndex].bio = updates.bio;
-    if (updates.location !== undefined) users[userIndex].location = updates.location;
-    if (updates.website !== undefined) users[userIndex].website = updates.website;
-    if (updates.avatar !== undefined) users[userIndex].avatar = updates.avatar;
-    if (updates.cover !== undefined) users[userIndex].cover = updates.cover;
-    if (updates.birthday !== undefined) users[userIndex].birthday = updates.birthday;
-    if (updates.skills !== undefined) users[userIndex].skills = updates.skills;
+    if (updates.name !== undefined) doc.fullName = updates.name;
+    if (updates.username !== undefined) doc.username = updates.username;
+    if (updates.bio !== undefined) doc.bio = updates.bio;
+    if (updates.location !== undefined) doc.location = updates.location;
+    if (updates.website !== undefined) doc.website = updates.website;
+    if (updates.avatar !== undefined) doc.avatar = updates.avatar;
+    if (updates.cover !== undefined) doc.cover = updates.cover;
+    if (updates.birthday !== undefined) doc.birthday = updates.birthday;
+    if (updates.skills !== undefined) doc.skills = updates.skills;
     
-    if (updates.email !== undefined) {
+    if (updates.email !== undefined && updates.email !== doc.email) {
       // Check for duplicate email
-      const existing = users.find(u => u.email === updates.email && u.id !== userId);
+      const existing = await User.findOne({ email: updates.email });
       if (existing) {
         return res.status(400).json({ success: false, message: 'Email đã được sử dụng bởi người khác' });
       }
-      users[userIndex].email = updates.email;
+      doc.email = updates.email;
     }
 
     if (updates.apiKeys !== undefined) {
-      users[userIndex].apiKeys = updates.apiKeys;
+      doc.apiKeys = updates.apiKeys;
     }
 
-    writeUsers(users);
+    await doc.save();
 
     res.json({ success: true, message: 'Cập nhật thành công!' });
   } catch (err) {
@@ -96,96 +80,109 @@ export const updateProfile = (req: Request, res: Response) => {
   }
 };
 
-export const getHistory = (req: Request, res: Response) => {
+export const getHistory = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const users = readUsers();
-    const user = users.find(u => u.id === userId);
+    const user = await User.findOne({ id: userId });
     if (!user) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
-    res.json({ success: true, data: user.history || [] });
+    
+    const doc = user as any;
+    res.json({ success: true, data: doc.history || [] });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi server' });
   }
 };
 
-export const logHistoryHelper = (userId: string, action: string, tool: string, detail: string, model: string = 'System', prompt?: string, result?: string) => {
+export const logHistoryHelper = async (userId: string, action: string, tool: string, detail: string, model: string = 'System', prompt?: string, result?: string) => {
   try {
-    const users = readUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
-    if (userIndex === -1) return;
+    const user = await User.findOne({ id: userId });
+    if (!user) return;
     
-    if (!users[userIndex].history) users[userIndex].history = [];
+    const doc = user as any;
+    if (!doc.history) doc.history = [];
+    
     const newItem = {
       id: Date.now().toString(),
       action, tool, detail, model, prompt, result,
       time: new Date().toISOString()
     };
-    users[userIndex].history.unshift(newItem);
-    if (users[userIndex].history.length > 50) {
-      users[userIndex].history = users[userIndex].history.slice(0, 50);
+    
+    doc.history.unshift(newItem);
+    if (doc.history.length > 50) {
+      doc.history = doc.history.slice(0, 50);
     }
-    writeUsers(users);
+    
+    await User.updateOne({ id: userId }, { $set: { history: doc.history } });
   } catch (err) {
     console.error('Error logging history helper:', err);
   }
 };
 
-export const addHistory = (req: Request, res: Response) => {
+export const addHistory = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
     const { action, tool, detail, model, prompt, result } = req.body;
-    const users = readUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
-    if (userIndex === -1) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
     
-    if (!users[userIndex].history) users[userIndex].history = [];
+    const user = await User.findOne({ id: userId });
+    if (!user) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
+    
+    const doc = user as any;
+    if (!doc.history) doc.history = [];
+    
     const newItem = {
       id: Date.now().toString(),
       action, tool, detail, model, prompt, result,
       time: new Date().toISOString()
     };
-    users[userIndex].history.unshift(newItem);
+    
+    doc.history.unshift(newItem);
     // Keep max 50 history items
-    if (users[userIndex].history.length > 50) {
-      users[userIndex].history = users[userIndex].history.slice(0, 50);
+    if (doc.history.length > 50) {
+      doc.history = doc.history.slice(0, 50);
     }
-    writeUsers(users);
+    
+    await User.updateOne({ id: userId }, { $set: { history: doc.history } });
+    
     res.json({ success: true, data: newItem });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi server' });
   }
 };
 
-export const getSavedRecipes = (req: Request, res: Response) => {
+export const getSavedRecipes = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const users = readUsers();
-    const user = users.find(u => u.id === userId);
+    const user = await User.findOne({ id: userId });
     if (!user) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
-    res.json({ success: true, data: user.savedRecipes || [] });
+    
+    const doc = user as any;
+    res.json({ success: true, data: doc.savedRecipes || [] });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi server' });
   }
 };
 
-export const toggleSavedRecipe = (req: Request, res: Response) => {
+export const toggleSavedRecipe = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
     const { recipe } = req.body;
-    const users = readUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
-    if (userIndex === -1) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
     
-    if (!users[userIndex].savedRecipes) users[userIndex].savedRecipes = [];
-    const existingIndex = users[userIndex].savedRecipes.findIndex((r: any) => r.id === recipe.id);
+    const user = await User.findOne({ id: userId });
+    if (!user) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
+    
+    const doc = user as any;
+    if (!doc.savedRecipes) doc.savedRecipes = [];
+    
+    const existingIndex = doc.savedRecipes.findIndex((r: any) => r.id === recipe.id);
     
     if (existingIndex > -1) {
-      users[userIndex].savedRecipes.splice(existingIndex, 1);
+      doc.savedRecipes.splice(existingIndex, 1);
     } else {
-      users[userIndex].savedRecipes.unshift(recipe);
+      doc.savedRecipes.unshift(recipe);
     }
     
-    writeUsers(users);
+    await User.updateOne({ id: userId }, { $set: { savedRecipes: doc.savedRecipes } });
+    
     res.json({ success: true, message: 'Đã cập nhật danh sách lưu' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi server' });

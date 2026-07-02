@@ -1,29 +1,7 @@
 import { Request, Response } from 'express';
-import fs from 'fs';
-import path from 'path';
-import fetch from 'node-fetch'; // if needed, but Next/Node 18+ has fetch built-in, assuming Node 18+ because Express + Next14.
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
-
-const USERS_FILE = path.join(__dirname, '../data/users.json');
-
-// Helper to read users
-const readUsers = (): any[] => {
-  try {
-    if (!fs.existsSync(USERS_FILE)) {
-      fs.writeFileSync(USERS_FILE, '[]');
-    }
-    const data = fs.readFileSync(USERS_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch (err) {
-    return [];
-  }
-};
-
-// Helper to write users
-const writeUsers = (users: any[]) => {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-};
+import User from '../models/User';
 
 // Helper to verify Turnstile token
 const verifyTurnstile = async (token: string): Promise<boolean> => {
@@ -60,24 +38,20 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: 'Vui lòng điền đầy đủ thông tin.' });
     }
 
-    const users = readUsers();
-    
     // Check if user exists
-    const existingUser = users.find(u => u.email === email);
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ success: false, message: 'Email này đã được sử dụng!' });
     }
 
     // Create new user (Storing password as plain text just for mock purposes)
-    const newUser = {
+    const newUser = await User.create({
       id: Date.now().toString(),
       fullName,
       email,
-      password 
-    };
-
-    users.push(newUser);
-    writeUsers(users);
+      password,
+      username: email.split('@')[0]
+    });
 
     res.json({ success: true, message: 'Đăng ký thành công!', data: { id: newUser.id, email: newUser.email, fullName: newUser.fullName } });
   } catch (error: any) {
@@ -93,8 +67,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: 'Vui lòng nhập email và mật khẩu.' });
     }
 
-    const users = readUsers();
-    const user = users.find(u => u.email === email && u.password === password);
+    const user = await User.findOne({ email, password });
 
     if (!user) {
       return res.status(401).json({ success: false, message: 'Email hoặc mật khẩu không đúng.' });
@@ -134,19 +107,17 @@ export const googleLogin = async (req: Request, res: Response) => {
     const payload = await response.json();
     const { email, name, sub } = payload;
 
-    const users = readUsers();
-    let user = users.find(u => u.email === email);
+    let user = await User.findOne({ email });
 
     if (!user) {
       // Auto-register
-      user = {
+      user = await User.create({
         id: 'google-' + sub,
         fullName: name,
         email,
         password: 'google-oauth-dummy-password',
-      };
-      users.push(user);
-      writeUsers(users);
+        username: email.split('@')[0]
+      });
     }
 
     res.json({
@@ -186,23 +157,20 @@ export const forgotPassword = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: 'Vui lòng cung cấp email.' });
     }
 
-    const users = readUsers();
-    const userIndex = users.findIndex(u => u.email === email);
+    const user = await User.findOne({ email });
     
     // Luôn trả về success để tránh dò rỉ email (security best practice)
-    if (userIndex === -1) {
+    if (!user) {
       return res.json({ success: true, message: 'Nếu email tồn tại, một hướng dẫn đã được gửi đi.' });
     }
 
-    const user = users[userIndex];
-    
     // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
 
-    // Save token to user
-    users[userIndex] = { ...user, resetToken, resetTokenExpiry };
-    writeUsers(users);
+    // Save token to user via generic field or extending schema
+    // Using any cast to bypass mongoose strict typing temporarily for reset logic
+    await User.updateOne({ _id: user._id }, { $set: { resetToken, resetTokenExpiry } } as any);
 
     // Prepare Nodemailer transport
     const transporter = nodemailer.createTransport({
@@ -259,28 +227,24 @@ export const resetPassword = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: 'Thiếu thông tin yêu cầu.' });
     }
 
-    const users = readUsers();
-    const userIndex = users.findIndex(u => u.email === email && u.resetToken === token);
+    // Cast any to access generic fields
+    const user = await User.findOne({ email, resetToken: token } as any);
 
-    if (userIndex === -1) {
+    if (!user) {
       return res.status(400).json({ success: false, message: 'Token không hợp lệ hoặc sai email.' });
     }
 
-    const user = users[userIndex];
-
-    if (!user.resetTokenExpiry || Date.now() > user.resetTokenExpiry) {
+    const doc = user as any;
+    if (!doc.resetTokenExpiry || Date.now() > doc.resetTokenExpiry) {
       return res.status(400).json({ success: false, message: 'Token đã hết hạn. Vui lòng yêu cầu lại.' });
     }
 
     // Update password and remove reset token
-    users[userIndex] = {
-      ...user,
-      password: newPassword,
-      resetToken: undefined,
-      resetTokenExpiry: undefined
-    };
-
-    writeUsers(users);
+    user.password = newPassword;
+    await User.updateOne({ _id: user._id }, { 
+      $set: { password: newPassword },
+      $unset: { resetToken: 1, resetTokenExpiry: 1 } 
+    } as any);
 
     res.json({ success: true, message: 'Đổi mật khẩu thành công. Bạn có thể đăng nhập bằng mật khẩu mới.' });
   } catch (error: any) {

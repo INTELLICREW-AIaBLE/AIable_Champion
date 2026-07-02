@@ -7,7 +7,12 @@ import {
   getSystemHealth,
 } from '../controllers/admin';
 
+import { requireAdmin } from '../middleware/adminMiddleware';
+
 const router = Router();
+
+// Áp dụng middleware bảo mật cho toàn bộ route admin
+router.use(requireAdmin);
 
 // Dashboard
 router.get('/stats', getDashboardStats);

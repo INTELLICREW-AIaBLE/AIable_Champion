@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Users, BookOpen, Activity, Server,
   TrendingUp, ChevronRight, Trash2, Edit3, Plus, X,
@@ -147,6 +148,7 @@ function RecipeModal({ recipe, onClose, onSave }: { recipe: any; onClose: () => 
 
 // ─── Main Admin Page ──────────────────────────────────────────────────────────
 export default function AdminPage() {
+  const router = useRouter();
   const [tab, setTab] = useState<Tab>('dashboard');
   const [stats, setStats] = useState<any>(null);
   const [users, setUsers] = useState<any[]>([]);
@@ -171,9 +173,16 @@ export default function AdminPage() {
     try {
       const r = await fetch(`${API}/api/admin/stats`, { headers: authHeaders() });
       const j = await r.json();
+      if (r.status === 401 || r.status === 403) {
+        showToast(j.message || 'Không có quyền truy cập', 'error');
+        router.push('/recipes');
+        return;
+      }
       if (j.success) setStats(j.data);
+    } catch (e) {
+      console.error(e);
     } finally { setLoading(false); }
-  }, []);
+  }, [router]);
 
   const fetchUsers = useCallback(async () => {
     const r = await fetch(`${API}/api/admin/users`, { headers: authHeaders() });

@@ -385,5 +385,21 @@
     "cover": "",
     "birthday": "2008-07-23",
     "skills": []
+  },
+  {
+    "id": "admin-001",
+    "fullName": "Admin User",
+    "email": "admin@admin.com",
+    "password": "admin",
+    "username": "admin",
+    "role": "admin",
+    "bio": "",
+    "location": "",
+    "website": "",
+    "avatar": "",
+    "cover": "",
+    "birthday": "",
+    "savedRecipes": [],
+    "history": []
   }
 ]
