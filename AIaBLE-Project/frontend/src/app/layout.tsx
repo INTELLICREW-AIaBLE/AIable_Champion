@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={cn("font-sans font-heading", inter.variable, sora.variable)} suppressHydrationWarning>
+    <html lang="vi" className={cn("font-sans font-heading", inter.variable, beVietnamPro.variable)} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
