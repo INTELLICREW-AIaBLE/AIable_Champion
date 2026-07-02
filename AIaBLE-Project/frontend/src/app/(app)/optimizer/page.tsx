@@ -539,7 +539,7 @@ export default function OptimizerPage() {
           placeholder={text.placeholder}
           maxLength={2000}
           rows={6}
-          className="w-full px-5 py-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
+          className="w-full px-5 py-4 text-sm text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
         />
 
         <div className="flex items-center justify-between px-5 py-3 border-t border-slate-100 bg-slate-50/50">
@@ -632,7 +632,7 @@ export default function OptimizerPage() {
                   </div>
                   <CopyButton text={raw} />
                 </div>
-                <pre className="px-5 py-4 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed font-mono bg-slate-50/30 min-h-[180px]">
+                <pre className="px-5 py-4 text-sm text-slate-900 font-medium whitespace-pre-wrap leading-relaxed font-mono bg-slate-50/30 min-h-[180px]">
                   {raw}
                 </pre>
               </div>
@@ -658,7 +658,7 @@ export default function OptimizerPage() {
                     <CopyButton text={result.optimized} />
                   </div>
                 </div>
-                <pre className="px-5 py-4 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed font-mono min-h-[180px]">
+                <pre className="px-5 py-4 text-sm text-slate-900 font-medium whitespace-pre-wrap leading-relaxed font-mono min-h-[180px]">
                   {result.optimized}
                 </pre>
               </div>

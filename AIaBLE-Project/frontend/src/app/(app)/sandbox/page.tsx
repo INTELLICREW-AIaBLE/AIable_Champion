@@ -349,7 +349,7 @@ export default function SandboxPage() {
             onChange={(e) => setPrompt(e.target.value)}
             placeholder={text.placeholder}
             rows={4}
-            className="w-full text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
+            className="w-full text-sm text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && e.shiftKey) {
                 e.preventDefault();
@@ -445,7 +445,7 @@ export default function SandboxPage() {
                 <textarea
                   value={res.content}
                   onChange={(e) => handleContentChange(res.model, e.target.value)}
-                  className="w-full min-h-[250px] p-0 bg-transparent border-0 prose prose-sm prose-slate max-w-none text-slate-700 text-sm leading-relaxed focus:ring-0 focus:outline-none resize-y animate-in fade-in slide-in-from-bottom-2 duration-500"
+                  className="w-full min-h-[250px] p-0 bg-transparent border-0 prose prose-sm prose-slate max-w-none text-slate-900 font-medium text-sm leading-relaxed focus:ring-0 focus:outline-none resize-y animate-in fade-in slide-in-from-bottom-2 duration-500"
                 />
               )}
 
