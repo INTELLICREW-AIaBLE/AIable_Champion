@@ -91,7 +91,43 @@ export function Navbar() {
         </div>
 
         {/* Right Controls */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-3.5 shrink-0">
+          {/* Beautiful Sliding Pill Language Switcher */}
+          <div className="relative flex items-center bg-slate-100 border border-slate-200/50 rounded-full p-0.5 shadow-inner select-none">
+            <button
+              onClick={() => {
+                if (lang !== 'vi') {
+                  setLang('vi');
+                  localStorage.setItem('app_lang', 'vi');
+                  window.dispatchEvent(new Event('app_lang_changed'));
+                }
+              }}
+              className={`px-3 py-1 text-[11px] font-extrabold rounded-full transition-all duration-300 whitespace-nowrap ${
+                lang === 'vi' 
+                  ? 'bg-white text-violet-600 shadow-sm border border-slate-200/10' 
+                  : 'text-slate-400 hover:text-slate-700'
+              }`}
+            >
+              VI
+            </button>
+            <button
+              onClick={() => {
+                if (lang !== 'en') {
+                  setLang('en');
+                  localStorage.setItem('app_lang', 'en');
+                  window.dispatchEvent(new Event('app_lang_changed'));
+                }
+              }}
+              className={`px-3 py-1 text-[11px] font-extrabold rounded-full transition-all duration-300 whitespace-nowrap ${
+                lang === 'en' 
+                  ? 'bg-white text-violet-600 shadow-sm border border-slate-200/10' 
+                  : 'text-slate-400 hover:text-slate-700'
+              }`}
+            >
+              EN
+            </button>
+          </div>
+
           {isLoggedIn ? (
             <Link
               href="/home"
