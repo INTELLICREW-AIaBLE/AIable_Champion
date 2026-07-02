@@ -8,6 +8,7 @@ import {
   Sparkles,
   X,
 } from 'lucide-react';
+import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 
 type TimelineStep = {
   stepName: string;
@@ -319,9 +320,9 @@ export default function TaskMatcherPage() {
                 <p className="text-xs font-bold text-violet-600 uppercase tracking-wide mb-2">
                   {text.promptSample}
                 </p>
-                <pre className="whitespace-pre-wrap text-sm text-slate-700 leading-relaxed font-mono">
-                  {selectedStep.suggestedPrompt || text.promptDefault.replace('{stepName}', selectedStep.stepName)}
-                </pre>
+                <div className="bg-white p-3 rounded-xl border border-slate-100/80">
+                  <MarkdownRenderer content={selectedStep.suggestedPrompt || text.promptDefault.replace('{stepName}', selectedStep.stepName)} />
+                </div>
               </div>
             </div>
           </aside>

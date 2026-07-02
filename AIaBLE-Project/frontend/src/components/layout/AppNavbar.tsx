@@ -281,7 +281,7 @@ export function AppNavbar() {
   const handleLogout = () => {
     setAvatarOpen(false);
     logout();
-    router.push('/login');
+    router.push('/');
   };
 
   return (

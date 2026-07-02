@@ -5,10 +5,11 @@ import Image from 'next/image';
 import { 
   Sparkles, Send, Copy, Check, RotateCcw, 
   Zap, Settings2, Info, ChevronDown, FolderPlus,
-  ImagePlus, Loader2
+  ImagePlus, Loader2, Edit2, Eye
 } from 'lucide-react';
 import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
 import Tesseract from 'tesseract.js';
+import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 
 type AIModel = 'Groq' | 'OpenRouter' | 'Gemini';
 
@@ -124,6 +125,7 @@ function SkeletonLoader() {
 
 export default function SandboxPage() {
   const [lang, setLang] = useState('vi');
+  const [editModes, setEditModes] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setLang(localStorage.getItem('app_lang') || 'vi');
@@ -529,6 +531,15 @@ export default function SandboxPage() {
                     <FolderPlus className="w-4 h-4" />
                   </button>
                 )}
+                {res.status === 'success' && (
+                  <button
+                    onClick={() => setEditModes(prev => ({ ...prev, [res.model]: !prev[res.model] }))}
+                    className="p-1.5 rounded-md text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-all"
+                    title={editModes[res.model] ? "Switch to Preview" : "Switch to Edit"}
+                  >
+                    {editModes[res.model] ? <Eye className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
+                  </button>
+                )}
                 <CopyButton text={res.content} />
               </div>
             </div>
@@ -549,11 +560,18 @@ export default function SandboxPage() {
               )}
 
               {res.status === 'success' && (
-                <textarea
-                  value={res.content}
-                  onChange={(e) => handleContentChange(res.model, e.target.value)}
-                  className="w-full min-h-[250px] p-0 bg-transparent border-0 prose prose-sm prose-slate max-w-none text-slate-900 font-medium text-sm leading-relaxed focus:ring-0 focus:outline-none resize-y animate-in fade-in slide-in-from-bottom-2 duration-500"
-                />
+                editModes[res.model] ? (
+                  <textarea
+                    value={res.content}
+                    onChange={(e) => handleContentChange(res.model, e.target.value)}
+                    className="w-full min-h-[250px] p-2 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-sm leading-relaxed focus:ring-1 focus:ring-violet-400 focus:outline-none resize-y animate-in fade-in duration-300"
+                  />
+                ) : (
+                  <MarkdownRenderer 
+                    content={res.content}
+                    className="min-h-[250px] overflow-y-auto animate-in fade-in duration-300"
+                  />
+                )
               )}
 
               {res.status === 'error' && (

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
+import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type AIModel = 'Groq' | 'OpenRouter' | 'Gemini';
@@ -668,9 +669,9 @@ export default function OptimizerPage() {
                     <CopyButton text={result.optimized} />
                   </div>
                 </div>
-                <pre className="px-5 py-4 text-sm text-slate-900 font-medium whitespace-pre-wrap leading-relaxed font-mono min-h-[180px]">
-                  {result.optimized}
-                </pre>
+                <div className="px-5 py-4 min-h-[180px]">
+                  <MarkdownRenderer content={result.optimized} />
+                </div>
               </div>
             )}
           </div>

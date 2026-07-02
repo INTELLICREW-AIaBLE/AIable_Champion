@@ -654,5 +654,23 @@
         "model": "Gemini"
       }
     ]
+  },
+  {
+    "id": "1783014090015",
+    "fullName": "Pham Quanh",
+    "email": "quocanhdeptrai1",
+    "password": "Phamquocanh1",
+    "history": [
+      {
+        "id": "1783014134461",
+        "action": "Test prompt in Sandbox",
+        "tool": "Sandbox",
+        "detail": "Prompt: giải phương trình bậc 2: 4x^2 + 6x =20000000",
+        "model": "All Models",
+        "prompt": "giải phương trình bậc 2: 4x^2 + 6x =20000000",
+        "result": "[Groq]: Để giải phương trình bậc 2, ta cần chuyển phương trình về dạng tiêu chuẩn: ax^2 + bx + c = 0.\n\nPhương trình mà bạn đưa vào là: 4x^2 + 6x = 20000000\n\nTa sẽ chuyển nó về dạng tiêu chuẩn bằng cách subtract 20000000 từ cả hai vế của phương trình:\n\n4x^2 + 6x - 20000000 = 0\n\nĐể giải phương trình, ta có thể dùng công thức cơ bản để giải phương trình bậc 2:\n\nx = (-b ± √(b^2 - 4ac)) / 2a\n\nTrong trường hợp này, a = 4, b = 6, c = -20000000.\n\nVậy, thay vào công thức cơ bản, ta có:\n\nx = (-(6) ± √((6)^2 - 4 * 4 * (-20000000))) / 2 * 4\nx = (-6 ± √(36 + 320000000)) / 8\nx = (-6 ± √320000036) / 8\nx = (-6 ± 17894,97) / 8\n\nGiải ra hai trường hợp x = (-6 + 17894,97) / 8 và x = (-6 - 17894,97) / 8.\n\nx1 = (-6 + 17894,97) / 8 = 2227,96\nx2 = (-6 - 17894,97) / 8 = -2246,99\n\nVậy, hai giải của phương trình bậc 2 là x ≈ 2228 và x ≈ -2247 (số nguyên gần đúng nhất).\n\nLưu ý: Trong giải trên, ta chỉ tính đến hai số thực vì số phức không được hiển thị trong kết quả.\n\n[OpenRouter]: Chiêm trung ương chương trình bậc 2:\n\nĐể tương tự định hình, bạn đã có hệ thống:\n\n$$ 4x^2 + 6x = 20000000 $$\n\nTrước tiên, hãy di chuyển toán tử sang hai biến cố là 0 để giải bền vị:\n\n$$ 4x^2 + 6x - 20000000 = 0 $$\n\nĐể được đạt hàm thực đến 0, ta cập nhật hàm tương ứng sẽ có nhiều động thái:\n\n1. **Ước số (lời giải hướng):**  \n   Rộng lớn nhất:  \n   $$ x = \\frac{ -b \\pm \\sqrt{b^2 - 4ac} }{2a} $$  \n   Đối với hệ thống xy:  \n   $$ 4x^2 + 6x - 20000000 = 0 $$  \n   Đọc như: $ 4x^2 + 6x + (-20000000) = 0 $\n\n   Nơi có giải và lớn nhất là:  \n   $$ x = \\frac{-6 \\pm \\sqrt{6^2 - 4(4)(-20000000)}}{2 \\times 4} $$  \n   $$\n   x = \\frac{-6 \\pm \\sqrt{36 + 320000000}}{8}\n   $$\n   $$\n   x = \\frac{-6 \\pm \\sqrt{320000036}}{8}\n   $$\n\n   Tính toán $ \\sqrt{320000036} \\approx 56644 $, chìa:\n\n   $$ x = \\frac{-6 + 56644}{8} = \\frac{56638}{8} \\approx 70459.25 $$\n\n2. **Nhận kết hợp:**  \n   Kết quả chính xác là:  \n   $$ x \\approx 70459.25 $$\n\n*Ngoài ra, có thể có các giá giả vì là thuần toán học, nhưng số này là cú pháp chính xác thuần trong hình thức giải.*\n\n---\n\n✅ **Đáp án: x ≈ 70459.25**\n\n[Gemini]: Để giải phương trình bậc hai $4x^2 + 6x = 20.000.000$, chúng ta làm theo các bước sau:\n\n### 1. Đưa phương trình về dạng tổng quát $ax^2 + bx + c = 0$\nChuyển $20.000.000$ sang vế trái:\n$$4x^2 + 6x - 20.000.000 = 0$$\n\nĐể đơn giản hóa, ta chia cả hai vế cho 2:\n$$2x^2 + 3x - 10.000.000 = 0$$\n\n### 2. Sử dụng công thức nghiệm\nPhương trình có dạng $ax^2 + bx + c = 0$ với:\n*   $a = 2$\n*   $b = 3$\n*   $c = -10.000.000$\n\nTính biệt thức $\\Delta$ (Delta):\n$$\\Delta = b^2 - 4ac$$\n$$\\Delta = 3^2 - 4 \\cdot 2 \\cdot (-10.000.000)$$\n$$\\Delta = 9 + 80.000.000 = 80.000.009$$\n\nTính căn bậc hai của $\\Delta$:\n$$\\sqrt{\\Delta} = \\sqrt{80.000.009} \\approx 8944,272$$\n\n### 3. Tìm nghiệm của phương trình\nCông thức nghiệm là: $x = \\frac{-b \\pm \\sqrt{\\Delta}}{2a}$\n\n*   **Nghiệm thứ nhất ($x_1$):**\n    $$x_1 = \\frac{-3 + 8944,272}{2 \\cdot 2} = \\frac{8941,272}{4} \\approx 2235,318$$\n\n*   **Nghiệm thứ hai ($x_2$):**\n    $$x_2 = \\frac{-3 - 8944,272}{4} = \\frac{-8947,272}{4} \\approx -2236,818$$\n\n**Kết luận:**\nPhương trình có hai nghiệm xấp xỉ là:\n**$x_1 \\approx 2235,318$** và **$x_2 \\approx -2236,818$**",
+        "time": "2026-07-02T17:42:14.461Z"
+      }
+    ]
   }
 ]
