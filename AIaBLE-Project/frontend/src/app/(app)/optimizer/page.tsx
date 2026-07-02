@@ -45,6 +45,7 @@ const t = {
     rawPrompt: 'Raw Prompt',
     chars: 'ký tự',
     words: 'từ',
+    promptHistory: 'Lịch sử Prompt',
     example: 'Ví dụ',
     placeholder: "Nhập prompt thô của bạn vào đây...\n\nVí dụ: 'Giải thích thuật toán quicksort cho tôi'",
     hint: 'Nhập tối thiểu 10 ký tự để bắt đầu tối ưu',
@@ -92,6 +93,7 @@ const t = {
     rawPrompt: 'Raw Prompt',
     chars: 'chars',
     words: 'words',
+    promptHistory: 'Prompt History',
     example: 'Examples',
     placeholder: "Enter your raw prompt here...\n\nExample: 'Explain the quicksort algorithm to me'",
     hint: 'Enter at least 10 characters to start optimizing',
@@ -268,7 +270,31 @@ export default function OptimizerPage() {
   const [activeView, setActiveView] = useState<'split' | 'before' | 'after'>('split');
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
+  const [historyPrompts, setHistoryPrompts] = useState<string[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/history`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && data.data) {
+          const prompts = data.data
+            .filter((item: any) => item.tool === 'Prompt Optimizer' && item.prompt)
+            .map((item: any) => item.prompt);
+          const uniquePrompts = Array.from(new Set(prompts)).slice(0, 5) as string[];
+          setHistoryPrompts(uniquePrompts);
+        }
+      } catch (e) {
+        console.error('Error fetching history:', e);
+      }
+    };
+    fetchHistory();
+  }, []);
 
   const [lang, setLang] = useState('vi');
 
@@ -456,17 +482,17 @@ export default function OptimizerPage() {
                 onClick={() => setShowExamples(!showExamples)}
                 className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-800 font-semibold transition"
               >
-                {text.example} <ChevronDown className="w-3 h-3" />
+                {text.promptHistory || text.example} <ChevronDown className="w-3 h-3" />
               </button>
               
               {showExamples && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowExamples(false)} />
-                  <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-slate-100 rounded-xl shadow-lg py-1 z-20 animate-in fade-in zoom-in-95 duration-200">
-                    {text.examples.map((ex) => (
+                  <div className="absolute right-0 top-full mt-2 w-64 max-h-64 overflow-y-auto bg-white border border-slate-100 rounded-xl shadow-lg py-1 z-20 animate-in fade-in zoom-in-95 duration-200">
+                    {(historyPrompts.length > 0 ? historyPrompts : text.examples).map((ex, i) => (
                       <button
                         type="button"
-                        key={ex}
+                        key={i}
                         onClick={() => {
                           setRaw(ex);
                           setShowExamples(false);

@@ -25,10 +25,10 @@ export function QuickAccessCard({
   return (
     <a
       href={href}
-      className="group relative flex items-start gap-3 rounded-xl border border-slate-100 bg-white p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden cursor-pointer"
+      className="group relative flex items-start gap-3 rounded-2xl border-2 border-violet-100 bg-white p-5 shadow-md hover:shadow-xl hover:border-violet-300 hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer ring-1 ring-violet-50 hover:ring-violet-200"
     >
       {/* Subtle background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white to-slate-50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute inset-0 bg-gradient-to-br from-violet-50/50 to-white opacity-0 group-hover:opacity-100 transition-opacity" />
 
       {/* Main Icon */}
       <div className={cn('relative shrink-0 w-10 h-10 rounded-lg flex items-center justify-center', iconBg)}>

@@ -44,6 +44,16 @@
     ],
     "history": [
       {
+        "id": "1782977759885",
+        "action": "Optimize Prompt",
+        "tool": "Prompt Optimizer",
+        "detail": "Raw: tôi muốn cao 2m mà giờ 20 tuổi rồi mới cao m8 tôi k thích tậ...",
+        "model": "Groq",
+        "prompt": "tôi muốn cao 2m mà giờ 20 tuổi rồi mới cao m8 tôi k thích tập thể thao, ăn uống thích đồ chiên rán",
+        "result": "[VAI TRÒ / ROLE]\nBạn là một Chuyên gia Dinh dưỡng và Huấn luyện viên Sức khỏe (Health & Wellness Coach) có kinh nghiệm trong việc phân tích tăng trưởng sinh học.\n\n[BỐI CẢNH / CONTEXT]\nNgười dùng hiện 20 tuổi, cao 1m80 và có mục tiêu tăng chiều cao lên 2m. Người dùng có lối sống ít vận động và sở thích ăn đồ chiên rán, gây cản trở cho quá trình phát triển thể chất tối ưu.\n\n[NHIỆM VỤ / TASK]\n1. Giải thích về cơ chế sinh học của quá trình tăng trưởng chiều cao ở nam giới sau 20 tuổi (đặc biệt là tình trạng đóng các đĩa sụn tăng trưởng).\n2. Phân tích thực tế khả năng tăng chiều cao từ 1m80 lên 2m ở độ tuổi này.\n3. Tư vấn các thay đổi lối sống khoa học: đề xuất lộ trình dinh dưỡng thay thế đồ chiên rán và các bài tập kéo giãn nhẹ nhàng phù hợp với người lười vận động.\n\n[ĐỊNH DẠNG / FORMAT]\n- Sử dụng Markdown để trình bày.\n- Chia làm 3 phần: Khoa học tăng trưởng, Phân tích tính khả thi, và Lời khuyên thay đổi lối sống.\n- Trình bày dạng danh sách liệt kê (bullet points) để dễ theo dõi.\n\n[RÀNG BUỘC / CONSTRAINTS]\n- Không đưa ra lời hứa hẹn sai lệch về việc tăng chiều cao thần tốc.\n- Nội dung phải dựa trên y khoa, tránh các lời khuyên thiếu căn cứ.\n- Giọng điệu chuyên nghiệp, khách quan và mang tính giáo dục.",
+        "time": "2026-07-02T07:35:59.885Z"
+      },
+      {
         "id": "1782961262531",
         "action": "Optimize Prompt",
         "tool": "Prompt Optimizer",

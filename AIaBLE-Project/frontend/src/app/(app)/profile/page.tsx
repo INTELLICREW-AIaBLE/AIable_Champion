@@ -143,28 +143,21 @@ function LocationSelector({ value, onSave }: { value: string; onSave: (v: string
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function ProfilePage() {
-  const [name,     setName]     = useState('Nguyễn Văn A');
-  const [username, setUsername] = useState('nguyenvana');
-  const [bio,      setBio]      = useState('AI enthusiast & Computer Science student. Đam mê prompt engineering và ứng dụng AI trong học tập.');
-  const [location, setLocation] = useState('Ho Chi Minh City, Vietnam');
-  const [website,  setWebsite]  = useState('github.com/nguyenvana');
+  const [name,     setName]     = useState('');
+  const [username, setUsername] = useState('');
+  const [bio,      setBio]      = useState('');
+  const [location, setLocation] = useState('');
+  const [website,  setWebsite]  = useState('');
   const [avatar,   setAvatar]   = useState('');
   const [cover,    setCover]    = useState('');
-  const [email,    setEmail]    = useState('user@alable.edu.vn');
-  const [birthday, setBirthday] = useState('2000-01-01');
+  const [email,    setEmail]    = useState('');
+  const [birthday, setBirthday] = useState('');
 
-  const [favoriteModels, setFavoriteModels] = useState<any[]>([
-    { name: 'Claude',  pct: 45, color: 'from-orange-400 to-amber-500' },
-    { name: 'GPT-4',   pct: 35, color: 'from-emerald-400 to-teal-500' },
-    { name: 'Gemini',  pct: 20, color: 'from-blue-400 to-cyan-500' },
-  ]);
-  const [dynamicStats, setDynamicStats] = useState({ projects: 12, recipesUsed: 48, promptsOptimized: 137, outputsVerified: 64 });
+  const [favoriteModels, setFavoriteModels] = useState<any[]>([]);
+  const [dynamicStats, setDynamicStats] = useState({ projects: 0, recipesUsed: 0, promptsOptimized: 0, outputsVerified: 0 });
   const [activities, setActivities] = useState<any[]>([]);
-  const [recentRecipes, setRecentRecipes] = useState<any[]>([
-    { title: 'Debug code Python step-by-step', type: 'CODING', model: 'Claude', icon: Code2,       iconBg: 'bg-violet-50',  iconColor: 'text-violet-600' },
-    { title: 'Báo cáo môn học theo chuẩn APA', type: 'REPORT', model: 'Claude', icon: FileText,    iconBg: 'bg-blue-50',    iconColor: 'text-blue-600' },
-  ]);
-  const [totalActivities, setTotalActivities] = useState(137);
+  const [recentRecipes, setRecentRecipes] = useState<any[]>([]);
+  const [totalActivities, setTotalActivities] = useState(0);
   
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState('');
@@ -189,11 +182,8 @@ export default function ProfilePage() {
           setAvatar(data.data.avatar || '');
           setCover(data.data.cover || '');
           setEmail(data.data.email || '');
-          setBirthday(data.data.birthday || 'Chưa cập nhật');
-          setSkills(data.data.skills || [
-            'Python', 'Machine Learning', 'Prompt Engineering', 'Data Analysis',
-            'React', 'TypeScript', 'SQL', 'Technical Writing', 'AI Research',
-          ]);
+          setBirthday(data.data.birthday || '');
+          setSkills(data.data.skills || []);
         }
 
         // Fetch history to calculate favorite models
