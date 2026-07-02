@@ -225,6 +225,10 @@ export default function SandboxPage() {
     setTimeout(() => textareaRef.current?.focus(), 10);
   };
 
+  const handleContentChange = (modelName: string, newContent: string) => {
+    setResults(prev => prev.map(r => r.model === modelName ? { ...r, content: newContent } : r));
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
       
@@ -378,9 +382,11 @@ export default function SandboxPage() {
               )}
 
               {res.status === 'success' && (
-                <div className="prose prose-sm prose-slate max-w-none text-slate-700 text-sm whitespace-pre-wrap leading-relaxed animate-in fade-in slide-in-from-bottom-2 duration-500">
-                  {res.content}
-                </div>
+                <textarea
+                  value={res.content}
+                  onChange={(e) => handleContentChange(res.model, e.target.value)}
+                  className="w-full min-h-[250px] p-0 bg-transparent border-0 prose prose-sm prose-slate max-w-none text-slate-700 text-sm leading-relaxed focus:ring-0 focus:outline-none resize-y animate-in fade-in slide-in-from-bottom-2 duration-500"
+                />
               )}
 
               {res.status === 'error' && (

@@ -22,7 +22,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 export const callGemini = async (prompt: string, userKey?: string): Promise<string> => {
   try {
     // Check cache first
-    const cacheKey = `${userKey || 'default'}:${prompt.substring(0, 200)}`;
+    const cacheKey = `${userKey || 'default'}:${prompt}`;
     const cached = promptCache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
       console.log('[Gemini Cache Hit]');
