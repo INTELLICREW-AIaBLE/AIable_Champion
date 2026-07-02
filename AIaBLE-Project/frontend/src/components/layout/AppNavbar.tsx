@@ -8,7 +8,7 @@ import { Search, ChevronDown, X } from 'lucide-react';
 import {
   User, Settings, BookOpen, FolderOpen, Bell, HelpCircle, LogOut,
   Wand2, GitBranch, ShieldCheck, Code2, FileText, Presentation, Home,
-  Sparkles, Keyboard, Moon,
+  Sparkles, Keyboard, Moon, ShieldAlert,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { getNotifications, markAllAsRead, Notification } from '@/lib/notifications';
@@ -106,6 +106,7 @@ const t = {
     shortcuts: 'Phím tắt',
     help: 'Trợ giúp',
     logout: 'Đăng xuất',
+    adminPanel: 'Bảng quản trị',
   },
   en: {
     profile: 'Profile',
@@ -115,6 +116,7 @@ const t = {
     shortcuts: 'Shortcuts',
     help: 'Help',
     logout: 'Logout',
+    adminPanel: 'Admin Panel',
   }
 };
 
@@ -170,7 +172,14 @@ export function AppNavbar() {
 
   const currentLang = (lang === 'en' ? 'en' : 'vi') as 'en' | 'vi';
   const text = t[currentLang];
-  const menuItems = getMenuItems(text);
+  let menuItems = getMenuItems(text);
+
+  if (userProfile?.role === 'admin') {
+    menuItems = [
+      { icon: ShieldAlert, label: text.adminPanel, href: '/admin', dividerAfter: true },
+      ...menuItems
+    ];
+  }
 
   // Search
   const [query, setQuery] = useState('');

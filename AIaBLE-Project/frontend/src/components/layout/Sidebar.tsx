@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
 import {
   Home,
-  Wand2, GitBranch, BookOpen, ShieldCheck,
+  Wand2, GitBranch, BookOpen, ShieldCheck, ShieldAlert,
   FolderOpen, Bookmark, Clock, Sparkles,
 } from 'lucide-react';
 
@@ -26,7 +27,8 @@ const t = {
       sandbox: 'AI Sandbox',
       projects: 'Dự án',
       saved: 'Recipe đã lưu',
-      history: 'Lịch sử'
+      history: 'Lịch sử',
+      admin: 'Bảng quản trị'
     }
   },
   en: {
@@ -44,7 +46,8 @@ const t = {
       sandbox: 'AI Sandbox',
       projects: 'Projects',
       saved: 'Saved Recipes',
-      history: 'History'
+      history: 'History',
+      admin: 'Admin Panel'
     }
   }
 };
@@ -76,9 +79,17 @@ const getNavGroups = (text: any) => [
   },
 ];
 
+const getAdminNavGroup = (text: any) => ({
+  label: 'Admin',
+  items: [
+    { href: '/admin', label: text.items.admin, icon: ShieldAlert },
+  ],
+});
+
 export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
   const pathname = usePathname();
   const [lang, setLang] = useState('vi');
+  const { userProfile } = useAuth();
 
   useEffect(() => {
     setLang(localStorage.getItem('app_lang') || 'vi');
@@ -95,7 +106,11 @@ export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
 
   const currentLang = (lang === 'en' ? 'en' : 'vi') as 'en' | 'vi';
   const text = t[currentLang];
-  const NAV_GROUPS = getNavGroups(text);
+  let NAV_GROUPS = getNavGroups(text);
+  
+  if (userProfile?.role === 'admin') {
+    NAV_GROUPS = [...NAV_GROUPS, getAdminNavGroup(text)];
+  }
 
   return (
     <div className={cn('pb-12 border-r h-[calc(100vh-3.5rem)] sticky top-14 overflow-y-auto w-56 hidden md:block bg-white shrink-0', className)}>

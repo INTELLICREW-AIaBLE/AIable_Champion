@@ -31,6 +31,7 @@ export const getProfile = (req: Request, res: Response) => {
       name: user.fullName,
       username: user.username || user.email.split('@')[0],
       email: user.email,
+      role: user.role || 'user',
       bio: user.bio || '',
       location: user.location || '',
       website: user.website || '',

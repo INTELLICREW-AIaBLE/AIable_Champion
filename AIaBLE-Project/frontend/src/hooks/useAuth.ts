@@ -4,6 +4,7 @@ interface UserProfile {
     name: string;
     email: string;
     avatar: string;
+    role: string;
 }
 
 const PROFILE_CACHE_KEY = 'user_profile_cache';
@@ -21,7 +22,8 @@ export function useAuth() {
     const [userProfile, setUserProfile] = useState<UserProfile>({
         name: 'User',
         email: 'user@alable.edu.vn',
-        avatar: ''
+        avatar: '',
+        role: 'user'
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -75,7 +77,8 @@ export function useAuth() {
                 const profile: UserProfile = {
                     name: data.data.name || 'User',
                     email: data.data.email || 'user@alable.edu.vn',
-                    avatar: data.data.avatar || ''
+                    avatar: data.data.avatar || '',
+                    role: data.data.role || 'user'
                 };
 
                 setUserProfile(profile);
@@ -114,7 +117,8 @@ export function useAuth() {
         setUserProfile({
             name: 'User',
             email: 'user@alable.edu.vn',
-            avatar: ''
+            avatar: '',
+            role: 'user'
         });
     };
 
