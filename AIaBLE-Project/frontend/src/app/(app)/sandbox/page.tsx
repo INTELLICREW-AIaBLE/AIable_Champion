@@ -4,9 +4,11 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { 
   Sparkles, Send, Copy, Check, RotateCcw, 
-  Zap, Settings2, Info, ChevronDown, FolderPlus 
+  Zap, Settings2, Info, ChevronDown, FolderPlus,
+  ImagePlus, Loader2
 } from 'lucide-react';
 import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
+import Tesseract from 'tesseract.js';
 
 type AIModel = 'Groq' | 'OpenRouter' | 'Gemini';
 
@@ -40,6 +42,9 @@ const t = {
     errConn: 'Không thể kết nối đến server.',
     waiting: 'Chờ thực thi',
     errApi: 'Lỗi kết nối API',
+    scanImg: 'Quét văn bản từ ảnh',
+    scanning: 'Đang quét ảnh...',
+    scanErr: 'Không thể nhận diện văn bản. Vui lòng thử lại.',
     examples: [
       'Viết một email chuyên nghiệp từ chối lời mời phỏng vấn.',
       'Giải thích nguyên lý hoạt động của Quantum Computing cho học sinh cấp 2.',
@@ -60,6 +65,9 @@ const t = {
     errConn: 'Cannot connect to server.',
     waiting: 'Waiting to execute',
     errApi: 'API Connection Error',
+    scanImg: 'Scan text from image',
+    scanning: 'Scanning image...',
+    scanErr: 'Could not recognize text. Please try again.',
     examples: [
       'Write a professional email declining an interview invitation.',
       'Explain the principles of Quantum Computing to a middle schooler.',
@@ -144,6 +152,9 @@ export default function SandboxPage() {
     }
   };
   
+  const [isScanning, setIsScanning] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [saveData, setSaveData] = useState<{prompt?: string, result?: string, aiModel?: string}>({});
   const [showExamples, setShowExamples] = useState(false);
@@ -194,6 +205,51 @@ export default function SandboxPage() {
   }, [results]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await processImageFile(file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const processImageFile = async (file: File) => {
+    try {
+      setIsScanning(true);
+      const ocrLang = lang === 'vi' ? 'vie+eng' : 'eng';
+      
+      const result = await Tesseract.recognize(file, ocrLang, {
+        logger: (m) => console.log(m)
+      });
+      
+      const extractedText = result.data.text.trim();
+      if (extractedText) {
+        setPrompt(prev => prev ? `${prev}\n\n${extractedText}` : extractedText);
+        setTimeout(() => textareaRef.current?.focus(), 100);
+      } else {
+        alert(text.scanErr);
+      }
+    } catch (error) {
+      console.error('OCR Error:', error);
+      alert(text.scanErr);
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) {
+          e.preventDefault();
+          processImageFile(file);
+          break;
+        }
+      }
+    }
+  };
 
   const handleRun = async () => {
     if (!prompt.trim()) return;
@@ -324,13 +380,32 @@ export default function SandboxPage() {
       </div>
 
       {/* ── Prompt Input Area ──────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden focus-within:border-violet-400 focus-within:ring-1 focus-within:ring-violet-400 transition-all">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden focus-within:border-violet-400 focus-within:ring-1 focus-within:ring-violet-400 transition-all relative">
         <div className="flex items-center justify-between px-4 py-3 bg-slate-50/50 border-b border-slate-100">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-violet-500" />
             <span className="text-sm font-bold text-slate-700">{text.masterPrompt}</span>
           </div>
-          <div className="relative">
+          <div className="relative flex items-center gap-3">
+            
+            {/* Nút Upload Ảnh */}
+            <input 
+              type="file" 
+              accept="image/*" 
+              className="hidden" 
+              ref={fileInputRef} 
+              onChange={handleImageUpload} 
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isScanning}
+              title={text.scanImg}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-violet-600 bg-violet-50 hover:bg-violet-100 disabled:opacity-50 transition"
+            >
+              {isScanning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImagePlus className="w-3.5 h-3.5" />}
+              <span className="hidden sm:inline">{isScanning ? text.scanning : text.scanImg}</span>
+            </button>
+            
             <button 
               onClick={() => setShowExamples(!showExamples)}
               className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-800 font-semibold transition"
@@ -376,10 +451,21 @@ export default function SandboxPage() {
                 handleRun();
               }
             }}
+            onPaste={handlePaste}
           />
         </div>
         
-        <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-t border-slate-100">
+        {/* Lớp phủ khi đang quét ảnh (Paste/Upload) */}
+        {isScanning && (
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10 rounded-2xl">
+            <div className="flex flex-col items-center gap-2 text-violet-600 bg-white px-4 py-3 rounded-xl shadow-lg border border-violet-100 animate-in zoom-in duration-200">
+              <Loader2 className="w-6 h-6 animate-spin" />
+              <span className="text-sm font-bold">{text.scanning}</span>
+            </div>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-t border-slate-100 relative z-20">
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <Info className="w-4 h-4" />
             {text.hint}

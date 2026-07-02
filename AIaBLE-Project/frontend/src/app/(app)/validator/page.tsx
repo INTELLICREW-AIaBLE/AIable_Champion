@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ShieldCheck,
   AlertTriangle,
@@ -12,9 +12,12 @@ import {
   ScanSearch,
   ChevronRight,
   Target,
-  FolderPlus
+  FolderPlus,
+  ImagePlus,
+  Loader2
 } from 'lucide-react';
 import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
+import Tesseract from 'tesseract.js';
 
 interface ValidationResult {
   score: number;
@@ -55,7 +58,10 @@ const t = {
     dangerTitle: 'Phát hiện nguy cơ ảo giác (Hallucinations)',
     reasonLabel: 'Lý do: ',
     errConn: 'Không thể kết nối đến server backend.',
-    errGen: 'Có lỗi xảy ra khi kiểm định.'
+    errGen: 'Có lỗi xảy ra khi kiểm định.',
+    scanImg: 'Quét văn bản từ ảnh',
+    scanning: 'Đang quét ảnh...',
+    scanErr: 'Không thể nhận diện văn bản. Vui lòng thử lại.'
   },
   en: {
     title: 'Output Validator',
@@ -87,7 +93,10 @@ const t = {
     dangerTitle: 'Hallucination Risks Detected',
     reasonLabel: 'Reason: ',
     errConn: 'Cannot connect to backend server.',
-    errGen: 'An error occurred during validation.'
+    errGen: 'An error occurred during validation.',
+    scanImg: 'Scan text from image',
+    scanning: 'Scanning image...',
+    scanErr: 'Could not recognize text. Please try again.'
   }
 };
 
@@ -112,6 +121,58 @@ export default function ValidatorPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ValidationResult | null>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [isScanning, setIsScanning] = useState<'output' | 'context' | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const contextFileInputRef = useRef<HTMLInputElement>(null);
+
+  const processImageFile = async (file: File, target: 'output' | 'context') => {
+    try {
+      setIsScanning(target);
+      const ocrLang = lang === 'vi' ? 'vie+eng' : 'eng';
+      
+      const resultData = await Tesseract.recognize(file, ocrLang, {
+        logger: (m) => console.log(m)
+      });
+      
+      const extractedText = resultData.data.text.trim();
+      if (extractedText) {
+        if (target === 'output') {
+          setOutput(prev => prev ? `${prev}\n\n${extractedText}` : extractedText);
+        } else {
+          setContext(prev => prev ? `${prev}\n\n${extractedText}` : extractedText);
+        }
+      } else {
+        alert(text.scanErr);
+      }
+    } catch (error) {
+      console.error('OCR Error:', error);
+      alert(text.scanErr);
+    } finally {
+      setIsScanning(null);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'output' | 'context') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await processImageFile(file, target);
+    if (target === 'output' && fileInputRef.current) fileInputRef.current.value = '';
+    if (target === 'context' && contextFileInputRef.current) contextFileInputRef.current.value = '';
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>, target: 'output' | 'context') => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) {
+          e.preventDefault();
+          processImageFile(file, target);
+          break;
+        }
+      }
+    }
+  };
 
   const charCount = output.length;
   const canValidate = output.trim().length >= 20 && !loading;
@@ -225,15 +286,33 @@ export default function ValidatorPage() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6">
         
         <div className="space-y-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden relative">
             <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50/50">
               <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-slate-400" />
                 {text.inputLabel}
               </span>
-              <span className={`text-xs font-medium ${charCount > 5000 ? 'text-amber-500' : 'text-slate-400'}`}>
-                {charCount}/5000 {text.chars}
-              </span>
+              <div className="flex items-center gap-3">
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  ref={fileInputRef} 
+                  onChange={(e) => handleImageUpload(e, 'output')} 
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isScanning !== null}
+                  title={text.scanImg}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-violet-600 bg-violet-50 hover:bg-violet-100 disabled:opacity-50 transition"
+                >
+                  {isScanning === 'output' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImagePlus className="w-3.5 h-3.5" />}
+                  <span className="hidden sm:inline">{isScanning === 'output' ? text.scanning : text.scanImg}</span>
+                </button>
+                <span className={`text-xs font-medium ${charCount > 5000 ? 'text-amber-500' : 'text-slate-400'}`}>
+                  {charCount}/5000 {text.chars}
+                </span>
+              </div>
             </div>
 
             <textarea
@@ -243,15 +322,44 @@ export default function ValidatorPage() {
               maxLength={5000}
               rows={8}
               className="w-full px-5 py-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
+              onPaste={(e) => handlePaste(e, 'output')}
             />
+
+            {/* Lớp phủ khi đang quét ảnh (Paste/Upload) */}
+            {isScanning === 'output' && (
+              <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10">
+                <div className="flex flex-col items-center gap-2 text-violet-600 bg-white px-4 py-3 rounded-xl shadow-lg border border-violet-100 animate-in zoom-in duration-200">
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <span className="text-sm font-bold">{text.scanning}</span>
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="flex items-center px-5 py-3 border-b border-slate-100 bg-slate-50/50">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden relative">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50/50">
               <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                 <Target className="w-4 h-4 text-slate-400" />
                 {text.contextLabel}
               </span>
+              <div className="flex items-center gap-3">
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  ref={contextFileInputRef} 
+                  onChange={(e) => handleImageUpload(e, 'context')} 
+                />
+                <button
+                  onClick={() => contextFileInputRef.current?.click()}
+                  disabled={isScanning !== null}
+                  title={text.scanImg}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-violet-600 bg-violet-50 hover:bg-violet-100 disabled:opacity-50 transition"
+                >
+                  {isScanning === 'context' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImagePlus className="w-3.5 h-3.5" />}
+                  <span className="hidden sm:inline">{isScanning === 'context' ? text.scanning : text.scanImg}</span>
+                </button>
+              </div>
             </div>
             <textarea
               value={context}
@@ -259,7 +367,17 @@ export default function ValidatorPage() {
               placeholder={text.contextPlaceholder}
               rows={3}
               className="w-full px-5 py-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
+              onPaste={(e) => handlePaste(e, 'context')}
             />
+
+            {isScanning === 'context' && (
+              <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10">
+                <div className="flex flex-col items-center gap-2 text-violet-600 bg-white px-4 py-3 rounded-xl shadow-lg border border-violet-100 animate-in zoom-in duration-200">
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <span className="text-sm font-bold">{text.scanning}</span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-between">
