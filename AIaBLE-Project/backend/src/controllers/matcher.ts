@@ -6,7 +6,7 @@ import { matchTask } from '../services/taskMatcher';
 
 export const matchTaskController = async (req: Request, res: Response) => {
   try {
-    const { subject, description } = req.body;
+    const { subject, description, lang } = req.body;
 
     // Validate input
     if (!subject || !description) {
@@ -23,7 +23,7 @@ export const matchTaskController = async (req: Request, res: Response) => {
       });
     }
 
-    const result = await matchTask(subject.trim(), description.trim());
+    const result = await matchTask(subject.trim(), description.trim(), lang);
 
     res.json(result);
 

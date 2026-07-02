@@ -101,7 +101,7 @@ const t = {
   vi: {
     profile: 'Thông tin cá nhân',
     notifications: 'Thông báo',
-    whatsNew: "What's New",
+    whatsNew: "Tính năng mới",
     settings: 'Cài đặt',
     shortcuts: 'Phím tắt',
     help: 'Trợ giúp',

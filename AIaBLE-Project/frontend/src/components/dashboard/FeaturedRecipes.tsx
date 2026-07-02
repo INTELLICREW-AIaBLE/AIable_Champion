@@ -66,11 +66,11 @@ const tabs = [
 
 const t = {
   vi: {
-    title: 'Featured AI Recipe Templates',
+    title: 'Mẫu Recipe Nổi bật',
     all: 'Tất cả',
-    coding: 'Coding',
-    report: 'Report',
-    slide: 'Slide',
+    coding: 'Lập trình',
+    report: 'Báo cáo',
+    slide: 'Thuyết trình',
     viewAll: 'Xem tất cả Recipes'
   },
   en: {

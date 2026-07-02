@@ -49,7 +49,31 @@ const t = {
     filter: 'Filter',
     filterTitle: 'Tối ưu cho mô hình AI:',
     allAi: 'Tất cả AI',
-    categories: 'Categories',
+    categories: 'Danh mục',
+    allCategories: {
+      'All': 'Tất cả',
+      'Coding': 'Lập trình',
+      'Report': 'Báo cáo',
+      'Slide': 'Thuyết trình',
+      'Research': 'Nghiên cứu',
+      'Writing': 'Viết lách',
+      'Planning': 'Kế hoạch',
+      'Math': 'Toán học',
+      'English': 'Tiếng Anh',
+      'Business': 'Kinh doanh',
+      'Design': 'Thiết kế',
+      'Data': 'Dữ liệu',
+      'Law': 'Luật',
+      'Economics': 'Kinh tế',
+      'Creative': 'Sáng tạo',
+      'Marketing': 'Marketing',
+      'HR': 'Nhân sự',
+      'Psychology': 'Tâm lý học',
+      'Science': 'Khoa học',
+      'History': 'Lịch sử',
+      'Career': 'Sự nghiệp',
+      'AI Prompting': 'AI Prompting'
+    },
     loading: 'Loading recipes...'
   },
   en: {
@@ -332,7 +356,7 @@ export default function RecipeLibraryPage() {
                 : 'bg-slate-50 border border-slate-100 text-slate-600 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700'
                 }`}
             >
-              {category}
+              {text.allCategories?.[category as keyof typeof text.allCategories] || category}
             </button>
           ))}
         </div>

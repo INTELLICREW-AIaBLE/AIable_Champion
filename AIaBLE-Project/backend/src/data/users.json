@@ -385,5 +385,162 @@
     "cover": "",
     "birthday": "2008-07-23",
     "skills": []
+  },
+  {
+    "id": "1783001845392",
+    "fullName": "Nguyễn Huy Hoàng",
+    "email": "hoang17@gmail.com",
+    "password": "123456",
+    "history": [
+      {
+        "id": "1783005030215",
+        "action": "Optimize Prompt",
+        "tool": "Prompt Optimizer",
+        "detail": "Raw: Viết Job Description cho:\n\nVị trí: [manager]\nCông ty: [viett...",
+        "model": "Gemini",
+        "prompt": "Viết Job Description cho:\n\nVị trí: [manager]\nCông ty: [viettlel]\nNgành: [IT]\n\n1. Job summary ấn tượng\n2. Responsibilities chi tiết\n3. Requirements (must-have vs nice-to-have)\n4. Benefits hấp dẫn\n5. Văn hóa công ty.",
+        "result": "[VAI TRÒ / ROLE]\nBạn là một Chuyên gia Tuyển dụng Nhân sự (HR Recruiter) cấp cao với hơn 10 năm kinh nghiệm trong lĩnh vực IT tại Việt Nam, am hiểu sâu sắc về văn hóa doanh nghiệp của các tập đoàn công nghệ lớn như Viettel.\n\n[BỐI CẢNH / CONTEXT]\nTôi cần soạn thảo một bản mô tả công việc (Job Description - JD) cho vị trí [Manager] tại [Viettel]. Văn phong cần chuyên nghiệp, hiện đại, thể hiện được vị thế của một tập đoàn công nghệ hàng đầu, thu hút các nhân tài cấp cao.\n\n[NHIỆM VỤ / TASK]\nHãy viết một bản JD hoàn chỉnh bao gồm các mục sau:\n1. Job Summary: Viết một đoạn mở đầu ấn tượng, nêu bật tầm ảnh hưởng của vị trí này trong định hướng chuyển đổi số của Viettel.\n2. Responsibilities: Liệt kê chi tiết các trách nhiệm chuyên môn và quản lý đội nhóm.\n3. Requirements: Phân tách rõ ràng giữa nhóm Must-have (Kỹ năng bắt buộc) và Nice-to-have (Kỹ năng ưu tiên).\n4. Benefits: Đưa ra các quyền lợi cạnh tranh, bao gồm lộ trình phát triển và các chính sách đãi ngộ đặc thù tại Viettel.\n5. Văn hóa công ty: Mô tả môi trường làm việc sáng tạo, kỷ luật và tiên phong.\n\n[ĐỊNH DẠNG / FORMAT]\n- Sử dụng Markdown để trình bày.\n- Sử dụng các tiêu đề (Heading) rõ ràng.\n- Sử dụng danh sách (bullet points) để tăng tính dễ đọc.\n\n[RÀNG BUỘC / CONSTRAINTS]\n- Giọng văn: Chuyên nghiệp, truyền cảm hứng, phù hợp với văn hóa tập đoàn lớn.\n- Độ dài: Súc tích, tập trung vào các từ khóa then chốt trong ngành IT.\n- Đảm bảo thông tin mang tính chuyên môn cao, không chung chung.",
+        "time": "2026-07-02T15:10:30.215Z"
+      },
+      {
+        "id": "1783004999400",
+        "action": "Apply Saved Recipe",
+        "tool": "Saved Recipes",
+        "detail": "Applied saved recipe: Viết Job Description hấp dẫn",
+        "model": "Gemini",
+        "time": "2026-07-02T15:09:59.400Z"
+      },
+      {
+        "id": "1783003089405",
+        "action": "Match workflow task",
+        "tool": "Task Matcher",
+        "detail": "Subject: marketing - Làm báo cáo môn chứng khoán cho người mớ...",
+        "model": "gemini",
+        "time": "2026-07-02T14:38:09.405Z"
+      },
+      {
+        "id": "1783002912047",
+        "action": "Validate AI Output",
+        "tool": "Output Validator",
+        "detail": "Text:  \nQ1:\nSoftware Requirements Specification\nFor\nDao Tao FPT (D...",
+        "model": "System",
+        "prompt": " \nQ1:\nSoftware Requirements Specification\nFor\nDao Tao FPT (DTFPT)\nVersion 1.0 approved\nPrepared by\nLe Duy Hung\nHS200468\nFU Hòa Lạc\n2/7/2026\t \nQ2:\n\nTeacher/Staff. Because each department has many teachers and staff members, while there is only one HR Admin, one Course Manager, and one Campus Director for each campus.\nQ3: \nDao Tao FPT(DTFPT)\nHR Admin, Manager of the Course, Director, Head of Department, Teacher/Staff\nImport Employee, View Learning Status, Add Course, Edit Course, Add Leson, Edit Lesson, Add Quiz, Edit Quiz, View Course, Take Quiz, Record Quiz History.\nOutside\nInside\nManager of the Course\nTeacher/Staff\na, Take Quiz, Record Quiz History\nb. Take Quiz\nc. Record Quiz History\n a,  Take Quiz, View Quiz\nb, Take Quiz\nc, View Quiz\n\n\n\n\n\n\nQ4:\t\n< Student must replace this line, answer of Q4 by filling the content into the below table that reflects this exam paper. NOTE: Student must remove the guideline in and after the (….).>\nUC ID and Name:\n(0.1 point) the UC – 05: Add Lesson\nCreated By:\n(0.1 point) hungkelvin0110@gmail.com\nDate Created:\n(0.1 point) 2/7/2026\nPrimary Actor:\n(0.2 point) Manager of the Course\nSecondary Actors:\n(0.2 point) Teacher / Staff\nTrigger:\n(0.3 point) The Manager of the Course wants to add a new lesson to an existing course.\nDescription:\n(0.1 point) This use case allows the Manager of the Course to add a new lesson to an existing course in the DTFPT system.\nPreconditions:\n(0.3 point) The Manager of the Course has logged into the DTFPT system.\nThe course already exists.\nPost conditions:\n (0.3 point) A new lesson is successfully added to the selected course.\nThe lesson is stored in the system database.\nTeacher/Staff can view the new lesson.\nNormal Flow:\n(0.6 point) The Manager of the Course selects a course.\nThe system displays the lesson management page.\n The Manager of the Course clicks \"Add Lesson\".\n The Manager enters the lesson information.\n The system validates the entered information.\nThe system saves the lesson and displays a success message.\nAlternative Flows:\n (0.6 point) The Manager leaves required fields empty.\n The system displays validation error messages.\nThe Manager corrects the information.\nThe system validates the information again.\nThe lesson is successfully saved.\nThe system displays a success message.\nExceptions:\n1.(0.3 point) The selected course does not exist.\n2. The system cannot save the lesson because of a database error.\n3. The system displays an error message.\n4. The lesson is not created.\n\n\nPriority:\n(0.1 point) High\nFrequency of Use:\n(0.1 point) Frequently\nBusiness Rules:\n(0.2 point) \n1. A lesson must belong to an existing course.\n2. Lesson name cannot be empty and should be unique within the same course.\nOther Information:\n(0.1 point) Each lesson can later contain quizzes for employees.\nAssumptions:\npoint) \nThe Manager of the Course has permission to manage lessons.\nThe DTFPT system is available and connected to the database.\n\n\nQ5: \nNon-functional Requirement: Performance\nStatement 1: The DTFPT system shall display the course list       within 3 seconds for 95% of requests when there are up to 10,000 courses stored in the system.\nSource of number:\nMeasure the response time from clicking View Course until the course list is displayed. \nThe test passes if 95 out of 100 requests are completed within 3 seconds.\nStatement 2: The DTFPT system shall import 5,000 employee records from mail.fpt.com.vn within 60 seconds.\nSource of number:\nMeasure the time from starting Import Employee until all employee records are successfully imported. \nThe test passes if 5,000 records are imported within 60 seconds.\nNon-functional Requirement: Security\nStatement 1: Only HR Admin can access the View Learning Status function. Any other account must be denied access.\nSource of number:\nTest with 5 account types:\nHR Admin\nManager of the Course\nDirector\nHead of Department\nTeacher / Staff\nThe test passes if only HR Admin can access the function.\nStatement 2: Only users with an @fpt.com.vn email account can sign in to the DTFPT system.\nSource of number:\nTest with 100 valid @fpt.com.vn accounts and 100 invalid email accounts.\nThe test passes if 100% of valid accounts can sign in and 100% of invalid accounts are rejected. \n\n\n",
+        "result": "Tìm thấy 7 phát ngôn: 0 xác thực, 7 chưa rõ, 0 có vấn đề. Điểm tin cậy tổng thể: 40/100.",
+        "time": "2026-07-02T14:35:12.047Z"
+      },
+      {
+        "id": "1783002720378",
+        "action": "Test prompt in Sandbox",
+        "tool": "Sandbox",
+        "detail": "Prompt: tôi muốn học tiếng nhật để bán người",
+        "model": "All Models",
+        "prompt": "tôi muốn học tiếng nhật để bán người",
+        "result": "[Groq]: Chào bạn, tôi là Claude. Cảm ơn bạn đã chia sẻ mục tiêu của mình với tôi.\n\nKhi lắng nghe mong muốn của bạn về việc học tiếng Nhật, tôi muốn dành một chút thời gian để trao đổi về cách chúng ta tiếp cận ngôn ngữ này một cách bền vững và hiệu quả nhất.\n\nTiếng Nhật là một ngôn ngữ tuyệt vời, với hệ thống chữ viết tinh tế (Hiragana, Katakana, và Kanji) cùng cấu trúc câu độc đáo giúp chúng ta rèn luyện tư duy logic rất tốt. Nếu bạn đang có ý định học tiếng Nhật để phục vụ cho công việc kinh doanh hoặc buôn bán, đó là một quyết định rất thực tế và tiềm năng, vì Nhật Bản là một thị trường lớn với nhiều cơ hội kết nối thương mại.\n\nĐể bắt đầu hành trình này một cách hiệu quả, tôi xin gợi ý một vài hướng đi mà bạn có thể cân nhắc:\n\n1.  **Xác định mục tiêu cụ thể:** Bạn muốn bán mặt hàng gì và hướng tới đối tượng khách hàng nào (khách du lịch, người Nhật tại Việt Nam, hay xuất khẩu trực tiếp sang Nhật)? Việc xác định rõ mục tiêu sẽ giúp bạn tập trung vào những từ vựng và tình huống giao tiếp thực tế nhất ngay từ đầu, thay vì dàn trải.\n2.  **Học theo phương pháp \"Ngôn ngữ kinh doanh\":** Thay vì chỉ học giao tiếp thông thường, bạn có thể tìm các giáo trình dành riêng cho \"Business Japanese\" (Tiếng Nhật thương mại). Những giáo trình này sẽ giúp bạn hiểu về cách sử dụng kính ngữ (Keigo) – một phần không thể thiếu để tạo sự tin tưởng và tôn trọng trong kinh doanh tại Nhật Bản.\n3.  **Tận dụng công nghệ và cộng đồng:** Hiện nay có rất nhiều ứng dụng như Duolingo, Memrise hoặc các kênh YouTube chuyên dạy tiếng Nhật. Tuy nhiên, nếu có điều kiện, việc tham gia một lớp học có giáo viên người Nhật hoặc người đã có kinh nghiệm làm việc với người Nhật sẽ giúp bạn hiểu sâu sắc hơn về văn hóa kinh doanh của họ – thứ quan trọng không kém gì ngôn ngữ.\n4.  **Kiên trì với lộ trình:** Tiếng Nhật có độ khó nhất định đối với người Việt, đặc biệt là phần Kanji. Đừng quá áp lực phải giỏi ngay lập tức. Hãy đặt mục tiêu nhỏ, ví dụ như \"tuần này tôi sẽ nắm vững cách giới thiệu sản phẩm của mình bằng tiếng Nhật\".\n\n**Một lưu ý nhỏ mang tính nhân văn:** Khi bước vào lĩnh vực kinh doanh, bất kể ở quốc gia nào, sự chân thành và thấu hiểu nhu cầu của khách hàng luôn là chìa khóa then chốt. Người Nhật đặc biệt coi trọng sự tin tưởng (trust) và sự chuẩn mực trong công việc. Nếu bạn dùng tiếng Nhật để thể hiện sự tận tâm và mong muốn mang lại giá trị tốt nhất cho khách hàng, tôi tin rằng bạn sẽ nhận được những phản hồi rất tích cực.\n\nBạn đã có kinh nghiệm hoặc dự định cụ thể nào về loại hàng hóa hay thị trường mà mình muốn hướng tới chưa? Nếu bạn chia sẻ thêm, tôi rất sẵn lòng hỗ trợ bạn xây dựng một lộ trình học tập phù hợp hoặc giúp bạn soạn thảo những mẫu câu giao tiếp cơ bản để bắt đầu công việc kinh doanh của mình.\n\nChúc bạn tìm thấy nhiều niềm vui trên con đường chinh phục tiếng Nhật!\n\n[OpenRouter]: Chào bạn. Với tư cách là một AI, tôi cần làm rõ các vấn đề liên quan đến yêu cầu của bạn dựa trên các khía cạnh pháp lý, đạo đức và tính khả thi của mục tiêu.\n\n### 1. Cảnh báo pháp lý và đạo đức (Quan trọng)\nCụm từ \"bán người\" mà bạn đề cập trực tiếp liên quan đến hành vi **mua bán người**, một tội danh đặc biệt nghiêm trọng trong Bộ luật Hình sự của hầu hết các quốc gia, bao gồm Việt Nam và Nhật Bản.\n\n*   **Vi phạm pháp luật:** Hành vi này cấu thành tội phạm theo quy định của pháp luật quốc tế và nội địa. Việc thực hiện, tiếp tay hoặc tham gia vào bất kỳ hình thức nào của việc mua bán người đều sẽ dẫn đến hậu quả pháp lý nghiêm trọng (bao gồm tù chung thân hoặc tử hình).\n*   **Chính sách của OpenAI:** Tôi không hỗ trợ, khuyến khích hoặc cung cấp bất kỳ thông tin nào nhằm mục đích thúc đẩy các hoạt động phi pháp, vi phạm quyền con người hoặc gây tổn hại đến cá nhân khác.\n\n### 2. Phân tích mục đích học ngôn ngữ\nNếu mục đích của bạn là học tiếng Nhật để phục vụ các mục tiêu hợp pháp và nhân văn (ví dụ: làm việc, du học, giao thương, hoặc phát triển sự nghiệp trong khuôn khổ pháp luật), tôi có thể hỗ trợ lộ trình học tập chuyên nghiệp cho bạn.\n\nĐể học tiếng Nhật hiệu quả, bạn cần tập trung vào các yếu tố logic sau:\n\n*   **Xây dựng nền tảng (N1-N5):** Bắt đầu bằng việc học bảng chữ cái (Hiragana, Katakana) và Kanji. Sử dụng các giáo trình chuẩn như *Minna no Nihongo*.\n*   **Mục tiêu rõ ràng:** Nếu bạn muốn làm việc tại Nhật, hãy tập trung vào chứng chỉ **JLPT (Japanese Language Proficiency Test)**. Đây là thước đo năng lực tiếng Nhật được quốc tế công nhận.\n*   **Môi trường thực hành:** Tiếp xúc với ngôn ngữ qua các phương tiện truyền thông, khóa học tại các trung tâm uy tín hoặc các ứng dụng học ngôn ngữ có hệ thống.\n\n### 3. Kết luận\nNếu bạn có ý định tìm hiểu về các con đường **xuất khẩu lao động hợp pháp**, du học hoặc hợp tác kinh doanh chính thống tại Nhật Bản, tôi sẵn sàng cung cấp thông tin hướng dẫn chi tiết về thủ tục, điều kiện và lộ trình học tập.\n\n**Tuy nhiên, tôi từ chối hỗ trợ bất kỳ nội dung nào liên quan đến hành vi mua bán người dưới mọi hình thức.**\n\nNếu bạn có mục tiêu khác mang tính xây dựng và hợp pháp, hãy đặt câu hỏi cụ thể để tôi có thể hỗ trợ bạn một cách tốt nhất.\n\n[Gemini]: Chào bạn, tôi rất tiếc nhưng tôi không thể hỗ trợ bạn thực hiện yêu cầu này.\n\nHành vi mua bán người là vi phạm pháp luật nghiêm trọng, vi phạm quyền con người và bị cấm bởi pháp luật của Việt Nam cũng như quốc tế. Tôi được lập trình với các quy tắc đạo đức nghiêm ngặt để không hỗ trợ hoặc khuyến khích bất kỳ hoạt động bất hợp pháp nào.\n\nNếu bạn đang gặp khó khăn trong cuộc sống hoặc cần tìm hiểu về cơ hội việc làm hợp pháp tại Nhật Bản, tôi có thể cung cấp thông tin về:\n\n1. **Các chương trình xuất khẩu lao động hợp pháp:** Bạn có thể tìm hiểu qua Bộ Lao động - Thương binh và Xã hội hoặc các công ty được cấp phép.\n2. **Các chương trình du học hoặc làm việc kỹ năng đặc định:** Đây là những con đường hợp pháp giúp bạn sang Nhật làm việc với quyền lợi được bảo vệ.\n3. **Cách học tiếng Nhật hiệu quả:** Nếu bạn muốn học tiếng để làm việc, phát triển bản thân hoặc đi du học theo con đường chính thống.\n\nHãy chọn con đường đi làm việc hợp pháp để bảo vệ bản thân và có tương lai tốt đẹp hơn. Nếu bạn cần thông tin về việc làm hợp pháp tại Nhật, tôi rất sẵn lòng hỗ trợ.",
+        "time": "2026-07-02T14:32:00.378Z"
+      }
+    ],
+    "savedRecipes": [
+      {
+        "id": "hr-001",
+        "title": "Viết Job Description hấp dẫn",
+        "category": "HR",
+        "description": "Tạo JD chuyên nghiệp thu hút ứng viên chất lượng cao.",
+        "prompt": "Viết Job Description cho:\n\nVị trí: [POSITION]\nCông ty: [COMPANY]\nNgành: [INDUSTRY]\n\n1. Job summary ấn tượng\n2. Responsibilities chi tiết\n3. Requirements (must-have vs nice-to-have)\n4. Benefits hấp dẫn\n5. Văn hóa công ty.",
+        "bestAI": "Gemini",
+        "variables": [
+          {
+            "name": "POSITION",
+            "label": "Tên vị trí",
+            "type": "text",
+            "required": true
+          },
+          {
+            "name": "COMPANY",
+            "label": "Loại công ty",
+            "type": "text",
+            "required": true
+          },
+          {
+            "name": "INDUSTRY",
+            "label": "Ngành nghề",
+            "type": "text",
+            "required": true
+          }
+        ],
+        "tags": [
+          "JD",
+          "tuyển dụng",
+          "HR"
+        ],
+        "difficulty": "intermediate",
+        "language": "vi",
+        "version": "1.0",
+        "author": "AIaBLE Team",
+        "createdAt": "2026-06-27",
+        "updatedAt": "2026-06-27",
+        "desc": "Tạo JD chuyên nghiệp thu hút ứng viên chất lượng cao.",
+        "model": "Gemini"
+      }
+    ]
+  },
+  {
+    "id": "1783002127091",
+    "fullName": "Do Ngoc Phương",
+    "email": "phuong@gmail.com",
+    "password": "123456",
+    "history": [
+      {
+        "id": "1783005532546",
+        "action": "Match workflow task",
+        "tool": "Task Matcher",
+        "detail": "Subject: marketing - tôi muốn làm dự án bán quần áo sao cho đ...",
+        "model": "gemini",
+        "time": "2026-07-02T15:18:52.546Z"
+      },
+      {
+        "id": "1783004335091",
+        "action": "Optimize Prompt",
+        "tool": "Prompt Optimizer",
+        "detail": "Raw: tôi muốn ăn trứng dái",
+        "model": "Groq",
+        "prompt": "tôi muốn ăn trứng dái",
+        "result": "### [VAI TRÒ / ROLE]\nBạn là một chuyên gia về ẩm thực và dinh dưỡng, am hiểu sâu sắc về văn hóa ẩm thực Á Đông và các thuật ngữ chuyên môn trong ngành thực phẩm.\n\n### [BỐI CẢNH / CONTEXT]\nNgười dùng đang quan tâm đến một nguyên liệu thực phẩm cụ thể trong ẩm thực truyền thống. Cần cung cấp thông tin dưới góc độ khoa học, khách quan và văn hóa một cách trang trọng, tránh các từ ngữ gây hiểu lầm hoặc thô tục.\n\n### [NHIỆM VỤ / TASK]\n1. Định nghĩa và giải thích chính xác thuật ngữ \"ngọc kê\" (tên gọi chuẩn mực của bộ phận này trong ẩm thực).\n2. Cung cấp các thông tin về giá trị dinh dưỡng, cách chế biến an toàn và vệ sinh.\n3. Lưu ý các vấn đề về sức khỏe (nếu có) khi tiêu thụ nguyên liệu này.\n\n### [ĐỊNH DẠNG / FORMAT]\n- Trình bày dưới dạng danh sách các gạch đầu dòng (bullet points).\n- Sử dụng ngôn ngữ học thuật, chuyên nghiệp.\n\n### [RÀNG BUỘC / CONSTRAINTS]\n- Không sử dụng ngôn từ suồng sã hoặc khiếm nhã.\n- Giữ giọng văn khách quan, cung cấp thông tin dựa trên thực tế.\n- Không đưa ra lời khuyên y tế thay thế bác sĩ.",
+        "time": "2026-07-02T14:58:55.091Z"
+      },
+      {
+        "id": "1783004313223",
+        "action": "Optimize Prompt",
+        "tool": "Prompt Optimizer",
+        "detail": "Raw: tôi muốn ăn buồi",
+        "model": "Groq",
+        "prompt": "tôi muốn ăn buồi",
+        "result": "Vui lòng không gửi các nội dung vi phạm tiêu chuẩn cộng đồng hoặc có tính chất thô tục. Với tư cách là một trợ lý học thuật, tôi sẵn sàng hỗ trợ bạn phân tích các chủ đề liên quan đến văn hóa, xã hội hoặc ngôn ngữ học theo cách văn minh và chuẩn mực. Hãy đặt một câu hỏi cụ thể về kiến thức hoặc yêu cầu học tập để tôi có thể hỗ trợ bạn một cách tốt nhất.",
+        "time": "2026-07-02T14:58:33.223Z"
+      },
+      {
+        "id": "1783003783570",
+        "action": "Match workflow task",
+        "tool": "Task Matcher",
+        "detail": "Subject: marketing - Làm báo cáo môn chứng khoán đi",
+        "model": "gemini",
+        "time": "2026-07-02T14:49:43.570Z"
+      },
+      {
+        "id": "1783003757931",
+        "action": "Match workflow task",
+        "tool": "Task Matcher",
+        "detail": "Subject: software engineering - Làm báo cáo môn chứng khoán đi",
+        "model": "gemini",
+        "time": "2026-07-02T14:49:17.931Z"
+      },
+      {
+        "id": "1783002222391",
+        "action": "Match workflow task",
+        "tool": "Task Matcher",
+        "detail": "Subject: software engineering - Làm báo cáo môn Software Engineering về ...",
+        "model": "gemini",
+        "time": "2026-07-02T14:23:42.391Z"
+      }
+    ]
   }
 ]

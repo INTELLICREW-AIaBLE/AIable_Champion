@@ -53,8 +53,12 @@ const t = {
 
 export function Navbar() {
   const [lang, setLang] = useState('vi');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsLoggedIn(!!localStorage.getItem('token'));
+    }
     setLang(localStorage.getItem('app_lang') || 'vi');
     const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
     window.addEventListener('storage', handleLangChange);
@@ -88,20 +92,31 @@ export function Navbar() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-2.5 shrink-0">
-          {/* Login */}
-          <Link
-            href="/login"
-            className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition duration-200 shadow-sm whitespace-nowrap"
-          >
-            {text.login}
-          </Link>
-          {/* Register */}
-          <Link
-            href="/register"
-            className="inline-flex items-center justify-center rounded-lg bg-violet-600 px-4 py-1.5 text-sm font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-md shadow-violet-200 whitespace-nowrap"
-          >
-            {text.register}
-          </Link>
+          {isLoggedIn ? (
+            <Link
+              href="/home"
+              className="inline-flex items-center justify-center rounded-lg bg-violet-600 px-4 py-1.5 text-sm font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-md shadow-violet-200 whitespace-nowrap"
+            >
+              {lang === 'en' ? 'Dashboard' : 'Vào không gian'}
+            </Link>
+          ) : (
+            <>
+              {/* Login */}
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition duration-200 shadow-sm whitespace-nowrap"
+              >
+                {text.login}
+              </Link>
+              {/* Register */}
+              <Link
+                href="/register"
+                className="inline-flex items-center justify-center rounded-lg bg-violet-600 px-4 py-1.5 text-sm font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-md shadow-violet-200 whitespace-nowrap"
+              >
+                {text.register}
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

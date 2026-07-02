@@ -500,8 +500,11 @@ const findRuleBasedWorkflow = (subject: string): WorkflowStep[] | null => {
 // ============================================================
 const generateWorkflowWithGemini = async (
   subject: string,
-  description: string
+  description: string,
+  lang: string
 ): Promise<WorkflowStep[]> => {
+  const languageInstruction = lang === 'en' ? 'MUST BE WRITTEN ENTIRELY IN ENGLISH' : 'MUST BE WRITTEN ENTIRELY IN VIETNAMESE (TIẾNG VIỆT)';
+
   const prompt = `
 You are an academic assistant helping university students break down their complex assignments.
 
@@ -510,6 +513,8 @@ Task description: "${description}"
 
 Generate a comprehensive Workflow Combo with exactly 5 steps to complete this complex assignment.
 For each step, you MUST suggest a specific, highly suitable AI tool (e.g., Claude for deep research, Gemini for synthesis/brainstorming, Canva AI for slides/design, GitHub Copilot for coding, ChatGPT for general writing) and explain exactly why that tool is the best fit.
+
+CRITICAL INSTRUCTION: ALL output content (step names, descriptions, reasons, and sample prompts) ${languageInstruction}.
 
 Return ONLY a valid JSON array (no markdown formatting, no code blocks, no explanation text) in this exact format:
 [
@@ -557,7 +562,8 @@ Return ONLY a valid JSON array (no markdown formatting, no code blocks, no expla
 // ============================================================
 export const matchTask = async (
   subject: string,
-  description: string
+  description: string,
+  lang: string = 'vi'
 ): Promise<TaskMatcherResponse> => {
   const isGeneric = !description || description.trim().length < 5;
 
@@ -576,7 +582,7 @@ export const matchTask = async (
 
   // If description is provided, we ALWAYS want to use LLM to analyze the specific complex task
   try {
-    const geminiSteps = await generateWorkflowWithGemini(subject, description);
+    const geminiSteps = await generateWorkflowWithGemini(subject, description, lang);
     return {
       success: true,
       subject,

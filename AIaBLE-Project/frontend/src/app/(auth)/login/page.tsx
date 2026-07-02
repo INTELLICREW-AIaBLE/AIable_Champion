@@ -49,6 +49,9 @@ export default function LoginPage() {
   const [lang, setLang] = useState('vi');
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && localStorage.getItem('token')) {
+      router.push('/home');
+    }
     setLang(localStorage.getItem('app_lang') || 'vi');
     const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
     window.addEventListener('storage', handleLangChange);
@@ -57,7 +60,7 @@ export default function LoginPage() {
       window.removeEventListener('storage', handleLangChange);
       window.removeEventListener('app_lang_changed', handleLangChange);
     };
-  }, []);
+  }, [router]);
 
   const text = t[lang as 'en' | 'vi'] || t.vi;
 

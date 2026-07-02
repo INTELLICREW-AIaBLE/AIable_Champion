@@ -31,7 +31,7 @@ const t = {
     desc: 'Kiểm thử và so sánh kết quả trực tiếp từ nhiều mô hình AI (Groq, OpenRouter, Gemini) cùng một lúc.',
     reset: 'Reset',
     settings: 'Cài đặt mô hình',
-    masterPrompt: 'Master Prompt',
+    masterPrompt: 'Prompt Chính',
     promptHistory: 'Lịch sử Prompt',
     placeholder: 'Nhập prompt bạn muốn kiểm thử trên nhiều mô hình AI...',
     hint: 'Nhấn Ctrl + Enter để chạy',
@@ -133,6 +133,16 @@ export default function SandboxPage() {
   const [prompt, setPrompt] = useState('');
   const [results, setResults] = useState<ModelResult[]>(INITIAL_MODELS);
   const [isRunning, setIsRunning] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const handleStop = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsRunning(false);
+      setResults(prev => prev.map(m => m.status === 'loading' ? { ...m, status: 'error', content: lang === 'vi' ? 'Đã hủy bởi người dùng.' : 'Aborted by user.' } : m));
+    }
+  };
   
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [saveData, setSaveData] = useState<{prompt?: string, result?: string, aiModel?: string}>({});
@@ -189,6 +199,8 @@ export default function SandboxPage() {
     if (!prompt.trim()) return;
     
     setIsRunning(true);
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
     
     // Set all to loading
     setResults(prev => prev.map(m => ({ ...m, status: 'loading', content: '', timeMs: undefined })));
@@ -197,7 +209,11 @@ export default function SandboxPage() {
     const runModel = async (index: number, modelName: string, delayMs: number) => {
       // Đợi một khoảng thời gian trước khi gọi API để tránh lỗi 429 Too Many Requests của Gemini Free Tier
       if (delayMs > 0) {
-        await new Promise(r => setTimeout(r, delayMs));
+        await new Promise(r => {
+          const timeoutId = setTimeout(r, delayMs);
+          signal.addEventListener('abort', () => clearTimeout(timeoutId));
+        });
+        if (signal.aborted) return { model: modelName, content: 'Aborted' };
       }
       
       const startTime = Date.now();
@@ -205,7 +221,8 @@ export default function SandboxPage() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/sandbox`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt, model: modelName })
+          body: JSON.stringify({ prompt, model: modelName }),
+          signal
         });
         const data = await res.json();
         
@@ -222,6 +239,7 @@ export default function SandboxPage() {
         });
         return { model: modelName, content: data.success ? data.data : data.message };
       } catch (error: any) {
+        if (error.name === 'AbortError') return { model: modelName, content: 'Aborted' };
         setResults(prev => {
           const newResults = [...prev];
           newResults[index] = { 
@@ -241,7 +259,9 @@ export default function SandboxPage() {
       runModel(1, 'OpenRouter', 1500),
       runModel(2, 'Gemini', 3000)
     ]).then((runResults) => {
+      if (signal.aborted) return;
       setIsRunning(false);
+      abortControllerRef.current = null;
       
       // Log lịch sử hoạt động
       const token = localStorage.getItem('token');
@@ -364,26 +384,27 @@ export default function SandboxPage() {
             <Info className="w-4 h-4" />
             {text.hint}
           </div>
-          <button
-            onClick={handleRun}
-            disabled={!prompt.trim() || isRunning}
-            className="flex items-center gap-2 px-6 py-2 rounded-xl bg-violet-600 text-sm font-bold text-white hover:bg-violet-700 transition shadow-md shadow-violet-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none active:scale-95"
-          >
-            {isRunning ? (
-              <>
-                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                </svg>
-                {text.running}
-              </>
-            ) : (
-              <>
-                <Send className="w-4 h-4" />
-                {text.runBtn}
-              </>
-            )}
-          </button>
+          {isRunning ? (
+            <button
+              onClick={handleStop}
+              className="flex items-center gap-2 px-6 py-2 rounded-xl bg-red-500 text-sm font-bold text-white hover:bg-red-600 transition shadow-md shadow-red-200 active:scale-95"
+            >
+              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+              </svg>
+              {lang === 'vi' ? 'Dừng AI' : 'Stop AI'}
+            </button>
+          ) : (
+            <button
+              onClick={handleRun}
+              disabled={!prompt.trim()}
+              className="flex items-center gap-2 px-6 py-2 rounded-xl bg-violet-600 text-sm font-bold text-white hover:bg-violet-700 transition shadow-md shadow-violet-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none active:scale-95"
+            >
+              <Send className="w-4 h-4" />
+              {text.runBtn}
+            </button>
+          )}
         </div>
       </div>
 

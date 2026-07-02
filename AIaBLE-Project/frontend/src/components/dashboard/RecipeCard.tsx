@@ -1,6 +1,6 @@
 import { Copy, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface RecipeCardProps {
   type: 'CODING' | 'REPORT' | 'SLIDE';
@@ -28,6 +28,18 @@ export function RecipeCard({
   description,
   onApply,
 }: RecipeCardProps & { onApply: () => void }) {
+  const [lang, setLang] = useState('vi');
+  
+  useEffect(() => {
+      setLang(localStorage.getItem('app_lang') || 'vi');
+      const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+      window.addEventListener('storage', handleLangChange);
+      window.addEventListener('app_lang_changed', handleLangChange);
+      return () => {
+        window.removeEventListener('storage', handleLangChange);
+        window.removeEventListener('app_lang_changed', handleLangChange);
+      };
+  }, []);
 
 const [copied, setCopied] = useState(false);
 const handleCopy = async () => {
@@ -44,7 +56,7 @@ const handleCopy = async () => {
           {type}
         </span>
         <span className={cn('text-[11px] font-medium', modelStyles[bestModel])}>
-          Best: {bestModel}
+          {lang === 'vi' ? 'Tốt nhất: ' : 'Best: '}{bestModel}
         </span>
       </div>
 
@@ -63,12 +75,12 @@ const handleCopy = async () => {
         <button className="flex items-center gap-1.5 rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 transition"
         onClick={handleCopy}>
           <Copy className="w-3 h-3" />
-          {copied ? "Copied!" : "Copy"}
+          {copied ? (lang === 'vi' ? "Đã sao chép!" : "Copied!") : (lang === 'vi' ? "Sao chép" : "Copy")}
         </button>
         <button className="flex items-center gap-1 rounded-md bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition ml-auto"
         type="button"
         onClick={onApply}>
-          Apply
+          {lang === 'vi' ? 'Dùng thử' : 'Apply'}
           <ArrowRight className="w-3 h-3" />
         </button>
       </div>

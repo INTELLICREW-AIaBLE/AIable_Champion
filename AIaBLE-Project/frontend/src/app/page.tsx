@@ -53,8 +53,12 @@ const t = {
 
 export default function LandingPage() {
   const [lang, setLang] = useState('vi');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsLoggedIn(!!localStorage.getItem('token'));
+    }
     setLang(localStorage.getItem('app_lang') || 'vi');
     const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
     window.addEventListener('storage', handleLangChange);
@@ -95,10 +99,10 @@ export default function LandingPage() {
         {/* CTA Actions */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
           <Link
-            href="/login"
+            href={isLoggedIn ? "/home" : "/login"}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-8 py-4 text-base font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-lg shadow-violet-200 hover:-translate-y-0.5"
           >
-            {text.btnStart}
+            {isLoggedIn ? text.btnEnter : text.btnStart}
             <ArrowRight className="w-4 h-4" />
           </Link>
           <a
@@ -317,7 +321,7 @@ export default function LandingPage() {
           {text.readySub}
         </p>
         <Link
-          href="/login"
+          href={isLoggedIn ? "/home" : "/login"}
           className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-8 py-4 text-base font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-lg shadow-violet-200"
         >
           {text.btnEnter}

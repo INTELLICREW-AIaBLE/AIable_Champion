@@ -19,16 +19,16 @@ const statusDot: Record<string, string> = {
 
 const t = {
   vi: {
-    title: 'My Recent Projects',
+    title: 'Dự án Gần đây',
     status: 'Trạng thái',
     lastEdited: 'Cập nhật lần cuối',
-    viewAll: 'Tất cả Project'
+    viewAll: 'Tất cả Dự án'
   },
   en: {
     title: 'My Recent Projects',
     status: 'Status',
     lastEdited: 'Last Edited',
-    viewAll: 'Projects'
+    viewAll: 'All Projects'
   }
 };
 
