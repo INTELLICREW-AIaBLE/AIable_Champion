@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Inter } from "next/font/google";
+import { Inter, Sora } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { GatewayGuard } from "@/components/layout/GatewayGuard";
 
 const inter = Inter({ subsets: ["latin", "vietnamese"], variable: "--font-sans" });
+const sora = Sora({ subsets: ["latin", "latin-ext"], variable: "--font-heading" });
 
 export const metadata: Metadata = {
   title: "AIaBLE — The Next-Gen Academic AI Workspace",
@@ -19,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={cn("font-sans", inter.variable)} suppressHydrationWarning>
+    <html lang="vi" className={cn("font-sans font-heading", inter.variable, sora.variable)} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
