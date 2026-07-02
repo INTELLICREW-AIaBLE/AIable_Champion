@@ -27,6 +27,8 @@ type Recipe = {
   language: string;
 };
 
+const RECIPES_PER_PAGE = 9;
+
 const t = {
   vi: {
     title: 'Recipe Library',
@@ -66,13 +68,20 @@ const t = {
       'AI Prompting': 'AI Prompting'
     },
     loading: 'Loading recipes...'
+  }
+};
+
+const CATEGORY_GROUPS = [
+  {
+    label: 'Academic',
+    items: ['All', 'Coding', 'Report', 'Research', 'Math', 'English', 'Science', 'History', 'Economics', 'Law'],
   },
   {
-  label: 'Professional',
+    label: 'Professional',
     items: ['Writing', 'Slide', 'Business', 'Marketing', 'HR', 'Career', 'Planning'],
   },
-{
-  label: 'Creative & Tech',
+  {
+    label: 'Creative & Tech',
     items: ['Creative', 'Design', 'Data', 'Psychology', 'AI Prompting'],
   },
 ];
@@ -261,6 +270,21 @@ export default function RecipeLibraryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
 
+  const [lang, setLang] = useState('vi');
+
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
+
+  const text = t[lang as 'en' | 'vi'] || t.vi;
+
   useEffect(() => {
     async function fetchRecipes() {
       try {
@@ -373,25 +397,32 @@ export default function RecipeLibraryPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
-        <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-3">
-          {text.categories}
-        </p>
-
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((category) => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition ${activeCategory === category
-                ? 'bg-violet-600 text-white shadow-md shadow-violet-200'
-                : 'bg-slate-50 border border-slate-100 text-slate-600 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700'
-                }`}
-            >
-              {text.allCategories?.[category as keyof typeof text.allCategories] || category}
-            </button>
-          ))}
-        </div>
+      {/* ── Categories — grouped & scrollable ─────────────────────────────── */}
+      <div className="rounded-2xl border border-slate-100 bg-white shadow-sm p-4 space-y-3">
+        {CATEGORY_GROUPS.map(group => (
+          <div key={group.label}>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{group.label}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {group.items.map(cat => {
+                const isActive = activeCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={cn(
+                      'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all',
+                      isActive
+                        ? 'bg-violet-600 text-white shadow-md shadow-violet-200'
+                        : 'bg-slate-50 border border-slate-100 text-slate-600 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700'
+                    )}
+                  >
+                    {text.allCategories?.[cat as keyof typeof text.allCategories] || cat}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* ── Results info ────────────────────────────────────────────────────── */}
