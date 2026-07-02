@@ -110,10 +110,32 @@ export const getHistory = (req: Request, res: Response) => {
   }
 };
 
+export const logHistoryHelper = (userId: string, action: string, tool: string, detail: string, model: string = 'System', prompt?: string, result?: string) => {
+  try {
+    const users = readUsers();
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) return;
+    
+    if (!users[userIndex].history) users[userIndex].history = [];
+    const newItem = {
+      id: Date.now().toString(),
+      action, tool, detail, model, prompt, result,
+      time: new Date().toISOString()
+    };
+    users[userIndex].history.unshift(newItem);
+    if (users[userIndex].history.length > 50) {
+      users[userIndex].history = users[userIndex].history.slice(0, 50);
+    }
+    writeUsers(users);
+  } catch (err) {
+    console.error('Error logging history helper:', err);
+  }
+};
+
 export const addHistory = (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { action, tool, detail, model } = req.body;
+    const { action, tool, detail, model, prompt, result } = req.body;
     const users = readUsers();
     const userIndex = users.findIndex(u => u.id === userId);
     if (userIndex === -1) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
@@ -121,7 +143,7 @@ export const addHistory = (req: Request, res: Response) => {
     if (!users[userIndex].history) users[userIndex].history = [];
     const newItem = {
       id: Date.now().toString(),
-      action, tool, detail, model,
+      action, tool, detail, model, prompt, result,
       time: new Date().toISOString()
     };
     users[userIndex].history.unshift(newItem);

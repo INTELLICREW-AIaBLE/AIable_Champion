@@ -4,9 +4,10 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Wand2, Copy, Check, AlertTriangle, ChevronDown,
   Sparkles, ArrowRight, RotateCcw, Info, X,
-  Zap, BookOpen, Target, TrendingUp,
+  Zap, BookOpen, Target, TrendingUp, FolderPlus
 } from 'lucide-react';
 import Image from 'next/image';
+import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type AIModel = 'Groq' | 'OpenRouter' | 'Gemini';
@@ -265,6 +266,7 @@ export default function OptimizerPage() {
   const [result, setResult] = useState<OptimizeResult | null>(null);
   const [showEthics, setShowEthics] = useState(false);
   const [activeView, setActiveView] = useState<'split' | 'before' | 'after'>('split');
+  const [showSaveModal, setShowSaveModal] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [lang, setLang] = useState('vi');
@@ -322,6 +324,26 @@ export default function OptimizerPage() {
       if (res.ok) {
         setResult(json);
         if (json.ethicsFlag) setShowEthics(true);
+        
+        // Log lịch sử hoạt động
+        const token = localStorage.getItem('token');
+        if (token) {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/history`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              action: 'Optimize Prompt',
+              tool: 'Prompt Optimizer',
+              detail: `Raw: ${raw.substring(0, 60)}${raw.length > 60 ? '...' : ''}`,
+              model: model,
+              prompt: raw,
+              result: json.optimized || ''
+            })
+          }).catch(err => console.error('Lỗi khi lưu lịch sử:', err));
+        }
       } else {
         console.error('Failed to optimize prompt:', json.message);
         alert(json.message || text.errGen);
@@ -382,7 +404,7 @@ export default function OptimizerPage() {
                     : 'border-slate-100 text-slate-500 hover:border-slate-200 hover:bg-slate-50'
                   }`}
               >
-                <div className="w-6 h-6 rounded-lg overflow-hidden border border-slate-200 shrink-0">
+                <div className="w-6 h-6 rounded-lg overflow-hidden border border-slate-200 shrink-0 ignore-dark-mode bg-white">
                   <Image src={m.logo} alt={m.label} width={24} height={24} className="object-cover" />
                 </div>
                 {m.id}
@@ -562,7 +584,16 @@ export default function OptimizerPage() {
                     <span className="text-sm font-bold text-violet-800">{text.after}</span>
                     <span className="text-xs text-violet-400">{text.optimizedBy} · {model}</span>
                   </div>
-                  <CopyButton text={result.optimized} />
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setShowSaveModal(true)}
+                      className="p-1.5 text-violet-600 hover:bg-violet-100 rounded-lg transition"
+                      title="Lưu vào Dự án"
+                    >
+                      <FolderPlus className="w-4 h-4" />
+                    </button>
+                    <CopyButton text={result.optimized} />
+                  </div>
                 </div>
                 <pre className="px-5 py-4 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed font-mono min-h-[180px]">
                   {result.optimized}
@@ -621,6 +652,19 @@ export default function OptimizerPage() {
       {/* ── Ethics Dialog ────────────────────────────────────────────────────── */}
       {showEthics && result?.ethicsReason && (
         <EthicsDialog reason={result.ethicsReason} text={text} onDismiss={() => setShowEthics(false)} />
+      )}
+
+      {/* ── Save Modal ───────────────────────────────────────────────────────── */}
+      {result && (
+        <SaveToProjectModal
+          isOpen={showSaveModal}
+          onClose={() => setShowSaveModal(false)}
+          data={{
+            prompt: raw,
+            result: result.optimized,
+            aiModel: model
+          }}
+        />
       )}
     </div>
   );

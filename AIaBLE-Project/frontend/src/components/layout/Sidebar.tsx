@@ -107,7 +107,10 @@ export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
             </p>
             <div className="space-y-0.5">
               {items.map(({ href, label: itemLabel, icon: Icon }) => {
-                const isActive = pathname === href || pathname.startsWith(href + '/');
+                let isActive = pathname === href || pathname.startsWith(href + '/');
+                if (href === '/recipes' && pathname.startsWith('/recipes/saved')) {
+                  isActive = false;
+                }
                 return (
                   <Link
                     key={href}

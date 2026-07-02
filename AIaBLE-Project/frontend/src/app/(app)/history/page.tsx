@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Clock, Wand2, Sparkles, BookOpen, Search, ArrowUpRight, Activity } from 'lucide-react';
+import { Clock, Wand2, Sparkles, BookOpen, Search, ArrowUpRight, Activity, X, Copy } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function HistoryPage() {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -64,6 +65,10 @@ export default function HistoryPage() {
             const formattedTime = item.time ? new Date(item.time).toLocaleString('vi-VN') : 'Gần đây';
 
             const handleNavigate = () => {
+              if (item.prompt || item.result) {
+                setSelectedItem(item);
+                return;
+              }
               const tool = (item.tool || '').toLowerCase();
               if (tool.includes('optimizer')) router.push('/optimizer');
               else if (tool.includes('sandbox')) router.push('/sandbox');
@@ -116,6 +121,72 @@ export default function HistoryPage() {
           </button>
         </div>
       </div>
+
+      {/* Detail Modal */}
+      {selectedItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setSelectedItem(null)} />
+          <div className="relative bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
+              <h3 className="text-lg font-bold text-slate-800">
+                Chi tiết hoạt động
+              </h3>
+              <button onClick={() => setSelectedItem(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto space-y-6">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-sm font-bold text-slate-900">{selectedItem.action}</span>
+                <span className="text-xs font-bold text-violet-600 bg-violet-50 border border-violet-100 px-2 py-0.5 rounded-full">
+                  {selectedItem.tool}
+                </span>
+                <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full ml-auto">
+                  {selectedItem.model}
+                </span>
+              </div>
+
+              {selectedItem.prompt && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-bold text-slate-700">Dữ liệu đầu vào (Prompt)</h4>
+                    <button onClick={() => navigator.clipboard.writeText(selectedItem.prompt)} className="text-xs flex items-center gap-1 text-slate-400 hover:text-violet-600 transition">
+                      <Copy className="w-3 h-3" /> Copy
+                    </button>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-sm text-slate-700 whitespace-pre-wrap max-h-48 overflow-y-auto font-mono">
+                    {selectedItem.prompt}
+                  </div>
+                </div>
+              )}
+
+              {selectedItem.result && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-bold text-slate-700">Kết quả (Output)</h4>
+                    <button onClick={() => navigator.clipboard.writeText(selectedItem.result)} className="text-xs flex items-center gap-1 text-slate-400 hover:text-violet-600 transition">
+                      <Copy className="w-3 h-3" /> Copy
+                    </button>
+                  </div>
+                  <div className="bg-violet-50 p-4 rounded-xl border border-violet-100 text-sm text-slate-800 whitespace-pre-wrap max-h-64 overflow-y-auto font-mono">
+                    {selectedItem.result}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end">
+              <button
+                onClick={() => setSelectedItem(null)}
+                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-bold rounded-xl transition"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

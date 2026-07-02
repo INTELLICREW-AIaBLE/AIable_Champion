@@ -74,3 +74,8 @@ html.dark-mode-active video,
 html.dark-mode-active .ignore-dark-mode {
   filter: invert(1) hue-rotate(180deg);
 }
+
+html.dark-mode-active .ignore-dark-mode img,
+html.dark-mode-active .ignore-dark-mode video {
+  filter: none !important;
+}

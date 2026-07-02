@@ -11,8 +11,10 @@ import {
   FileText,
   ScanSearch,
   ChevronRight,
-  Target
+  Target,
+  FolderPlus
 } from 'lucide-react';
+import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
 
 interface ValidationResult {
   score: number;
@@ -109,6 +111,7 @@ export default function ValidatorPage() {
   const [context, setContext] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ValidationResult | null>(null);
+  const [showSaveModal, setShowSaveModal] = useState(false);
 
   const charCount = output.length;
   const canValidate = output.trim().length >= 20 && !loading;
@@ -155,6 +158,26 @@ export default function ValidatorPage() {
           ]
         };
         setResult(formattedResult);
+
+        // Log lịch sử hoạt động
+        const token = localStorage.getItem('token');
+        if (token) {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/history`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              action: 'Validate AI Output',
+              tool: 'Output Validator',
+              detail: `Text: ${output.substring(0, 60)}${output.length > 60 ? '...' : ''}`,
+              model: 'System',
+              prompt: output,
+              result: json.summary || 'Validation Completed'
+            })
+          }).catch(err => console.error('Lỗi khi lưu lịch sử:', err));
+        }
       } else {
         console.error('Validation error:', json.message);
         alert(json.message || text.errGen);
@@ -322,6 +345,9 @@ export default function ValidatorPage() {
             
             {/* Score Card */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 text-center relative overflow-hidden">
+               <button onClick={() => setShowSaveModal(true)} className="absolute top-3 right-3 p-1.5 text-violet-600 hover:bg-violet-50 rounded-lg transition z-10" title="Lưu vào Dự án">
+                 <FolderPlus className="w-5 h-5" />
+               </button>
                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500" />
                <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">{text.score}</p>
                <div className="flex items-end justify-center gap-1">
@@ -404,6 +430,18 @@ export default function ValidatorPage() {
          </div>
       )}
 
+      {/* ── Save Modal ───────────────────────────────────────────────────────── */}
+      {result && (
+        <SaveToProjectModal
+          isOpen={showSaveModal}
+          onClose={() => setShowSaveModal(false)}
+          data={{
+            prompt: output,
+            result: result.suggestions.join('\n'),
+            aiModel: 'System'
+          }}
+        />
+      )}
     </div>
   );
 }

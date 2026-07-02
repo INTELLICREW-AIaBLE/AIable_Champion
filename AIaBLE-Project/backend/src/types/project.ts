@@ -10,6 +10,7 @@ export interface Project {
     updatedAt: number;
     tags: string[];
     color?: string;
+    deletedAt?: number;
 }
 
 export type ProjectCategory =
@@ -60,8 +61,9 @@ export interface UpdateProjectRequest {
 export interface AddTaskRequest {
     title: string;
     description: string;
-    aiModel?: 'Claude' | 'GPT-4' | 'Gemini';
+    aiModel?: string;
     prompt?: string;
+    result?: string;
 }
 
 export interface UpdateTaskRequest {

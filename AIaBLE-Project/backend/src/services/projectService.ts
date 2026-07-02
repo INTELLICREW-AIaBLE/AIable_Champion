@@ -52,9 +52,34 @@ function generateId(): string {
  */
 export function getProjectsByUser(userId: string): Project[] {
     const projects = readProjects();
-    return projects
-        .filter(p => p.userId === userId)
+    const oneDay = 24 * 60 * 60 * 1000;
+    const now = Date.now();
+
+    // Cleanup expired soft-deleted projects
+    const activeAndRecentDeleted = projects.filter(p => {
+        if (!p.deletedAt) return true;
+        return (now - p.deletedAt) < oneDay;
+    });
+    
+    if (activeAndRecentDeleted.length !== projects.length) {
+        writeProjects(activeAndRecentDeleted);
+    }
+
+    return activeAndRecentDeleted
+        .filter(p => p.userId === userId && !p.deletedAt)
         .sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+/**
+ * Get soft-deleted projects for a user
+ */
+export function getDeletedProjectsByUser(userId: string): Project[] {
+    const projects = readProjects();
+    const oneDay = 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    return projects
+        .filter(p => p.userId === userId && p.deletedAt && (now - p.deletedAt) < oneDay)
+        .sort((a, b) => b.deletedAt! - a.deletedAt!);
 }
 
 /**
@@ -62,7 +87,7 @@ export function getProjectsByUser(userId: string): Project[] {
  */
 export function getProjectById(projectId: string, userId: string): Project | null {
     const projects = readProjects();
-    const project = projects.find(p => p.id === projectId && p.userId === userId);
+    const project = projects.find(p => p.id === projectId && p.userId === userId && !p.deletedAt);
     return project || null;
 }
 
@@ -97,7 +122,7 @@ export function createProject(userId: string, data: CreateProjectRequest): Proje
  */
 export function updateProject(projectId: string, userId: string, data: UpdateProjectRequest): Project | null {
     const projects = readProjects();
-    const index = projects.findIndex(p => p.id === projectId && p.userId === userId);
+    const index = projects.findIndex(p => p.id === projectId && p.userId === userId && !p.deletedAt);
 
     if (index === -1) return null;
 
@@ -116,11 +141,27 @@ export function updateProject(projectId: string, userId: string, data: UpdatePro
  */
 export function deleteProject(projectId: string, userId: string): boolean {
     const projects = readProjects();
-    const index = projects.findIndex(p => p.id === projectId && p.userId === userId);
+    const index = projects.findIndex(p => p.id === projectId && p.userId === userId && !p.deletedAt);
 
     if (index === -1) return false;
 
-    projects.splice(index, 1);
+    // Soft delete
+    projects[index].deletedAt = Date.now();
+    writeProjects(projects);
+    return true;
+}
+
+/**
+ * Restore a soft-deleted project
+ */
+export function restoreProject(projectId: string, userId: string): boolean {
+    const projects = readProjects();
+    const index = projects.findIndex(p => p.id === projectId && p.userId === userId && p.deletedAt);
+
+    if (index === -1) return false;
+
+    // Restore
+    projects[index].deletedAt = undefined;
     writeProjects(projects);
     return true;
 }
@@ -130,7 +171,7 @@ export function deleteProject(projectId: string, userId: string): boolean {
  */
 export function addTaskToProject(projectId: string, userId: string, data: AddTaskRequest): Project | null {
     const projects = readProjects();
-    const index = projects.findIndex(p => p.id === projectId && p.userId === userId);
+    const index = projects.findIndex(p => p.id === projectId && p.userId === userId && !p.deletedAt);
 
     if (index === -1) return null;
 
@@ -138,10 +179,12 @@ export function addTaskToProject(projectId: string, userId: string, data: AddTas
         id: generateId(),
         title: data.title,
         description: data.description,
-        status: 'todo',
-        aiModel: data.aiModel,
+        status: data.result ? 'done' : 'todo',
+        aiModel: data.aiModel as any,
         prompt: data.prompt,
-        createdAt: Date.now()
+        result: data.result,
+        createdAt: Date.now(),
+        completedAt: data.result ? Date.now() : undefined
     };
 
     projects[index].tasks.push(newTask);
@@ -161,7 +204,7 @@ export function updateTaskInProject(
     data: UpdateTaskRequest
 ): Project | null {
     const projects = readProjects();
-    const projectIndex = projects.findIndex(p => p.id === projectId && p.userId === userId);
+    const projectIndex = projects.findIndex(p => p.id === projectId && p.userId === userId && !p.deletedAt);
 
     if (projectIndex === -1) return null;
 
@@ -189,7 +232,7 @@ export function updateTaskInProject(
  */
 export function deleteTaskFromProject(projectId: string, taskId: string, userId: string): Project | null {
     const projects = readProjects();
-    const projectIndex = projects.findIndex(p => p.id === projectId && p.userId === userId);
+    const projectIndex = projects.findIndex(p => p.id === projectId && p.userId === userId && !p.deletedAt);
 
     if (projectIndex === -1) return null;
 

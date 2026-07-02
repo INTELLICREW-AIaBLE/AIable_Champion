@@ -6,7 +6,7 @@ const SHORTCUT_GROUPS = [
   {
     title: 'Điều hướng chung',
     items: [
-      { key: ['⌘', 'K'], label: 'Mở thanh tìm kiếm toàn cục' },
+      { key: ['Shift', 'K'], label: 'Mở thanh tìm kiếm toàn cục' },
       { key: ['G', 'H'], label: 'Đi tới trang chủ (Home)' },
       { key: ['G', 'P'], label: 'Đi tới trang cá nhân (Profile)' },
       { key: ['G', 'S'], label: 'Đi tới cài đặt (Settings)' },
@@ -15,19 +15,19 @@ const SHORTCUT_GROUPS = [
   {
     title: 'AI Workflow',
     items: [
-      { key: ['⌘', 'Enter'], label: 'Chạy Prompt / Generate' },
-      { key: ['⌘', 'S'], label: 'Lưu thay đổi' },
+      { key: ['Shift', 'Enter'], label: 'Chạy Prompt / Generate' },
+      { key: ['Shift', 'S'], label: 'Lưu thay đổi' },
       { key: ['Esc'], label: 'Hủy / Đóng Modal' },
-      { key: ['⌘', 'Z'], label: 'Hoàn tác (Undo)' },
+      { key: ['Shift', 'Z'], label: 'Hoàn tác (Undo)' },
     ]
   },
   {
     title: 'Trình chỉnh sửa (Editor)',
     items: [
-      { key: ['⌘', 'B'], label: 'In đậm văn bản' },
-      { key: ['⌘', 'I'], label: 'In nghiêng văn bản' },
-      { key: ['⌘', '/'], label: 'Comment code / text' },
-      { key: ['⌘', 'F'], label: 'Tìm kiếm trong trang' },
+      { key: ['Shift', 'B'], label: 'In đậm văn bản' },
+      { key: ['Shift', 'I'], label: 'In nghiêng văn bản' },
+      { key: ['Shift', '/'], label: 'Comment code / text' },
+      { key: ['Shift', 'F'], label: 'Tìm kiếm trong trang' },
     ]
   }
 ];

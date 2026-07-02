@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FolderOpen, Plus, MoreVertical, Clock, FileText, CheckCircle2, Search, Trash2, Edit2, X, Folder } from 'lucide-react';
+import { FolderOpen, Plus, MoreVertical, Clock, FileText, CheckCircle2, Search, Trash2, Edit2, X, Folder, RefreshCcw } from 'lucide-react';
 import { useAPIRequest } from '@/hooks/useAPIRequest';
+import { addNotification } from '@/lib/notifications';
 
 interface Project {
   id: string;
@@ -30,6 +31,9 @@ const t = {
     progress: 'Tiến độ',
     details: 'Xem chi tiết',
     delete: 'Xóa',
+    restore: 'Khôi phục',
+    activeProjects: 'Đang hoạt động',
+    trash: 'Thùng rác',
     confirmDeleteTitle: 'Xác nhận xóa',
     confirmDeleteMsg: 'Bạn có chắc muốn xóa project',
     confirmDeleteWarn: 'Hành động này không thể hoàn tác.',
@@ -74,6 +78,9 @@ const t = {
     progress: 'Progress',
     details: 'View details',
     delete: 'Delete',
+    restore: 'Restore',
+    activeProjects: 'Active Projects',
+    trash: 'Trash',
     confirmDeleteTitle: 'Confirm Deletion',
     confirmDeleteMsg: 'Are you sure you want to delete the project',
     confirmDeleteWarn: 'This action cannot be undone.',
@@ -123,12 +130,15 @@ export default function ProjectsPage() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  const [activeTab, setActiveTab] = useState<'active' | 'trash'>('active');
+
   const { execute, loading } = useAPIRequest();
 
   // Fetch projects
-  const fetchProjects = async () => {
+  const fetchProjects = async (tab: 'active' | 'trash' = activeTab) => {
+    const endpoint = tab === 'trash' ? '/api/projects/trash' : '/api/projects';
     const result = await execute(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}`,
       { method: 'GET' }
     );
 
@@ -153,8 +163,8 @@ export default function ProjectsPage() {
   const text = t[lang as 'en' | 'vi'] || t.vi;
 
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    fetchProjects(activeTab);
+  }, [activeTab]);
 
   // Delete project
   const handleDelete = async () => {
@@ -169,6 +179,21 @@ export default function ProjectsPage() {
       setProjects(projects.filter(p => p.id !== selectedProject.id));
       setShowDeleteConfirm(false);
       setSelectedProject(null);
+      addNotification('Xóa dự án', `Đã xóa dự án "${selectedProject.title}".`);
+    }
+  };
+
+  // Restore project
+  const handleRestore = async (id: string) => {
+    const result = await execute(
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects/${id}/restore`,
+      { method: 'POST' }
+    );
+
+    if (result?.success) {
+      setProjects(projects.filter(p => p.id !== id));
+      setSelectedProject(null);
+      addNotification('Khôi phục dự án', `Đã khôi phục thành công.`);
     }
   };
 
@@ -220,6 +245,22 @@ export default function ProjectsPage() {
         </div>
       </div>
 
+      {/* Tabs */}
+      <div className="flex gap-6 border-b border-slate-200">
+        <button
+          onClick={() => setActiveTab('active')}
+          className={`pb-3 text-sm font-bold border-b-2 transition ${activeTab === 'active' ? 'border-violet-600 text-violet-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+        >
+          {text.activeProjects}
+        </button>
+        <button
+          onClick={() => setActiveTab('trash')}
+          className={`pb-3 text-sm font-bold border-b-2 transition ${activeTab === 'trash' ? 'border-violet-600 text-violet-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+        >
+          {text.trash}
+        </button>
+      </div>
+
       {/* Projects Grid */}
       {loading && projects.length === 0 ? (
         <div className="text-center py-12 text-slate-500">
@@ -267,26 +308,43 @@ export default function ProjectsPage() {
 
                     {selectedProject?.id === project.id && (
                       <div className="absolute right-0 top-8 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-10 min-w-[150px]">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            window.location.href = `/projects/${project.id}`;
-                          }}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                          {text.details}
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShowDeleteConfirm(true);
-                          }}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                          {text.delete}
-                        </button>
+                        {activeTab === 'active' ? (
+                          <>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.location.href = `/projects/${project.id}`;
+                              }}
+                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                              {text.details}
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowDeleteConfirm(true);
+                              }}
+                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              {text.delete}
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRestore(project.id);
+                              }}
+                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50"
+                            >
+                              <RefreshCcw className="w-4 h-4" />
+                              {text.restore}
+                            </button>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
@@ -425,6 +483,7 @@ function CreateProjectModal({ onClose, onSuccess, text }: { onClose: () => void;
     );
 
     if (result?.success) {
+      addNotification('Tạo dự án mới', `Dự án "${formData.title}" đã được tạo.`);
       onSuccess();
     }
   };

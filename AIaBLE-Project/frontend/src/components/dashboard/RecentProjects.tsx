@@ -1,4 +1,4 @@
-import { ArrowRight, Settings, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -101,7 +101,6 @@ export function RecentProjects() {
         <h2 className="text-base font-semibold text-slate-800">{text.title}</h2>
         <div className="flex items-center gap-1.5">
           <Sparkles className="w-3.5 h-3.5 text-violet-400" />
-          <Settings className="w-3.5 h-3.5 text-slate-400" />
         </div>
       </div>
 

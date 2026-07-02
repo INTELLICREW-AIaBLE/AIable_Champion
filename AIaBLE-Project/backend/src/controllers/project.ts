@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import {
     getProjectsByUser,
+    getDeletedProjectsByUser,
     getProjectById,
     createProject,
     updateProject,
@@ -8,8 +9,10 @@ import {
     addTaskToProject,
     updateTaskInProject,
     deleteTaskFromProject,
-    getProjectStats
+    getProjectStats,
+    restoreProject as restoreProjectService
 } from '../services/projectService';
+import { logHistoryHelper } from './profile';
 
 /**
  * GET /api/projects
@@ -32,6 +35,28 @@ export const getAllProjects = (req: Request, res: Response) => {
         res.status(500).json({
             success: false,
             message: error.message || 'Failed to fetch projects'
+        });
+    }
+};
+
+/**
+ * GET /api/projects/trash
+ * Get deleted projects
+ */
+export const getDeletedProjects = (req: Request, res: Response) => {
+    try {
+        const userId = req.query.userId as string || 'default-user';
+        const projects = getDeletedProjectsByUser(userId);
+
+        res.json({
+            success: true,
+            data: projects
+        });
+    } catch (error: any) {
+        console.error('[Projects Controller] Get deleted error:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to fetch deleted projects'
         });
     }
 };
@@ -115,6 +140,8 @@ export const createNewProject = (req: Request, res: Response) => {
             color
         });
 
+        logHistoryHelper(userId, 'Create Project', 'Project Manager', `Tạo dự án: ${title}`);
+
         res.status(201).json({
             success: true,
             data: project,
@@ -155,6 +182,8 @@ export const updateExistingProject = (req: Request, res: Response) => {
             });
         }
 
+        logHistoryHelper(userId, 'Update Project', 'Project Manager', `Cập nhật dự án: ${project.title}`);
+
         res.json({
             success: true,
             data: project,
@@ -187,6 +216,8 @@ export const deleteExistingProject = (req: Request, res: Response) => {
             });
         }
 
+        logHistoryHelper(userId, 'Delete Project', 'Project Manager', `Xóa dự án (ID: ${id})`);
+
         res.json({
             success: true,
             message: 'Project deleted successfully'
@@ -201,6 +232,39 @@ export const deleteExistingProject = (req: Request, res: Response) => {
 };
 
 /**
+ * POST /api/projects/:id/restore
+ * Restore project
+ */
+export const restoreExistingProject = (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const userId = req.body.userId || req.query.userId as string || 'default-user';
+
+        const restored = restoreProjectService(id, userId);
+
+        if (!restored) {
+            return res.status(404).json({
+                success: false,
+                message: 'Project not found or not deleted'
+            });
+        }
+
+        logHistoryHelper(userId, 'Restore Project', 'Project Manager', `Khôi phục dự án (ID: ${id})`);
+
+        res.json({
+            success: true,
+            message: 'Project restored successfully'
+        });
+    } catch (error: any) {
+        console.error('[Projects Controller] Restore project error:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to restore project'
+        });
+    }
+};
+
+/**
  * POST /api/projects/:id/tasks
  * Add task to project
  */
@@ -208,7 +272,7 @@ export const addTask = (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const userId = req.body.userId || 'default-user';
-        const { title, description, aiModel, prompt } = req.body;
+        const { title, description, aiModel, prompt, result } = req.body;
 
         // Validation
         if (!title || !description) {
@@ -222,7 +286,8 @@ export const addTask = (req: Request, res: Response) => {
             title,
             description,
             aiModel,
-            prompt
+            prompt,
+            result
         });
 
         if (!project) {

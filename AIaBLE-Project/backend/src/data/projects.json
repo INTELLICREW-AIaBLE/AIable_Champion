@@ -1,19 +1,105 @@
 [
   {
-    "id": "1782910920968-i67i1oad3",
+    "id": "1782956181038-v79qtv022",
     "userId": "default-user",
-    "title": "Javaweb",
-    "description": "làm web bán đồ ăn",
-    "category": "academic",
+    "title": "PRJ301",
+    "description": "Javaweb",
+    "category": "software-engineering",
     "status": "planning",
-    "tasks": [],
+    "tasks": [
+      {
+        "id": "1782956386960-qoxndfpiu",
+        "title": "How",
+        "description": "cách học",
+        "status": "done",
+        "aiModel": "OpenRouter",
+        "prompt": "cách học javawweb cho người mới",
+        "result": "Để học Java Web một cách hiệu quả và có hệ thống, bạn cần tuân thủ một lộ trình phân lớp (layered approach). Đừng cố gắng nhảy vào Framework ngay từ đầu. Dưới đây là lộ trình logic được chia thành 4 giai đoạn cụ thể:\n\n### Giai đoạn 1: Nền tảng Java Core (Bắt buộc)\nTrước khi chạm vào Web, bạn phải thành thạo ngôn ngữ. Nếu nền tảng yếu, bạn sẽ không hiểu tại sao Framework lại hoạt động như vậy.\n*   **Cú pháp & Hướng đối tượng (OOP):** Nắm vững Class, Object, Interface, Abstract Class, Inheritance, Polymorphism.\n*   **Java Collections Framework:** Hiểu cách quản lý dữ liệu với List, Set, Map.\n*   **Exception Handling & Java 8+ features:** Lambda expressions, Stream API (cực kỳ quan trọng để viết code ngắn gọn).\n*   **Multithreading & I/O:** Hiểu cơ bản để biết cách server xử lý nhiều request cùng lúc.\n\n### Giai đoạn 2: Công nghệ Web nền tảng (Cốt lõi)\nĐây là \"bộ não\" của Java Web. Đừng bỏ qua bước này để nhảy sang Spring Boot.\n*   **HTTP Protocol:** Hiểu Request/Response, các method (GET, POST, PUT, DELETE), Status code.\n*   **Servlet & JSP:** Đây là kỹ thuật cơ bản nhất để chạy ứng dụng Web trên Server (Tomcat).\n*   **JDBC (Java Database Connectivity):** Cách kết nối Java với cơ sở dữ liệu (MySQL, PostgreSQL). Phải hiểu được Transaction và cách dùng PreparedStatement để tránh SQL Injection.\n\n### Giai đoạn 3: Frameworks (Công cụ thực chiến)\nKhi đã hiểu cách Servlet hoạt động, bạn sẽ thấy Frameworks thực chất là các công cụ giúp tối ưu hóa công việc lặp lại.\n*   **Spring Framework:** Bắt đầu với **Spring Core (IoC/DI)**. Đây là khái niệm quan trọng nhất.\n*   **Spring Boot:** Đây là tiêu chuẩn công nghiệp hiện nay. Nó giúp cấu hình tự động, giúp bạn build ứng dụng cực nhanh.\n*   **Spring Data JPA / Hibernate:** Thay thế cho JDBC thủ công, giúp thao tác với Database thông qua đối tượng (ORM).\n*   **Spring Security:** Học cách bảo mật ứng dụng (Authentication & Authorization).\n\n### Giai đoạn 4: Hệ sinh thái mở rộng\nĐể làm việc trong môi trường chuyên nghiệp, bạn cần biết thêm các công cụ hỗ trợ:\n*   **Build Tools:** Maven hoặc Gradle (Quản lý thư viện và build project).\n*   **RESTful API:** Cách xây dựng API để giao tiếp với Frontend (React/Angular/Vue).\n*   **Postman:** Công cụ để test API.\n*   **Docker:** Đóng gói ứng dụng để triển khai trên mọi môi trường.\n*   **Git/GitHub:** Kỹ năng bắt buộc để quản lý mã nguồn.\n\n---\n\n### Chiến lược học tập hiệu quả\n1.  **Quy tắc 30/70:** Dành 30% thời gian đọc tài liệu/xem video, 70% thời gian thực hành code (Hands-on).\n2.  **Dự án cá nhân (Project-based learning):** Hãy bắt đầu từ việc làm một ứng dụng Todo-list, sau đó nâng cấp thành hệ thống quản lý bán hàng đơn giản. Chỉ khi bắt tay vào làm, bạn mới gặp lỗi (Debug) – đó là lúc kiến thức thấm sâu nhất.\n3.  **Đọc Documentation:** Tập thói quen đọc tài liệu chính thức từ [Spring.io](https://spring.io/projects/spring-boot). Đây là nguồn tài liệu chuẩn xác và cập nhật nhất.\n4.  **Tư duy giải quyết vấn đề:** Khi gặp lỗi (Exception), đừng hoảng. Hãy học cách đọc Stack Trace, tìm kiếm trên StackOverflow và hiểu bản chất lỗi thay vì copy-paste code.\n\n**Lời khuyên:** Đừng sa đà vào việc học quá nhiều Framework cùng lúc. Hãy nắm vững **Java Core -> Servlet -> Spring Boot**. Đây là \"kiềng ba chân\" giúp bạn có thể ứng tuyển vào bất kỳ vị trí Fresher Java Developer nào.",
+        "createdAt": 1782956386960,
+        "completedAt": 1782956386960
+      },
+      {
+        "id": "1782956901690-n89sjajlq",
+        "title": "Session",
+        "description": "học",
+        "status": "done",
+        "aiModel": "Gemini",
+        "prompt": "tôi muốn dùng session trong javawebTrong Java Web (Servlet/JSP), **Session** là một cơ chế giúp lưu trữ thông tin của người dùng (như thông tin đăng nhập, giỏ hàng...) xuyên suốt các trang khác nhau trong một khoảng thời gian nhất định.\n\nDưới đây là hướng dẫn chi tiết cách sử dụng Session:\n\n### 1. Cách tạo và lưu trữ dữ liệu vào Session\nĐể sử dụng Session trong Servlet, bạn thông qua đối tượng `HttpServletRequest`.\n\n```java\n// Lấy đối tượng session từ request\nHttpSession session = request.getSession();\n\n// Lưu dữ liệu vào session (dạng key-value)\nsession.setAttribute(\"username\", \"nguyenvana\");\nsession.setAttribute(\"role\", \"admin\");\n```\n*   `request.getSession()`: Nếu session chưa tồn tại, nó sẽ tạo mới. Nếu đã tồn tại, nó sẽ trả về session đó.\n\n### 2. Cách lấy dữ liệu từ Session\nKhi người dùng chuyển sang trang khác, bạn lấy lại dữ liệu bằng `getAttribute()`:\n\n```java\nHttpSession session = request.getSession();\n\n// Lấy dữ liệu (cần ép kiểu vì trả về là Object)\nString username = (String) session.getAttribute(\"username\");\n\nif (username != null) {\n    out.println(\"Xin chào: \" + username);\n} else {\n    out.println(\"Bạn chưa đăng nhập!\");\n}\n```\n\n### 3. Cách xóa dữ liệu trong Session\nCó 2 cách để xóa:\n\n*   **Xóa một thuộc tính cụ thể:**\n    ```java\n    session.removeAttribute(\"username\");\n    ```\n\n*   **Hủy toàn bộ Session (thường dùng cho chức năng Đăng xuất - Logout):**\n    ```java\n    session.invalidate();\n    ```\n\n### 4. Thiết lập thời gian sống của Session (Timeout)\nMặc định, session sẽ tồn tại trong khoảng 30 phút (tùy cấu hình server). Bạn có thể chỉnh sửa:\n\n*   **Cách 1: Code trong Servlet**\n    ```java\n    session.setMaxInactiveInterval(15 * 60); // Đơn vị là giây (15 phút)\n    ```\n\n*   **Cách 2: Cấu hình trong `web.xml`**\n    ```xml\n    <session-config>\n        <session-timeout>15</session-timeout> <!-- Đơn vị là phút -->\n    </session-config>\n    ```\n\n---\n\n### Ví dụ thực tế: Luồng Đăng nhập (Login)\n\n**Bước 1: Trang LoginServlet (Khi đăng nhập thành công)**\n```java\nif (checkLogin(user, pass)) {\n    HttpSession session = request.getSession();\n    session.setAttribute(\"user\", user);\n    response.sendRedirect(\"dashboard.jsp\");\n}\n```\n\n**Bước 2: Các trang bảo mật (Ví dụ: Dashboard.jsp hoặc ProfileServlet)**\nTrước khi cho xem nội dung, phải kiểm tra session:\n```java\nHttpSession session = request.getSession(false); // false nghĩa là không tạo mới nếu chưa có\nif (session == null || session.getAttribute(\"user\") == null) {\n    response.sendRedirect(\"login.jsp\"); // Quay về trang đăng nhập nếu chưa có session\n}\n```\n\n### Lưu ý quan trọng:\n1.  **Bảo mật:** Không bao giờ lưu mật khẩu người dùng vào Session.\n2.  **Bộ nhớ:** Session được lưu trên bộ nhớ của Server (RAM). Đừng lưu các đối tượng quá lớn hoặc quá nhiều dữ liệu vào Session, vì nếu có hàng ngàn người dùng, Server sẽ bị quá tải (tràn RAM).\n3.  **Client:** Session hoạt động dựa trên **Cookie** (JSESSIONID). Nếu người dùng tắt cookie trên trình duyệt, session sẽ không hoạt động (trừ khi dùng kỹ thuật URL Rewriting).\n\nBạn đang thực hiện dự án cụ thể nào không? Mình có thể hỗ trợ bạn viết code chi tiết hơn cho dự án đó!",
+        "result": "Trong Java Web (Servlet/JSP), **Session** là một cơ chế giúp lưu trữ thông tin của người dùng (như thông tin đăng nhập, giỏ hàng...) xuyên suốt các trang khác nhau trong một khoảng thời gian nhất định.\n\nDưới đây là hướng dẫn chi tiết cách sử dụng Session:\n\n### 1. Cách tạo và lưu trữ dữ liệu vào Session\nĐể sử dụng Session trong Servlet, bạn thông qua đối tượng `HttpServletRequest`.\n\n```java\n// Lấy đối tượng session từ request\nHttpSession session = request.getSession();\n\n// Lưu dữ liệu vào session (dạng key-value)\nsession.setAttribute(\"username\", \"nguyenvana\");\nsession.setAttribute(\"role\", \"admin\");\n```\n*   `request.getSession()`: Nếu session chưa tồn tại, nó sẽ tạo mới. Nếu đã tồn tại, nó sẽ trả về session đó.\n\n### 2. Cách lấy dữ liệu từ Session\nKhi người dùng chuyển sang trang khác, bạn lấy lại dữ liệu bằng `getAttribute()`:\n\n```java\nHttpSession session = request.getSession();\n\n// Lấy dữ liệu (cần ép kiểu vì trả về là Object)\nString username = (String) session.getAttribute(\"username\");\n\nif (username != null) {\n    out.println(\"Xin chào: \" + username);\n} else {\n    out.println(\"Bạn chưa đăng nhập!\");\n}\n```\n\n### 3. Cách xóa dữ liệu trong Session\nCó 2 cách để xóa:\n\n*   **Xóa một thuộc tính cụ thể:**\n    ```java\n    session.removeAttribute(\"username\");\n    ```\n\n*   **Hủy toàn bộ Session (thường dùng cho chức năng Đăng xuất - Logout):**\n    ```java\n    session.invalidate();\n    ```\n\n### 4. Thiết lập thời gian sống của Session (Timeout)\nMặc định, session sẽ tồn tại trong khoảng 30 phút (tùy cấu hình server). Bạn có thể chỉnh sửa:\n\n*   **Cách 1: Code trong Servlet**\n    ```java\n    session.setMaxInactiveInterval(15 * 60); // Đơn vị là giây (15 phút)\n    ```\n\n*   **Cách 2: Cấu hình trong `web.xml`**\n    ```xml\n    <session-config>\n        <session-timeout>15</session-timeout> <!-- Đơn vị là phút -->\n    </session-config>\n    ```\n\n---\n\n### Ví dụ thực tế: Luồng Đăng nhập (Login)\n\n**Bước 1: Trang LoginServlet (Khi đăng nhập thành công)**\n```java\nif (checkLogin(user, pass)) {\n    HttpSession session = request.getSession();\n    session.setAttribute(\"user\", user);\n    response.sendRedirect(\"dashboard.jsp\");\n}\n```\n\n**Bước 2: Các trang bảo mật (Ví dụ: Dashboard.jsp hoặc ProfileServlet)**\nTrước khi cho xem nội dung, phải kiểm tra session:\n```java\nHttpSession session = request.getSession(false); // false nghĩa là không tạo mới nếu chưa có\nif (session == null || session.getAttribute(\"user\") == null) {\n    response.sendRedirect(\"login.jsp\"); // Quay về trang đăng nhập nếu chưa có session\n}\n```\n\n### Lưu ý quan trọng:\n1.  **Bảo mật:** Không bao giờ lưu mật khẩu người dùng vào Session.\n2.  **Bộ nhớ:** Session được lưu trên bộ nhớ của Server (RAM). Đừng lưu các đối tượng quá lớn hoặc quá nhiều dữ liệu vào Session, vì nếu có hàng ngàn người dùng, Server sẽ bị quá tải (tràn RAM).\n3.  **Client:** Session hoạt động dựa trên **Cookie** (JSESSIONID). Nếu người dùng tắt cookie trên trình duyệt, session sẽ không hoạt động (trừ khi dùng kỹ thuật URL Rewriting).\n\nBạn đang thực hiện dự án cụ thể nào không? Mình có thể hỗ trợ bạn viết code chi tiết hơn cho dự án đó!",
+        "createdAt": 1782956901690,
+        "completedAt": 1782956901690
+      }
+    ],
     "tags": [
-      "JSP",
       "JSTL",
+      "JSP",
       "JDBC"
     ],
+    "color": "#EC4899",
+    "createdAt": 1782956181038,
+    "updatedAt": 1782956901690
+  },
+  {
+    "id": "1782957136490-ijb3f1k1h",
+    "userId": "default-user",
+    "title": "SWP",
+    "description": "Project",
+    "category": "academic",
+    "status": "planning",
+    "tasks": [
+      {
+        "id": "1782958668984-pvai7ixqm",
+        "title": "mẹo",
+        "description": "Saved output",
+        "status": "done",
+        "aiModel": "OpenRouter",
+        "prompt": "tôi đang bị đau đầu thì làm gì",
+        "result": "Khi bị đau đầu, mục tiêu ưu tiên là xác định nguyên nhân và giảm thiểu triệu chứng thông qua các biện pháp khoa học. Dưới đây là quy trình xử lý từng bước:\n\n### 1. Đánh giá tình trạng khẩn cấp (Cảnh báo đỏ)\nTrước khi tự điều trị, hãy kiểm tra xem bạn có thuộc nhóm cần **hỗ trợ y tế ngay lập tức** hay không. Hãy gọi cấp cứu hoặc đến bệnh viện nếu đau đầu kèm theo:\n*   Đau dữ dội, khởi phát đột ngột như \"tiếng sét đánh\".\n*   Sốt cao kèm cứng cổ.\n*   Lú lẫn, nói khó, yếu liệt chi hoặc mất thăng bằng.\n*   Thay đổi thị lực đột ngột.\n*   Chấn thương đầu gần đây.\n\n### 2. Các biện pháp giảm đau tại chỗ (Nếu đau thông thường)\nNếu cơn đau ở mức độ nhẹ đến trung bình, hãy áp dụng các bước sau:\n*   **Điều chỉnh môi trường:** Tìm một không gian yên tĩnh, tối và mát mẻ. Ánh sáng mạnh và tiếng ồn thường làm trầm trọng thêm tình trạng đau đầu (đặc biệt là đau nửa đầu).\n*   **Cung cấp nước:** Mất nước là nguyên nhân phổ biến. Hãy uống một cốc nước lọc lớn để bù dịch.\n*   **Liệu pháp nhiệt/lạnh:**\n    *   Chườm lạnh (túi đá bọc khăn): Giúp co mạch máu, giảm viêm, hiệu quả với đau nửa đầu.\n    *   Chườm ấm: Đặt khăn ấm lên vùng cổ hoặc sau gáy giúp thư giãn các cơ bị căng cứng (đau đầu do căng thẳng).\n*   **Thư giãn cơ:** Massage nhẹ nhàng vùng thái dương, cổ và vai để giải tỏa áp lực cơ bắp.\n\n### 3. Sử dụng thuốc (Sử dụng có kiểm soát)\nNếu cần dùng thuốc giảm đau không kê đơn, hãy tuân thủ nguyên tắc:\n*   **Paracetamol (Acetaminophen):** Lựa chọn đầu tay, an toàn hơn cho dạ dày.\n*   **Ibuprofen hoặc Naproxen:** Nhóm kháng viêm không steroid (NSAID), hiệu quả nếu đau do viêm hoặc căng cơ, nhưng cần thận trọng nếu có tiền sử bệnh dạ dày.\n*   **Lưu ý quan trọng:** Không lạm dụng thuốc. Sử dụng quá liều hoặc quá thường xuyên có thể dẫn đến \"đau đầu do lạm dụng thuốc\" (rebound headache).\n\n### 4. Phòng ngừa và theo dõi\n*   **Ghi chép (Headache Diary):** Nếu tình trạng đau đầu lặp lại, hãy ghi chú thời gian, cường độ, vị trí đau và các yếu tố khởi phát (căng thẳng, thiếu ngủ, thực phẩm, chu kỳ kinh nguyệt).\n*   **Lối sống:** Đảm bảo giấc ngủ ổn định, duy trì nhịp độ làm việc và hạn chế caffeine/rượu bia nếu phát hiện đó là tác nhân kích thích.\n\n**Lời khuyên:** Nếu cơn đau không thuyên giảm sau 24-48 giờ hoặc có tính chất tái diễn thường xuyên, **hãy gặp bác sĩ chuyên khoa nội thần kinh**. Đừng tự chẩn đoán nếu tình trạng kéo dài.\n\n*Tuyên bố từ chối trách nhiệm: Tôi là AI, không phải bác sĩ. Thông tin này mang tính chất tham khảo, không thay thế cho lời khuyên y khoa chuyên môn.*",
+        "createdAt": 1782958668984,
+        "completedAt": 1782958668984
+      }
+    ],
+    "tags": [
+      "all"
+    ],
     "color": "#8B5CF6",
-    "createdAt": 1782910920968,
-    "updatedAt": 1782910920968
+    "createdAt": 1782957136490,
+    "updatedAt": 1782958668984
+  },
+  {
+    "id": "1782959044228-j2a13cxkl",
+    "userId": "default-user",
+    "title": "Enviroment",
+    "description": "Created from Sandbox/Optimizer",
+    "category": "other",
+    "status": "planning",
+    "tasks": [
+      {
+        "id": "1782959044254-8ar3pd16v",
+        "title": "bvmt",
+        "description": "Saved output",
+        "status": "done",
+        "aiModel": "OpenRouter",
+        "prompt": "Bạn là một sinh viên đại học. Hãy viết báo cáo học thuật về chủ đề [môi trường].\n\nYêu cầu:\n1. Có mở đầu, nội dung chính và kết luận\n2. Văn phong học thuật, trang trọng\n3. Có luận điểm rõ ràng\n4. Gợi ý nguồn tham khảo theo chuẩn APA\n5. Tránh viết chung chung, ưu tiên lập luận có chiều sâu.",
+        "result": "[VAI TRÒ / ROLE]\nBạn là một chuyên gia nghiên cứu học thuật với kiến thức sâu rộng về khoa học môi trường và phát triển bền vững. Bạn có kỹ năng tổng hợp thông tin, tư duy phản biện và hành văn theo tiêu chuẩn đại học quốc tế.\n\n[BỐI CẢNH / CONTEXT]\nTôi đang thực hiện một bài báo cáo học thuật về chủ đề [MÔI TRƯỜNG]. Mục tiêu là xây dựng một văn bản có tính học thuật cao, thể hiện tư duy logic, phân tích các thách thức hiện tại và đề xuất giải pháp dựa trên dữ liệu thực tế.\n\n[NHIỆM VỤ / TASK]\n1. Xây dựng dàn ý chi tiết cho báo cáo, tập trung vào một khía cạnh cụ thể (ví dụ: biến đổi khí hậu, quản lý rác thải nhựa, hoặc năng lượng tái tạo).\n2. Viết nội dung cho từng phần: Mở đầu (đặt vấn đề), Thân bài (các luận điểm chính, lập luận chặt chẽ), và Kết luận (tổng hợp và gợi mở).\n3. Đảm bảo văn phong trang trọng, khách quan, sử dụng thuật ngữ chuyên môn chính xác.\n4. Gợi ý các nguồn tham khảo uy tín và trích dẫn theo chuẩn APA.\n\n[ĐỊNH DẠNG / FORMAT]\n- Sử dụng Markdown để phân cấp các mục (H1, H2, H3).\n- Sử dụng danh sách liệt kê cho các luận điểm.\n- Các trích dẫn APA phải đặt ở cuối mỗi đoạn hoặc mục tương ứng.\n\n[RÀNG BUỘC / CONSTRAINTS]\n- KHÔNG viết chung chung, sáo rỗng. Mọi lập luận phải có dẫn chứng logic.\n- Không được bịa đặt dữ liệu (hallucination). Nếu cần số liệu cụ thể, hãy ghi chú rõ nguồn cần kiểm chứng.\n- Văn phong phải mang tính hàn lâm, không sử dụng từ ngữ cảm thán hoặc văn nói.",
+        "createdAt": 1782959044255,
+        "completedAt": 1782959044255
+      },
+      {
+        "id": "1782959063054-0sbuyd30u",
+        "title": "Prompt",
+        "description": "Saved output",
+        "status": "done",
+        "aiModel": "OpenRouter",
+        "prompt": "Bạn là một sinh viên đại học. Hãy viết báo cáo học thuật về chủ đề [môi trường].\n\nYêu cầu:\n1. Có mở đầu, nội dung chính và kết luận\n2. Văn phong học thuật, trang trọng\n3. Có luận điểm rõ ràng\n4. Gợi ý nguồn tham khảo theo chuẩn APA\n5. Tránh viết chung chung, ưu tiên lập luận có chiều sâu.",
+        "result": "[VAI TRÒ / ROLE]\nBạn là một chuyên gia nghiên cứu học thuật với kiến thức sâu rộng về khoa học môi trường và phát triển bền vững. Bạn có kỹ năng tổng hợp thông tin, tư duy phản biện và hành văn theo tiêu chuẩn đại học quốc tế.\n\n[BỐI CẢNH / CONTEXT]\nTôi đang thực hiện một bài báo cáo học thuật về chủ đề [MÔI TRƯỜNG]. Mục tiêu là xây dựng một văn bản có tính học thuật cao, thể hiện tư duy logic, phân tích các thách thức hiện tại và đề xuất giải pháp dựa trên dữ liệu thực tế.\n\n[NHIỆM VỤ / TASK]\n1. Xây dựng dàn ý chi tiết cho báo cáo, tập trung vào một khía cạnh cụ thể (ví dụ: biến đổi khí hậu, quản lý rác thải nhựa, hoặc năng lượng tái tạo).\n2. Viết nội dung cho từng phần: Mở đầu (đặt vấn đề), Thân bài (các luận điểm chính, lập luận chặt chẽ), và Kết luận (tổng hợp và gợi mở).\n3. Đảm bảo văn phong trang trọng, khách quan, sử dụng thuật ngữ chuyên môn chính xác.\n4. Gợi ý các nguồn tham khảo uy tín và trích dẫn theo chuẩn APA.\n\n[ĐỊNH DẠNG / FORMAT]\n- Sử dụng Markdown để phân cấp các mục (H1, H2, H3).\n- Sử dụng danh sách liệt kê cho các luận điểm.\n- Các trích dẫn APA phải đặt ở cuối mỗi đoạn hoặc mục tương ứng.\n\n[RÀNG BUỘC / CONSTRAINTS]\n- KHÔNG viết chung chung, sáo rỗng. Mọi lập luận phải có dẫn chứng logic.\n- Không được bịa đặt dữ liệu (hallucination). Nếu cần số liệu cụ thể, hãy ghi chú rõ nguồn cần kiểm chứng.\n- Văn phong phải mang tính hàn lâm, không sử dụng từ ngữ cảm thán hoặc văn nói.",
+        "createdAt": 1782959063054,
+        "completedAt": 1782959063054
+      }
+    ],
+    "tags": [],
+    "color": "#8B5CF6",
+    "createdAt": 1782959044228,
+    "updatedAt": 1782959063054
   }
 ]

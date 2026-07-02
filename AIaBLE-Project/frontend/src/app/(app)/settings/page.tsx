@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Settings, Bell, Lock, Key, Globe, Moon, Shield, Sparkles, Monitor, KeyRound, Smartphone } from 'lucide-react';
+import { addNotification } from '@/lib/notifications';
 
 const t = {
   vi: {
@@ -99,15 +100,10 @@ const t = {
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('account');
-  const [apiKeys, setApiKeys] = useState({ openai: '', anthropic: '', gemini: '' });
-  
   const [theme, setTheme] = useState('light');
   const [lang, setLang] = useState('vi');
-
-  // Draft states for forms that need explicit save
   const [draftTheme, setDraftTheme] = useState('light');
   const [draftLang, setDraftLang] = useState('vi');
-  
   const [notifs, setNotifs] = useState({ sys: true, ai: true, marketing: false });
 
   // Password state
@@ -116,23 +112,6 @@ export default function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        if (data.success && data.data?.apiKeys) {
-          setApiKeys(data.data.apiKeys);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    fetchProfile();
-
     const savedTheme = localStorage.getItem('app_theme') || 'light';
     const savedLang = localStorage.getItem('app_lang') || 'vi';
     setTheme(savedTheme);
@@ -157,12 +136,14 @@ export default function SettingsPage() {
 
     const currentText = t[draftLang as 'en' | 'vi'];
     alert(currentText.prefs.success);
+    addNotification('Cập nhật cài đặt', currentText.prefs.success);
   };
 
   const handleSaveNotifs = () => {
     // In a real app, send `notifs` to backend here
     const currentText = t[lang as 'en' | 'vi'];
     alert(currentText.notifs.success);
+    addNotification('Cập nhật thông báo', currentText.notifs.success);
   };
 
   const currentLang = (lang === 'en' ? 'en' : 'vi') as 'en' | 'vi';
@@ -179,42 +160,16 @@ export default function SettingsPage() {
     }
     // TODO: Connect to backend password update endpoint
     alert(text.account.success);
+    addNotification('Bảo mật', text.account.success);
     setCurrentPassword('');
     setNewPassword('');
     setConfirmPassword('');
-  };
-
-  const handleSaveApiKeys = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ apiKeys })
-      });
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem('openaiKey', apiKeys.openai);
-        localStorage.setItem('anthropicKey', apiKeys.anthropic);
-        localStorage.setItem('geminiKey', apiKeys.gemini);
-        alert(text.keys.success);
-      } else {
-        alert(data.message || text.keys.fail);
-      }
-    } catch (e) {
-      alert(text.keys.fail);
-    }
   };
 
   const tabs = [
     { id: 'account', label: text.tabs.account, icon: Shield },
     { id: 'preferences', label: text.tabs.prefs, icon: Monitor },
     { id: 'notifications', label: text.tabs.notifs, icon: Bell },
-    { id: 'api_keys', label: text.tabs.keys, icon: KeyRound },
   ];
 
   return (
@@ -331,82 +286,7 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* ── Tab: API Keys ── */}
-          {activeTab === 'api_keys' && (
-            <div className="p-8 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <div>
-                <h2 className="text-lg font-bold text-slate-900 mb-2">{text.keys.title}</h2>
-                <p className="text-sm text-slate-500 mb-6">{text.keys.desc}</p>
-                
-                <div className="space-y-4">
-                  {/* OpenAI */}
-                  <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md bg-[#00A67E] flex items-center justify-center"><Sparkles className="w-3 h-3 text-white"/></div>
-                        <span className="font-bold text-sm text-slate-800">OpenAI (GPT-4)</span>
-                      </div>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${apiKeys.openai ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
-                        {apiKeys.openai ? text.keys.connected : text.keys.unconnected}
-                      </span>
-                    </div>
-                    <input 
-                      type="password" 
-                      value={apiKeys.openai} 
-                      onChange={(e) => setApiKeys({...apiKeys, openai: e.target.value})}
-                      placeholder="sk-proj-..." 
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-violet-400" 
-                    />
-                  </div>
 
-                  <div className="p-4 rounded-2xl border border-slate-200 bg-white">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md bg-[#D97757] flex items-center justify-center"><Sparkles className="w-3 h-3 text-white"/></div>
-                        <span className="font-bold text-sm text-slate-800">Anthropic (Claude)</span>
-                      </div>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${apiKeys.anthropic ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
-                        {apiKeys.anthropic ? text.keys.connected : text.keys.unconnected}
-                      </span>
-                    </div>
-                    <input 
-                      type="password" 
-                      value={apiKeys.anthropic} 
-                      onChange={(e) => setApiKeys({...apiKeys, anthropic: e.target.value})}
-                      placeholder="sk-ant-..." 
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-violet-400" 
-                    />
-                  </div>
-
-                  {/* Google */}
-                  <div className="p-4 rounded-2xl border border-slate-200 bg-white">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md bg-[#4285F4] flex items-center justify-center"><Sparkles className="w-3 h-3 text-white"/></div>
-                        <span className="font-bold text-sm text-slate-800">Google (Gemini)</span>
-                      </div>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${apiKeys.gemini ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
-                        {apiKeys.gemini ? text.keys.connected : text.keys.unconnected}
-                      </span>
-                    </div>
-                    <input 
-                      type="password" 
-                      value={apiKeys.gemini} 
-                      onChange={(e) => setApiKeys({...apiKeys, gemini: e.target.value})}
-                      placeholder="AIzaSy..." 
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-violet-400" 
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-6 flex justify-end">
-                  <button onClick={handleSaveApiKeys} className="px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold rounded-xl transition shadow-md shadow-violet-200">
-                    {text.keys.saveBtn}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* ── Tab: Thông báo ── */}
           {activeTab === 'notifications' && (

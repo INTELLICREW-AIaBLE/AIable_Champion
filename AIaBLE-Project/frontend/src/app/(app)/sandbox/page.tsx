@@ -4,8 +4,9 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { 
   Sparkles, Send, Copy, Check, RotateCcw, 
-  Zap, Settings2, Info, ChevronDown 
+  Zap, Settings2, Info, ChevronDown, FolderPlus 
 } from 'lucide-react';
+import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
 
 type AIModel = 'Groq' | 'OpenRouter' | 'Gemini';
 
@@ -133,6 +134,9 @@ export default function SandboxPage() {
   const [results, setResults] = useState<ModelResult[]>(INITIAL_MODELS);
   const [isRunning, setIsRunning] = useState(false);
   
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [saveData, setSaveData] = useState<{prompt?: string, result?: string, aiModel?: string}>({});
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleRun = async () => {
@@ -170,6 +174,7 @@ export default function SandboxPage() {
           };
           return newResults;
         });
+        return { model: modelName, content: data.success ? data.data : data.message };
       } catch (error: any) {
         setResults(prev => {
           const newResults = [...prev];
@@ -180,6 +185,7 @@ export default function SandboxPage() {
           };
           return newResults;
         });
+        return { model: modelName, content: text.errConn };
       }
     };
 
@@ -188,7 +194,7 @@ export default function SandboxPage() {
       runModel(0, 'Groq', 0),
       runModel(1, 'OpenRouter', 1500),
       runModel(2, 'Gemini', 3000)
-    ]).then(() => {
+    ]).then((runResults) => {
       setIsRunning(false);
       
       // Log lịch sử hoạt động
@@ -204,7 +210,9 @@ export default function SandboxPage() {
             action: 'Test prompt in Sandbox',
             tool: 'Sandbox',
             detail: `Prompt: ${prompt.substring(0, 60)}${prompt.length > 60 ? '...' : ''}`,
-            model: 'All Models'
+            model: 'All Models',
+            prompt: prompt,
+            result: runResults.map(r => `[${r.model}]: ${r.content}`).join('\n\n')
           })
         }).catch(err => console.error('Lỗi khi lưu lịch sử:', err));
       }
@@ -242,9 +250,6 @@ export default function SandboxPage() {
               <RotateCcw className="w-3.5 h-3.5" /> {text.reset}
             </button>
           )}
-          <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 transition">
-            <Settings2 className="w-3.5 h-3.5" /> {text.settings}
-          </button>
         </div>
       </div>
 
@@ -282,7 +287,8 @@ export default function SandboxPage() {
             rows={4}
             className="w-full text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+              if (e.key === 'Enter' && e.shiftKey) {
+                e.preventDefault();
                 handleRun();
               }
             }}
@@ -327,7 +333,7 @@ export default function SandboxPage() {
             {/* Header Column */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded flex items-center justify-center overflow-hidden border border-slate-200">
+                <div className="w-6 h-6 rounded flex items-center justify-center overflow-hidden border border-slate-200 ignore-dark-mode bg-white">
                   <Image src={res.logo} alt={res.model} width={24} height={24} className="object-cover" />
                 </div>
                 <span className="text-sm font-bold text-slate-800">{res.model}</span>
@@ -340,6 +346,18 @@ export default function SandboxPage() {
                     {res.timeMs}ms
                   </span>
                 )}
+                {res.status === 'success' && (
+                  <button
+                    onClick={() => {
+                      setSaveData({ prompt, result: res.content, aiModel: res.model });
+                      setIsSaveModalOpen(true);
+                    }}
+                    className="p-1.5 rounded-md text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-all"
+                    title="Save to Project"
+                  >
+                    <FolderPlus className="w-4 h-4" />
+                  </button>
+                )}
                 <CopyButton text={res.content} />
               </div>
             </div>
@@ -348,7 +366,7 @@ export default function SandboxPage() {
             <div className="flex-1 p-5 bg-slate-50/30 min-h-[300px]">
               {res.status === 'idle' && (
                 <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-3 opacity-50">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center grayscale overflow-hidden">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center grayscale overflow-hidden ignore-dark-mode bg-white border border-slate-200">
                     <Image src={res.logo} alt={res.model} width={48} height={48} className="object-cover opacity-60" />
                   </div>
                   <p className="text-xs font-medium">{text.waiting}</p>
@@ -380,6 +398,13 @@ export default function SandboxPage() {
           </div>
         ))}
       </div>
+
+      {/* ── Save to Project Modal ──────────────────────────────────────────── */}
+      <SaveToProjectModal
+        isOpen={isSaveModalOpen}
+        onClose={() => setIsSaveModalOpen(false)}
+        data={saveData}
+      />
     </div>
   );
 }

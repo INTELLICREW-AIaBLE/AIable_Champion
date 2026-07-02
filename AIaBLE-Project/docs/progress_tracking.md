@@ -19,7 +19,18 @@ Dự án được cấu trúc dạng Monorepo (Next.js Frontend + Express/TypeSc
 
 ## ✅ Các Công Việc Vừa Hoàn Thành (Recent Updates)
 
-*Cập nhật gần nhất: 01/07/2026 (Phiên 3)*
+*Cập nhật gần nhất: 02/07/2026*
+
+- **Cải tiến UI/UX & Hệ thống Thông báo (Notification System):**
+  - Xây dựng hệ thống thông báo thời gian thực (real-time notification) bằng `CustomEvent` và `localStorage` (tại `lib/notifications.ts`).
+  - Gắn thành công thông báo cho các thao tác quan trọng: Tạo/Xóa/Khôi phục dự án, Lưu prompt vào dự án, Đổi mật khẩu, Đổi cài đặt.
+  - Tách hệ thống thông báo thành Icon Chuông độc lập trên thanh điều hướng (`AppNavbar`), tích hợp giao diện hiện đại và báo chấm đỏ khi có tin mới.
+  - Cập nhật trang `/notifications` kết nối với dữ liệu thật, tự động quy đổi thời gian (Ví dụ: "Vừa xong", "5 phút trước").
+  - Gỡ bỏ cấu hình "API Keys" phức tạp khỏi trang cài đặt theo đúng yêu cầu tối giản hoá giao diện.
+
+- **Sửa lỗi tính năng & Lịch sử hoạt động:**
+  - Khắc phục triệt để lỗi sập ngầm (`ReferenceError: data is not defined`) trong Sandbox, giúp các prompt từ người dùng được **lưu thẳng vào Lịch sử hoạt động** (`/history`) một cách trơn tru.
+  - Sửa lỗi sập trang Cài đặt (Settings) do biến ngôn ngữ (`lang`) vô tình bị mất, khôi phục lại khả năng đổi giao diện và đa ngôn ngữ.
 
 - **Quản lý Tài Khoản & Bảo mật:**
   - **Quên mật khẩu (Forgot Password):** Tích hợp thành công thư viện `nodemailer` (Backend) để gửi email xác nhận.
