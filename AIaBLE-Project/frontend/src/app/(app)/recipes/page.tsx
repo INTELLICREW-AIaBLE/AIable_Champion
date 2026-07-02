@@ -27,49 +27,8 @@ type Recipe = {
   language: string;
 };
 
+// ─── Constants ────────────────────────────────────────────────────────────────
 const RECIPES_PER_PAGE = 9;
-
-const t = {
-  vi: {
-    title: 'Recipe Library',
-    desc: 'Thư viện prompt chất lượng cao - được tuyển chọn, thử nghiệm và phân loại theo chuyên ngành.',
-    bestWith: 'Tốt nhất với',
-    copy: 'Copy',
-    save: 'Save',
-    saved: 'Saved',
-    apply: 'Apply Recipe',
-    searchPlaceholder: 'Tìm kiếm recipe...',
-    filter: 'Filter',
-    filterTitle: 'Tối ưu cho mô hình AI:',
-    allAi: 'Tất cả AI',
-    categories: 'Danh mục',
-    allCategories: {
-      'All': 'Tất cả',
-      'Coding': 'Lập trình',
-      'Report': 'Báo cáo',
-      'Slide': 'Thuyết trình',
-      'Research': 'Nghiên cứu',
-      'Writing': 'Viết lách',
-      'Planning': 'Kế hoạch',
-      'Math': 'Toán học',
-      'English': 'Tiếng Anh',
-      'Business': 'Kinh doanh',
-      'Design': 'Thiết kế',
-      'Data': 'Dữ liệu',
-      'Law': 'Luật',
-      'Economics': 'Kinh tế',
-      'Creative': 'Sáng tạo',
-      'Marketing': 'Marketing',
-      'HR': 'Nhân sự',
-      'Psychology': 'Tâm lý học',
-      'Science': 'Khoa học',
-      'History': 'Lịch sử',
-      'Career': 'Sự nghiệp',
-      'AI Prompting': 'AI Prompting'
-    },
-    loading: 'Loading recipes...'
-  }
-};
 
 const CATEGORY_GROUPS = [
   {
@@ -270,21 +229,6 @@ export default function RecipeLibraryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
 
-  const [lang, setLang] = useState('vi');
-
-  useEffect(() => {
-    setLang(localStorage.getItem('app_lang') || 'vi');
-    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
-    window.addEventListener('storage', handleLangChange);
-    window.addEventListener('app_lang_changed', handleLangChange);
-    return () => {
-      window.removeEventListener('storage', handleLangChange);
-      window.removeEventListener('app_lang_changed', handleLangChange);
-    };
-  }, []);
-
-  const text = t[lang as 'en' | 'vi'] || t.vi;
-
   useEffect(() => {
     async function fetchRecipes() {
       try {
@@ -416,7 +360,7 @@ export default function RecipeLibraryPage() {
                         : 'bg-slate-50 border border-slate-100 text-slate-600 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700'
                     )}
                   >
-                    {text.allCategories?.[cat as keyof typeof text.allCategories] || cat}
+                    {cat}
                   </button>
                 );
               })}
@@ -425,50 +369,50 @@ export default function RecipeLibraryPage() {
         ))}
       </div>
 
-      {/* ── Results info ────────────────────────────────────────────────────── */}
-      {!loading && (
-        <p className="text-xs text-slate-400 font-medium">
-          Hiển thị {(currentPage - 1) * RECIPES_PER_PAGE + 1}–{Math.min(currentPage * RECIPES_PER_PAGE, filteredRecipes.length)} trong tổng số <span className="text-violet-600 font-bold">{filteredRecipes.length}</span> recipes
-        </p>
-      )}
+        {/* ── Results info ────────────────────────────────────────────────────── */}
+        {!loading && (
+          <p className="text-xs text-slate-400 font-medium">
+            Hiển thị {(currentPage - 1) * RECIPES_PER_PAGE + 1}–{Math.min(currentPage * RECIPES_PER_PAGE, filteredRecipes.length)} trong tổng số <span className="text-violet-600 font-bold">{filteredRecipes.length}</span> recipes
+          </p>
+        )}
 
-      {/* ── Grid ────────────────────────────────────────────────────────────── */}
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 9 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border border-slate-100 bg-white p-4 animate-pulse">
-              <div className="h-1 w-full bg-slate-200 rounded mb-4" />
-              <div className="h-3 bg-slate-200 rounded w-1/3 mb-3" />
-              <div className="h-4 bg-slate-200 rounded w-3/4 mb-2" />
-              <div className="h-3 bg-slate-100 rounded w-full mb-1" />
-              <div className="h-3 bg-slate-100 rounded w-5/6 mb-4" />
-              <div className="flex gap-2 mt-6">
-                <div className="h-7 w-16 bg-slate-100 rounded-lg" />
-                <div className="h-7 w-20 bg-violet-100 rounded-lg ml-auto" />
+        {/* ── Grid ────────────────────────────────────────────────────────────── */}
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className="rounded-2xl border border-slate-100 bg-white p-4 animate-pulse">
+                <div className="h-1 w-full bg-slate-200 rounded mb-4" />
+                <div className="h-3 bg-slate-200 rounded w-1/3 mb-3" />
+                <div className="h-4 bg-slate-200 rounded w-3/4 mb-2" />
+                <div className="h-3 bg-slate-100 rounded w-full mb-1" />
+                <div className="h-3 bg-slate-100 rounded w-5/6 mb-4" />
+                <div className="flex gap-2 mt-6">
+                  <div className="h-7 w-16 bg-slate-100 rounded-lg" />
+                  <div className="h-7 w-20 bg-violet-100 rounded-lg ml-auto" />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      ) : paginatedRecipes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-          <BookOpen className="w-12 h-12 mb-3 opacity-30" />
-          <p className="text-sm font-medium">Không tìm thấy recipe nào</p>
-          <button onClick={() => { setSearchQuery(''); setActiveCategory('All'); setAiFilter('All'); }} className="mt-3 text-xs text-violet-600 hover:underline">
-            Xóa bộ lọc
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {paginatedRecipes.map(r => (
-            <RecipeCard key={r.id} recipe={r} onApply={handleApply} />
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        ) : paginatedRecipes.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+            <BookOpen className="w-12 h-12 mb-3 opacity-30" />
+            <p className="text-sm font-medium">Không tìm thấy recipe nào</p>
+            <button onClick={() => { setSearchQuery(''); setActiveCategory('All'); setAiFilter('All'); }} className="mt-3 text-xs text-violet-600 hover:underline">
+              Xóa bộ lọc
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {paginatedRecipes.map(r => (
+              <RecipeCard key={r.id} recipe={r} onApply={handleApply} />
+            ))}
+          </div>
+        )}
 
-      {/* ── Pagination ──────────────────────────────────────────────────────── */}
-      {!loading && totalPages > 1 && (
-        <Pagination currentPage={currentPage} totalPages={totalPages} onChange={p => { setCurrentPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
-      )}
-    </div>
-  );
+        {/* ── Pagination ──────────────────────────────────────────────────────── */}
+        {!loading && totalPages > 1 && (
+          <Pagination currentPage={currentPage} totalPages={totalPages} onChange={p => { setCurrentPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+        )}
+      </div>
+      );
 }
