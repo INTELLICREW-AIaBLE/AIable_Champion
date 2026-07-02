@@ -192,6 +192,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Divider */}
+      <hr className="my-6 border-slate-200" />
+
       {/* Bottom Section: Recipes + Projects */}
       <div className="flex flex-col xl:flex-row gap-6">
         {/* Featured Recipes */}

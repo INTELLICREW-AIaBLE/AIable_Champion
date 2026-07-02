@@ -29,24 +29,24 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --background: 240 16% 10%;
+    --foreground: 240 20% 95%;
+    --card: 240 15% 16%;
+    --card-foreground: 240 20% 95%;
+    --popover: 240 15% 16%;
+    --popover-foreground: 240 20% 95%;
+    --primary: 240 20% 95%;
+    --primary-foreground: 240 16% 10%;
+    --secondary: 240 15% 22%;
+    --secondary-foreground: 240 20% 95%;
+    --muted: 240 15% 22%;
+    --muted-foreground: 240 14% 75%;
+    --accent: 240 15% 22%;
+    --accent-foreground: 240 20% 95%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    --destructive-foreground: 240 20% 95%;
+    --border: 240 12% 27%;
+    --input: 240 12% 27%;
     --ring: 212.7 26.8% 83.9%;
   }
 }
@@ -66,7 +66,12 @@
 
 html.dark-mode-active {
   filter: invert(1) hue-rotate(180deg);
-  background-color: #111 !important;
+  /* Target Background: #15151d (HSL 240, 16%, 10%) -> Pre-inverted: HSL 240, 16%, 90% */
+  background-color: hsl(240, 16%, 90%) !important;
+}
+
+html.dark-mode-active body {
+  background-color: hsl(240, 16%, 90%) !important;
 }
 
 html.dark-mode-active img,
@@ -79,3 +84,48 @@ html.dark-mode-active .ignore-dark-mode img,
 html.dark-mode-active .ignore-dark-mode video {
   filter: none !important;
 }
+
+/* Custom Overrides for precise inverted colors */
+/* Target Card: #22222e (HSL 240, 15%, 16%) -> Pre-inverted: HSL 240, 15%, 84% */
+html.dark-mode-active .bg-white {
+  background-color: hsl(240, 15%, 84%) !important;
+}
+
+/* Target Main Text: #f0f0f5 (HSL 240, 20%, 95%) -> Pre-inverted: HSL 240, 20%, 5% */
+html.dark-mode-active .text-slate-800,
+html.dark-mode-active .text-slate-900 {
+  color: hsl(240, 20%, 5%) !important;
+}
+
+/* Target Muted Text: #b8b8c8 (HSL 240, 14%, 75%) -> Pre-inverted: HSL 240, 14%, 25% */
+html.dark-mode-active .text-slate-500,
+html.dark-mode-active .text-slate-600 {
+  color: hsl(240, 14%, 25%) !important;
+}
+
+/* Target Borders: HSL 240, 15%, 25% -> Pre-inverted: HSL 240, 15%, 75% */
+html.dark-mode-active .border-slate-100,
+html.dark-mode-active .border-violet-100,
+html.dark-mode-active .border-slate-200 {
+  border-color: hsl(240, 15%, 75%) !important;
+}
+
+/* Add drop shadow for cards in dark mode. Drop shadow color inverted: rgba(0,0,0,0.5) inverted is rgba(255,255,255,0.5). To get dark shadow on screen, we use white shadow pre-invert */
+html.dark-mode-active .shadow-sm,
+html.dark-mode-active .shadow-md {
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Brighten icons and their backgrounds in dark mode */
+html.dark-mode-active .text-violet-600 { color: hsl(262, 80%, 30%) !important; }
+html.dark-mode-active .text-blue-600 { color: hsl(215, 80%, 30%) !important; }
+html.dark-mode-active .text-purple-600 { color: hsl(270, 80%, 30%) !important; }
+html.dark-mode-active .text-indigo-600 { color: hsl(245, 80%, 30%) !important; }
+html.dark-mode-active .text-fuchsia-600 { color: hsl(290, 80%, 30%) !important; }
+
+html.dark-mode-active .bg-violet-100 { background-color: hsl(262, 50%, 80%) !important; }
+html.dark-mode-active .bg-blue-100 { background-color: hsl(215, 50%, 80%) !important; }
+html.dark-mode-active .bg-purple-100 { background-color: hsl(270, 50%, 80%) !important; }
+html.dark-mode-active .bg-indigo-100 { background-color: hsl(245, 50%, 80%) !important; }
+html.dark-mode-active .bg-fuchsia-100 { background-color: hsl(290, 50%, 80%) !important; }
+

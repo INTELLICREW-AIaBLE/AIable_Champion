@@ -10,9 +10,9 @@ interface RecipeCardProps {
 }
 
 const typeStyles: Record<RecipeCardProps['type'], string> = {
-  CODING: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  REPORT: 'bg-orange-50 text-orange-700 border-orange-200',
-  SLIDE: 'bg-blue-50 text-blue-700 border-blue-200',
+  CODING: 'border-emerald-500 text-emerald-600 bg-transparent',
+  REPORT: 'border-orange-500 text-orange-600 bg-transparent',
+  SLIDE: 'border-blue-500 text-blue-600 bg-transparent',
 };
 
 const modelStyles: Record<RecipeCardProps['bestModel'], string> = {
