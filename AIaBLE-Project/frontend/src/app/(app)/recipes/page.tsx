@@ -110,13 +110,10 @@ function RecipeCard({ recipe, onApply }: { recipe: Recipe; onApply: (r: Recipe) 
       )} />
 
       <div className="flex flex-col flex-1 p-4">
-        {/* Category + difficulty badges */}
+        {/* Category badge */}
         <div className="flex items-center gap-2 mb-3">
           <span className={cn('inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide', CATEGORY_COLORS[recipe.category.toLowerCase()] || 'bg-slate-50 text-slate-600 border-slate-100')}>
             {catKey}
-          </span>
-          <span className={cn('ml-auto inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-semibold', DIFFICULTY_BADGE[recipe.difficulty] || '')}>
-            {recipe.difficulty}
           </span>
         </div>
 
