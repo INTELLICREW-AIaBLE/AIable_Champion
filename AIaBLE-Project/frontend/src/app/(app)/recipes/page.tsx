@@ -15,7 +15,7 @@ import {
   Filter,
 } from 'lucide-react';
 
-export type RecipeCategory = 'CODING' | 'REPORT' | 'SLIDE' | 'RESEARCH';
+export type RecipeCategory = 'CODING' | 'REPORT' | 'SLIDE' | 'RESEARCH' | 'WRITING' | 'PLANNING' | 'MATH' | 'ENGLISH' | 'BUSINESS' | 'DESIGN' | 'DATA' | 'LAW' | 'ECONOMICS' | 'CREATIVE' | 'MARKETING' | 'HR' | 'PSYCHOLOGY' | 'SCIENCE' | 'HISTORY' | 'CAREER' | 'AI_PROMPTING';
 export type AIProvider = 'OpenRouter' | 'Groq' | 'Gemini';
 
 type Recipe = {
@@ -70,7 +70,7 @@ const t = {
 };
 
 const RECIPES: Recipe[] = [];
-const CATEGORIES = ['All', 'Coding', 'Report', 'Slide', 'Research'];
+const CATEGORIES = ['All', 'Coding', 'Report', 'Slide', 'Research', 'Writing', 'Planning', 'Math', 'English', 'Business', 'Design', 'Data', 'Law', 'Economics', 'Creative', 'Marketing', 'HR', 'Psychology', 'Science', 'History', 'Career', 'AI Prompting'];
 
 function RecipeCard({
   recipe,
@@ -252,7 +252,7 @@ export default function RecipeLibraryPage() {
   };
 
   const filteredRecipes = recipes.filter(r => {
-    const matchCategory = activeCategory === 'All' || r.category.toLowerCase() === activeCategory.toLowerCase();
+    const matchCategory = activeCategory === 'All' || r.category.toLowerCase() === activeCategory.toLowerCase().replace(' ', '_');
     const matchSearch = r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       r.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (r.tags && r.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
