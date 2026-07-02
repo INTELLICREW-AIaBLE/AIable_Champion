@@ -469,9 +469,6 @@ export function AppNavbar() {
                   style={userProfile.avatar ? { backgroundImage: `url(${userProfile.avatar})` } : {}}>
                   {!userProfile.avatar && initials}
                 </div>
-                {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
-                )}
               </div>
               <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${avatarOpen ? 'rotate-180' : ''}`} />
             </button>

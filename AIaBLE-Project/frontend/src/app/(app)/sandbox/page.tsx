@@ -32,7 +32,7 @@ const t = {
     reset: 'Reset',
     settings: 'Cài đặt mô hình',
     masterPrompt: 'Master Prompt',
-    samplePrompt: 'Prompt Mẫu',
+    promptHistory: 'Lịch sử Prompt',
     placeholder: 'Nhập prompt bạn muốn kiểm thử trên nhiều mô hình AI...',
     hint: 'Nhấn Ctrl + Enter để chạy',
     running: 'Đang chạy...',
@@ -52,7 +52,7 @@ const t = {
     reset: 'Reset',
     settings: 'Model Settings',
     masterPrompt: 'Master Prompt',
-    samplePrompt: 'Sample Prompt',
+    promptHistory: 'Prompt History',
     placeholder: 'Enter the prompt you want to test across multiple AI models...',
     hint: 'Press Ctrl + Enter to run',
     running: 'Running...',
@@ -137,6 +137,51 @@ export default function SandboxPage() {
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [saveData, setSaveData] = useState<{prompt?: string, result?: string, aiModel?: string}>({});
   const [showExamples, setShowExamples] = useState(false);
+  const [historyPrompts, setHistoryPrompts] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/history`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && data.data) {
+          const prompts = data.data
+            .filter((item: any) => item.tool === 'Sandbox' && item.prompt)
+            .map((item: any) => item.prompt);
+          const uniquePrompts = Array.from(new Set(prompts)).slice(0, 5) as string[];
+          setHistoryPrompts(uniquePrompts);
+        }
+      } catch (e) {
+        console.error('Error fetching history:', e);
+      }
+    };
+    fetchHistory();
+  }, []);
+
+  // Restore state from sessionStorage
+  useEffect(() => {
+    const savedPrompt = sessionStorage.getItem('sandbox_prompt');
+    const savedResults = sessionStorage.getItem('sandbox_results');
+    if (savedPrompt) setPrompt(savedPrompt);
+    if (savedResults) {
+      try {
+        setResults(JSON.parse(savedResults));
+      } catch (e) {}
+    }
+  }, []);
+
+  // Save state to sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem('sandbox_prompt', prompt);
+  }, [prompt]);
+
+  useEffect(() => {
+    sessionStorage.setItem('sandbox_results', JSON.stringify(results));
+  }, [results]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -270,14 +315,14 @@ export default function SandboxPage() {
               onClick={() => setShowExamples(!showExamples)}
               className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-800 font-semibold transition"
             >
-              {text.samplePrompt} <ChevronDown className="w-3 h-3" />
+              {text.promptHistory} <ChevronDown className="w-3 h-3" />
             </button>
             
             {showExamples && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setShowExamples(false)} />
-                <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-slate-100 rounded-xl shadow-lg py-1 z-20 animate-in fade-in zoom-in-95 duration-200">
-                  {text.examples.map((ex, i) => (
+                <div className="absolute right-0 top-full mt-2 w-72 max-h-64 overflow-y-auto bg-white border border-slate-100 rounded-xl shadow-lg py-1 z-20 animate-in fade-in zoom-in-95 duration-200">
+                  {(historyPrompts.length > 0 ? historyPrompts : text.examples).map((ex, i) => (
                     <button
                       type="button"
                       key={i}
@@ -304,7 +349,7 @@ export default function SandboxPage() {
             onChange={(e) => setPrompt(e.target.value)}
             placeholder={text.placeholder}
             rows={4}
-            className="w-full text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
+            className="w-full text-sm text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && e.shiftKey) {
                 e.preventDefault();
@@ -400,7 +445,7 @@ export default function SandboxPage() {
                 <textarea
                   value={res.content}
                   onChange={(e) => handleContentChange(res.model, e.target.value)}
-                  className="w-full min-h-[250px] p-0 bg-transparent border-0 prose prose-sm prose-slate max-w-none text-slate-700 text-sm leading-relaxed focus:ring-0 focus:outline-none resize-y animate-in fade-in slide-in-from-bottom-2 duration-500"
+                  className="w-full min-h-[250px] p-0 bg-transparent border-0 prose prose-sm prose-slate max-w-none text-slate-900 font-medium text-sm leading-relaxed focus:ring-0 focus:outline-none resize-y animate-in fade-in slide-in-from-bottom-2 duration-500"
                 />
               )}
 

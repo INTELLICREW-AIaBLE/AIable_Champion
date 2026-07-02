@@ -98,7 +98,7 @@ export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
   const NAV_GROUPS = getNavGroups(text);
 
   return (
-    <div className={cn('pb-12 border-r min-h-[calc(100vh-3.5rem)] w-56 hidden md:block bg-white shrink-0', className)}>
+    <div className={cn('pb-12 border-r h-[calc(100vh-3.5rem)] sticky top-14 overflow-y-auto w-56 hidden md:block bg-white shrink-0', className)}>
       <div className="py-4 px-3 space-y-5">
         {NAV_GROUPS.map(({ label, items }) => (
           <div key={label}>

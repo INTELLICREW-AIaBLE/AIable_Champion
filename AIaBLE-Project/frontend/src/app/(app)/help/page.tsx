@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { HelpCircle, Search, Mail, MessageSquare, FileText, ChevronRight } from 'lucide-react';
 
 const FAQS = [
@@ -7,9 +8,21 @@ const FAQS = [
   { question: 'AI Sandbox khác gì Optimize Prompt?', answer: 'AI Sandbox cho phép bạn so sánh kết quả của nhiều model (GPT, Claude, Gemini) cùng lúc, trong khi Optimize tập trung vào việc tự động viết lại prompt của bạn sao cho chuẩn xác nhất.' },
   { question: 'Dữ liệu của tôi có được bảo mật không?', answer: 'Hoàn toàn bảo mật. Các dự án, prompt và thông tin của bạn được lưu trữ an toàn. AIaBLE không sử dụng dữ liệu của người dùng để train model.' },
   { question: 'Tôi có thể chia sẻ Recipe của mình không?', answer: 'Có, trong phiên bản tới bạn sẽ có tuỳ chọn Publish recipe của mình lên Community Library để chia sẻ với mọi người.' },
+  { question: 'Làm thế nào để đổi ngôn ngữ giao diện?', answer: 'Bạn có thể nhấp vào avatar ở góc phải trên cùng, chọn Cài đặt (Settings) > Tài khoản để chọn ngôn ngữ hiển thị (Tiếng Việt / Tiếng Anh).' },
+  { question: 'Tại sao AI đôi khi phản hồi chậm hoặc báo lỗi?', answer: 'Do đặc thù gọi qua API của các bên thứ ba (như Google Gemini, Groq), đôi khi hệ thống của họ bị quá tải. Bạn chỉ cần đợi vài giây rồi thử nhấn chạy lại.' },
+  { question: 'Tính năng Verify Output (Kiểm tra Output) hoạt động như thế nào?', answer: 'Tính năng này giúp phát hiện lỗi bịa đặt (hallucination) của AI bằng cách phân tích câu trả lời và đối chiếu với các nguồn dữ liệu bên ngoài, từ đó đưa ra mức độ chính xác.' },
+  { question: 'Tôi có thể xuất kết quả dưới dạng file PDF/Word không?', answer: 'Hiện tại bạn có thể sử dụng nút Copy để dán sang các phần mềm khác. Tính năng xuất trực tiếp ra PDF/Word đang được phát triển và sẽ sớm ra mắt.' },
+  { question: 'Làm sao để lấy lại mật khẩu khi bị quên?', answer: 'Ở màn hình Đăng nhập, bạn hãy nhấp vào "Quên mật khẩu". Hệ thống sẽ gửi hướng dẫn khôi phục mật khẩu vào địa chỉ email mà bạn đã đăng ký.' },
 ];
 
 export default function HelpPage() {
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const filteredFaqs = FAQS.filter(faq => 
+    faq.question.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
       {/* Header */}
@@ -26,6 +39,8 @@ export default function HelpPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input 
               type="text" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Nhập câu hỏi của bạn..." 
               className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white text-slate-800 focus:outline-none focus:ring-4 focus:ring-violet-400/50 shadow-sm transition placeholder:text-slate-400 font-medium"
             />
@@ -41,8 +56,8 @@ export default function HelpPage() {
             Câu hỏi thường gặp
           </h2>
           <div className="bg-white rounded-3xl border border-slate-100 shadow-sm divide-y divide-slate-100">
-            {FAQS.map((faq, idx) => (
-              <details key={idx} className="group p-6 cursor-pointer marker:content-['']">
+            {filteredFaqs.length > 0 ? filteredFaqs.map((faq, idx) => (
+              <details key={idx} className="group p-6 cursor-pointer marker:content-['']" open={searchQuery.trim().length > 0}>
                 <summary className="flex items-center justify-between font-bold text-slate-800 select-none">
                   {faq.question}
                   <ChevronRight className="w-5 h-5 text-slate-400 group-open:rotate-90 transition-transform" />
@@ -51,7 +66,11 @@ export default function HelpPage() {
                   {faq.answer}
                 </div>
               </details>
-            ))}
+            )) : (
+              <div className="p-8 text-center text-slate-500 text-sm">
+                Không tìm thấy kết quả phù hợp cho "{searchQuery}"
+              </div>
+            )}
           </div>
         </div>
 

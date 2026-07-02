@@ -45,6 +45,7 @@ const t = {
     rawPrompt: 'Raw Prompt',
     chars: 'ký tự',
     words: 'từ',
+    promptHistory: 'Lịch sử Prompt',
     example: 'Ví dụ',
     placeholder: "Nhập prompt thô của bạn vào đây...\n\nVí dụ: 'Giải thích thuật toán quicksort cho tôi'",
     hint: 'Nhập tối thiểu 10 ký tự để bắt đầu tối ưu',
@@ -92,6 +93,7 @@ const t = {
     rawPrompt: 'Raw Prompt',
     chars: 'chars',
     words: 'words',
+    promptHistory: 'Prompt History',
     example: 'Examples',
     placeholder: "Enter your raw prompt here...\n\nExample: 'Explain the quicksort algorithm to me'",
     hint: 'Enter at least 10 characters to start optimizing',
@@ -268,7 +270,31 @@ export default function OptimizerPage() {
   const [activeView, setActiveView] = useState<'split' | 'before' | 'after'>('split');
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
+  const [historyPrompts, setHistoryPrompts] = useState<string[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/history`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && data.data) {
+          const prompts = data.data
+            .filter((item: any) => item.tool === 'Prompt Optimizer' && item.prompt)
+            .map((item: any) => item.prompt);
+          const uniquePrompts = Array.from(new Set(prompts)).slice(0, 5) as string[];
+          setHistoryPrompts(uniquePrompts);
+        }
+      } catch (e) {
+        console.error('Error fetching history:', e);
+      }
+    };
+    fetchHistory();
+  }, []);
 
   const [lang, setLang] = useState('vi');
 
@@ -292,13 +318,35 @@ export default function OptimizerPage() {
     if (prefill) {
       setRaw(prefill);
       sessionStorage.removeItem('optimizer_prefill');
+    } else {
+      const savedRaw = sessionStorage.getItem('optimizer_raw');
+      if (savedRaw) setRaw(savedRaw);
     }
 
     if (prefillAI && ['Groq', 'OpenRouter', 'Gemini'].includes(prefillAI)) {
       setModel(prefillAI);
       sessionStorage.removeItem('optimizer_prefill_AI');
     }
+
+    const savedResult = sessionStorage.getItem('optimizer_result');
+    if (!prefill && savedResult) {
+      try {
+        setResult(JSON.parse(savedResult));
+      } catch (e) {}
+    }
   }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem('optimizer_raw', raw);
+  }, [raw]);
+
+  useEffect(() => {
+    if (result) {
+      sessionStorage.setItem('optimizer_result', JSON.stringify(result));
+    } else {
+      sessionStorage.removeItem('optimizer_result');
+    }
+  }, [result]);
   
   const charCount = raw.length;
   const wordCount = raw.trim() ? raw.trim().split(/\s+/).length : 0;
@@ -456,17 +504,17 @@ export default function OptimizerPage() {
                 onClick={() => setShowExamples(!showExamples)}
                 className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-800 font-semibold transition"
               >
-                {text.example} <ChevronDown className="w-3 h-3" />
+                {text.promptHistory || text.example} <ChevronDown className="w-3 h-3" />
               </button>
               
               {showExamples && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowExamples(false)} />
-                  <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-slate-100 rounded-xl shadow-lg py-1 z-20 animate-in fade-in zoom-in-95 duration-200">
-                    {text.examples.map((ex) => (
+                  <div className="absolute right-0 top-full mt-2 w-64 max-h-64 overflow-y-auto bg-white border border-slate-100 rounded-xl shadow-lg py-1 z-20 animate-in fade-in zoom-in-95 duration-200">
+                    {(historyPrompts.length > 0 ? historyPrompts : text.examples).map((ex, i) => (
                       <button
                         type="button"
-                        key={ex}
+                        key={i}
                         onClick={() => {
                           setRaw(ex);
                           setShowExamples(false);
@@ -491,7 +539,7 @@ export default function OptimizerPage() {
           placeholder={text.placeholder}
           maxLength={2000}
           rows={6}
-          className="w-full px-5 py-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
+          className="w-full px-5 py-4 text-sm text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
         />
 
         <div className="flex items-center justify-between px-5 py-3 border-t border-slate-100 bg-slate-50/50">
@@ -584,7 +632,7 @@ export default function OptimizerPage() {
                   </div>
                   <CopyButton text={raw} />
                 </div>
-                <pre className="px-5 py-4 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed font-mono bg-slate-50/30 min-h-[180px]">
+                <pre className="px-5 py-4 text-sm text-slate-900 font-medium whitespace-pre-wrap leading-relaxed font-mono bg-slate-50/30 min-h-[180px]">
                   {raw}
                 </pre>
               </div>
@@ -610,7 +658,7 @@ export default function OptimizerPage() {
                     <CopyButton text={result.optimized} />
                   </div>
                 </div>
-                <pre className="px-5 py-4 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed font-mono min-h-[180px]">
+                <pre className="px-5 py-4 text-sm text-slate-900 font-medium whitespace-pre-wrap leading-relaxed font-mono min-h-[180px]">
                   {result.optimized}
                 </pre>
               </div>

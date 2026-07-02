@@ -15,20 +15,20 @@ const DEFAULT_SKILLS = [
 ];
 
 function EditableField({
-  value, onChange, multiline = false, type = "text"
+  value, onChange, multiline = false, type = "text", placeholder = "Thêm thông tin"
 }: {
-  value: string; onChange: (v: string) => void; multiline?: boolean; type?: string;
+  value: string; onChange: (v: string) => void; multiline?: boolean; type?: string; placeholder?: string;
 }) {
   const [editing, setEditing] = useState(false);
 
   if (!editing) {
     return (
       <span
-        className="group/field relative cursor-pointer"
+        className="group/field relative cursor-pointer inline-block min-w-[50px]"
         onClick={() => setEditing(true)}
         title="Nhấn để chỉnh sửa"
       >
-        {value}
+        {value || <span className="opacity-50 italic">{placeholder}</span>}
         <Edit3 className="inline-block ml-1.5 w-3 h-3 text-slate-400 opacity-0 group-hover/field:opacity-100 transition -mt-0.5" />
       </span>
     );
@@ -70,11 +70,11 @@ function LocationSelector({ value, onSave }: { value: string; onSave: (v: string
   return (
     <>
       <span
-        className="group/loc relative cursor-pointer hover:text-violet-600 transition"
+        className="group/loc relative cursor-pointer hover:text-violet-600 transition inline-block min-w-[50px]"
         onClick={() => { setDraft(value); setMapQuery(value); setIsOpen(true); }}
         title="Chọn địa điểm trên bản đồ"
       >
-        {value}
+        {value || <span className="opacity-50 italic">Thêm Tỉnh/Thành phố, Quốc gia</span>}
         <Edit3 className="inline-block ml-1.5 w-3 h-3 text-slate-400 opacity-0 group-hover/loc:opacity-100 transition -mt-0.5" />
       </span>
 
@@ -97,7 +97,7 @@ function LocationSelector({ value, onSave }: { value: string; onSave: (v: string
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  placeholder="Nhập thành phố, quốc gia..."
+                  placeholder="Nhập Tỉnh/Thành phố, Quốc gia..."
                   className="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
                 />
                 <button 
@@ -143,28 +143,21 @@ function LocationSelector({ value, onSave }: { value: string; onSave: (v: string
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function ProfilePage() {
-  const [name,     setName]     = useState('Nguyễn Văn A');
-  const [username, setUsername] = useState('nguyenvana');
-  const [bio,      setBio]      = useState('AI enthusiast & Computer Science student. Đam mê prompt engineering và ứng dụng AI trong học tập.');
-  const [location, setLocation] = useState('Ho Chi Minh City, Vietnam');
-  const [website,  setWebsite]  = useState('github.com/nguyenvana');
+  const [name,     setName]     = useState('');
+  const [username, setUsername] = useState('');
+  const [bio,      setBio]      = useState('');
+  const [location, setLocation] = useState('');
+  const [website,  setWebsite]  = useState('');
   const [avatar,   setAvatar]   = useState('');
   const [cover,    setCover]    = useState('');
-  const [email,    setEmail]    = useState('user@alable.edu.vn');
-  const [birthday, setBirthday] = useState('2000-01-01');
+  const [email,    setEmail]    = useState('');
+  const [birthday, setBirthday] = useState('');
 
-  const [favoriteModels, setFavoriteModels] = useState<any[]>([
-    { name: 'Claude',  pct: 45, color: 'from-orange-400 to-amber-500' },
-    { name: 'GPT-4',   pct: 35, color: 'from-emerald-400 to-teal-500' },
-    { name: 'Gemini',  pct: 20, color: 'from-blue-400 to-cyan-500' },
-  ]);
-  const [dynamicStats, setDynamicStats] = useState({ projects: 12, recipesUsed: 48, promptsOptimized: 137, outputsVerified: 64 });
+  const [favoriteModels, setFavoriteModels] = useState<any[]>([]);
+  const [dynamicStats, setDynamicStats] = useState({ projects: 0, recipesUsed: 0, promptsOptimized: 0, outputsVerified: 0 });
   const [activities, setActivities] = useState<any[]>([]);
-  const [recentRecipes, setRecentRecipes] = useState<any[]>([
-    { title: 'Debug code Python step-by-step', type: 'CODING', model: 'Claude', icon: Code2,       iconBg: 'bg-violet-50',  iconColor: 'text-violet-600' },
-    { title: 'Báo cáo môn học theo chuẩn APA', type: 'REPORT', model: 'Claude', icon: FileText,    iconBg: 'bg-blue-50',    iconColor: 'text-blue-600' },
-  ]);
-  const [totalActivities, setTotalActivities] = useState(137);
+  const [recentRecipes, setRecentRecipes] = useState<any[]>([]);
+  const [totalActivities, setTotalActivities] = useState(0);
   
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState('');
@@ -189,11 +182,8 @@ export default function ProfilePage() {
           setAvatar(data.data.avatar || '');
           setCover(data.data.cover || '');
           setEmail(data.data.email || '');
-          setBirthday(data.data.birthday || 'Chưa cập nhật');
-          setSkills(data.data.skills || [
-            'Python', 'Machine Learning', 'Prompt Engineering', 'Data Analysis',
-            'React', 'TypeScript', 'SQL', 'Technical Writing', 'AI Research',
-          ]);
+          setBirthday(data.data.birthday || '');
+          setSkills(data.data.skills || []);
         }
 
         // Fetch history to calculate favorite models
@@ -447,8 +437,8 @@ export default function ProfilePage() {
           </div>
 
           {/* Bio */}
-          <p className="text-sm text-slate-600 leading-relaxed mb-4 max-w-2xl">
-            <EditableField value={bio} onChange={setBio} multiline />
+          <p className="text-sm text-slate-600 leading-relaxed mb-4 max-w-2xl min-h-[1.5rem]">
+            <EditableField value={bio} onChange={setBio} multiline placeholder="Thêm tiểu sử của bạn..." />
           </p>
 
           {/* Meta info */}
@@ -459,17 +449,17 @@ export default function ProfilePage() {
             </span>
             <span className="flex items-center gap-1.5">
               <Mail className="w-3.5 h-3.5 text-slate-400" />
-              <EditableField value={email} onChange={setEmail} />
+              <EditableField value={email} onChange={setEmail} placeholder="Thêm email" />
             </span>
             <span className="flex items-center gap-1.5">
               <Link2 className="w-3.5 h-3.5 text-slate-400" />
               <span className="text-violet-600 hover:underline cursor-pointer">
-                <EditableField value={website} onChange={setWebsite} />
+                <EditableField value={website} onChange={setWebsite} placeholder="Thêm website/link" />
               </span>
             </span>
             <span className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-slate-400" />
-              <EditableField value={birthday} onChange={setBirthday} type="date" />
+              <EditableField value={birthday} onChange={setBirthday} type="date" placeholder="Thêm ngày sinh" />
             </span>
           </div>
         </div>
