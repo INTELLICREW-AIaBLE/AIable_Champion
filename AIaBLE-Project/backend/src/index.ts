@@ -11,6 +11,7 @@ import sandboxRoutes from './routes/sandbox';
 import authRoutes from './routes/auth';
 import profileRoutes from './routes/profile';
 import validatorRoutes from './routes/validator';
+import adminRoutes from './routes/admin';
 import projectRoutes from './routes/projects';
 import helpRoutes from './routes/help';
 import { apiLimiter } from './middleware/rateLimiter';
@@ -62,6 +63,9 @@ app.use('/api/sandbox', apiLimiter, sandboxRoutes);
 
 // Validator routes
 app.use('/api/validator', validatorRoutes);
+
+// Admin routes
+app.use('/api/admin', adminRoutes);
 
 // Projects routes
 app.use('/api/projects', projectRoutes);
