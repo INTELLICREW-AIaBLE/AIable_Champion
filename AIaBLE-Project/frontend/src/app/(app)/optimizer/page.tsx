@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
+import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type AIModel = 'Groq' | 'OpenRouter' | 'Gemini';
@@ -39,10 +40,10 @@ const t = {
   vi: {
     title: 'Prompt Optimizer',
     desc: 'Biến raw prompt thô thành prompt chuyên nghiệp với AI. Xem ngay sự khác biệt Before / After.',
-    reset: 'Reset',
-    aiModel: 'AI Model',
-    outputTone: 'Output Tone',
-    rawPrompt: 'Raw Prompt',
+    reset: 'Làm mới',
+    aiModel: 'Mô hình AI',
+    outputTone: 'Phong cách Output',
+    rawPrompt: 'Prompt gốc',
     chars: 'ký tự',
     words: 'từ',
     promptHistory: 'Lịch sử Prompt',
@@ -64,10 +65,15 @@ const t = {
     copied: 'Copied!',
     copy: 'Copy',
     tones: {
-      academic: { label: 'Academic', desc: 'Formal, citation-ready' },
-      technical: { label: 'Technical', desc: 'Precise, structured' },
-      creative: { label: 'Creative', desc: 'Vivid, engaging' },
-      concise: { label: 'Concise', desc: 'Brief, to the point' }
+      academic: { label: 'Học thuật', desc: 'Trang trọng, trích dẫn' },
+      technical: { label: 'Kỹ thuật', desc: 'Chính xác, có cấu trúc' },
+      creative: { label: 'Sáng tạo', desc: 'Sinh động, lôi cuốn' },
+      concise: { label: 'Ngắn gọn', desc: 'Xúc tích, đúng trọng tâm' }
+    },
+    badges: {
+      Groq: 'Tốt nhất cho viết lách',
+      OpenRouter: 'Tốt nhất cho code',
+      Gemini: 'Tốt nhất cho phân tích'
     },
     examples: [
       'Giải thích thuật toán quicksort cho tôi',
@@ -116,6 +122,11 @@ const t = {
       technical: { label: 'Technical', desc: 'Precise, structured' },
       creative: { label: 'Creative', desc: 'Vivid, engaging' },
       concise: { label: 'Concise', desc: 'Brief, to the point' }
+    },
+    badges: {
+      Groq: 'Best for writing',
+      OpenRouter: 'Best for coding',
+      Gemini: 'Best for analysis'
     },
     examples: [
       'Explain the quicksort algorithm to me',
@@ -457,7 +468,7 @@ export default function OptimizerPage() {
                   <Image src={m.logo} alt={m.label} width={24} height={24} className="object-cover" />
                 </div>
                 {m.id}
-                <span className="text-[9px] font-medium text-slate-400 leading-none">{m.badge}</span>
+                <span className="text-[9px] font-medium text-slate-400 leading-none">{(text.badges as any)[m.id] || m.badge}</span>
               </button>
             ))}
           </div>
@@ -658,9 +669,9 @@ export default function OptimizerPage() {
                     <CopyButton text={result.optimized} />
                   </div>
                 </div>
-                <pre className="px-5 py-4 text-sm text-slate-900 font-medium whitespace-pre-wrap leading-relaxed font-mono min-h-[180px]">
-                  {result.optimized}
-                </pre>
+                <div className="px-5 py-4 min-h-[180px]">
+                  <MarkdownRenderer content={result.optimized} />
+                </div>
               </div>
             )}
           </div>

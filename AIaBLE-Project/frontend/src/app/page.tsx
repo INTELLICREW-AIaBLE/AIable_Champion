@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Navbar } from '@/components/layout/Navbar';
+import { Footer } from '@/components/layout/Footer';
 import { 
   ArrowRight, 
   Wand2, 
@@ -35,7 +37,39 @@ const t = {
     btnExplore: 'Khám phá tính năng',
     btnEnter: 'Vào không gian làm việc AIaBLE',
     ready: 'Sẵn sàng học tập hiệu quả cùng AI?',
-    readySub: 'Không còn sao chép mù quáng. Xây dựng kỹ năng viết prompt và đảm bảo bài tập đạt chuẩn học thuật với AIaBLE.'
+    readySub: 'Không còn sao chép mù quáng. Xây dựng kỹ năng viết prompt và đảm bảo bài tập đạt chuẩn học thuật với AIaBLE.',
+    foundersTitle: 'Gặp Gỡ Đội Ngũ Co-Founders',
+    foundersSub: 'Đội ngũ INTELLICREW kiến tạo và phát triển không gian làm việc học tập AI học thuật tối ưu.',
+    founders: [
+      {
+        name: 'Phạm Quốc Anh',
+        initials: 'QA',
+        image: '/quoc_anh.jpg',
+        role: 'Leader / Lead Backend & Devops',
+        desc: 'Thiết kế cấu trúc API, tích hợp dịch vụ AI (Claude & Gemini), quản lý cơ sở dữ liệu và triển khai toàn bộ hệ thống.'
+      },
+      {
+        name: 'Nguyễn Huy Hoàng',
+        initials: 'HH',
+        image: '/huy_hoang.jpg',
+        role: 'Lead Frontend & Cấu trúc UI',
+        desc: 'Xây dựng layout tổng thể, phát triển landing page, thiết kế hệ thống style và các thành phần giao diện chính.'
+      },
+      {
+        name: 'Nguyễn Duy Nhật Anh',
+        initials: 'NA',
+        image: '/nhat_anh.jpg',
+        role: 'Frontend & Tương tác Logic',
+        desc: 'Lập trình logic tương tác trên các phân hệ Sandbox, Validator, Task-Matcher và đảm bảo tính mượt mà của UX.'
+      },
+      {
+        name: 'Lê Duy Hưng',
+        initials: 'DH',
+        image: '/duy_hung.jpg',
+        role: 'Backend & Quản lý API Tĩnh',
+        desc: 'Quản lý thư viện công thức prompt học thuật (Recipes), viết các thuật toán bổ trợ và xác thực nguồn tin tức.'
+      }
+    ]
   },
   en: {
     badge: 'Project AIaBLE by INTELLICREW',
@@ -47,14 +81,50 @@ const t = {
     btnExplore: 'Explore Features',
     btnEnter: 'Enter AIaBLE Workspace',
     ready: 'Ready to learn effectively alongside AI?',
-    readySub: 'No more blind copying. Build prompt engineering skills and ensure your assignments match academic standards with AIaBLE.'
+    readySub: 'No more blind copying. Build prompt engineering skills and ensure your assignments match academic standards with AIaBLE.',
+    foundersTitle: 'Meet Our Co-Founders',
+    foundersSub: 'The visionary INTELLICREW team behind the academic AI workspace.',
+    founders: [
+      {
+        name: 'Pham Quoc Anh',
+        initials: 'QA',
+        image: '/quoc_anh.jpg',
+        role: 'Leader / Lead Backend & Devops',
+        desc: 'Designs backend APIs, integrates LLMs (Claude & Gemini), manages databases, and oversees cloud deployments.'
+      },
+      {
+        name: 'Nguyen Huy Hoang',
+        initials: 'HH',
+        image: '/huy_hoang.jpg',
+        role: 'Lead Frontend & UI Architecture',
+        desc: 'Establishes UI layout guidelines, develops the landing page, and styles core visual dashboard components.'
+      },
+      {
+        name: 'Nguyen Duy Nhat Anh',
+        initials: 'NA',
+        image: '/nhat_anh.jpg',
+        role: 'Frontend & Logic Developer',
+        desc: 'Powers client-side state machine, handles interactive flows for Sandbox, Validator, and Task-Matcher features.'
+      },
+      {
+        name: 'Le Duy Hung',
+        initials: 'DH',
+        image: '/duy_hung.jpg',
+        role: 'Backend & Data API Engineer',
+        desc: 'Curates learning prompt library, builds search index algorithms, and validates source credibility checks.'
+      }
+    ]
   }
 };
 
 export default function LandingPage() {
   const [lang, setLang] = useState('vi');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsLoggedIn(!!localStorage.getItem('token'));
+    }
     setLang(localStorage.getItem('app_lang') || 'vi');
     const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
     window.addEventListener('storage', handleLangChange);
@@ -95,10 +165,10 @@ export default function LandingPage() {
         {/* CTA Actions */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
           <Link
-            href="/login"
+            href={isLoggedIn ? "/home" : "/login"}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-8 py-4 text-base font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-lg shadow-violet-200 hover:-translate-y-0.5"
           >
-            {text.btnStart}
+            {isLoggedIn ? text.btnEnter : text.btnStart}
             <ArrowRight className="w-4 h-4" />
           </Link>
           <a
@@ -305,8 +375,76 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Call to Action Banner */}
-      <section className="pt-20 px-4 md:px-8 text-center max-w-4xl mx-auto relative">
+      {/* ── Co-founders Grid Section ────────────────────────────────────────── */}
+      <section className="py-20 px-4 md:px-8 max-w-7xl mx-auto relative overflow-hidden">
+        {/* Glow indicators */}
+        <div className="absolute top-1/2 left-0 w-72 h-72 bg-violet-600/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-72 h-72 bg-indigo-600/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="text-center max-w-3xl mx-auto mb-16 relative z-10">
+          <div className="inline-flex items-center gap-1 text-xs font-bold text-violet-600 uppercase tracking-widest mb-3">
+            <Sparkles className="w-4 h-4 animate-pulse" />
+            INTELLICREW Team
+          </div>
+          <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight mb-4">
+            {text.foundersTitle}
+          </h2>
+          <p className="text-slate-500 font-medium text-sm md:text-base leading-relaxed">
+            {text.foundersSub}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+          {(text.founders || []).map((founder: any, idx: number) => (
+            <div 
+              key={idx}
+              className="group relative bg-white border border-slate-100 rounded-3xl p-8 text-center shadow-lg shadow-slate-100/40 hover:shadow-2xl hover:shadow-violet-100/60 hover:-translate-y-2.5 transition-all duration-500 flex flex-col justify-between overflow-hidden"
+            >
+              {/* Inner ambient light glow that expands on hover */}
+              <div className="absolute -top-10 -right-10 w-24 h-24 bg-gradient-to-tr from-violet-600/10 to-indigo-600/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500 pointer-events-none" />
+
+              <div>
+                {/* Photo Space (Avatar Slot) - Rectangular Portrait format */}
+                <div className="relative w-full aspect-[3/4] rounded-2xl bg-gradient-to-tr from-violet-100 via-indigo-50 to-purple-100 border border-slate-100 overflow-hidden flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-500 shadow-inner">
+                  {founder.image ? (
+                    <Image 
+                      src={founder.image} 
+                      alt={founder.name} 
+                      fill 
+                      sizes="(max-w-7xl) 25vw, 100vw"
+                      className="object-cover object-center group-hover:scale-105 transition-transform duration-700" 
+                    />
+                  ) : (
+                    <span className="text-3xl font-black bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent select-none">
+                      {founder.initials}
+                    </span>
+                  )}
+                </div>
+
+                {/* Founder Info */}
+                <h3 className="text-lg font-black text-slate-800 tracking-tight mt-6 group-hover:text-violet-700 transition-colors duration-300">
+                  {founder.name}
+                </h3>
+                
+                <p className="text-[10px] font-black text-violet-600 uppercase tracking-widest mt-1.5 px-2 py-0.5 rounded bg-violet-50 inline-block">
+                  {founder.role}
+                </p>
+              </div>
+
+              {/* Responsibilities */}
+              <p className="text-xs text-slate-500 leading-relaxed mt-6 pt-5 border-t border-slate-100 font-medium">
+                {founder.desc}
+              </p>
+
+              {/* Hover bottom accent bar */}
+              <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Call to Action Banner - added padding-bottom to separate from footer */}
+      <section className="pt-20 pb-32 px-4 md:px-8 text-center max-w-4xl mx-auto relative">
         <div className="inline-flex items-center gap-1.5 text-xs font-bold text-violet-600 uppercase tracking-widest mb-3">
           <GraduationCap className="w-4 h-4" /> Academic Excellence
         </div>
@@ -317,7 +455,7 @@ export default function LandingPage() {
           {text.readySub}
         </p>
         <Link
-          href="/login"
+          href={isLoggedIn ? "/home" : "/login"}
           className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-8 py-4 text-base font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-lg shadow-violet-200"
         >
           {text.btnEnter}
@@ -326,9 +464,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="pt-20 px-4 md:px-8 text-center text-slate-400 text-xs border-t border-slate-200/50 mt-16 max-w-6xl mx-auto">
-        <p>© 2026 AIaBLE Hub. Developed by Team INTELLICREW. Powered by Gemini & Next.js.</p>
-      </footer>
+      <Footer />
     </div>
   );
 }

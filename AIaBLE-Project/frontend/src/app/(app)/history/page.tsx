@@ -72,7 +72,7 @@ export default function HistoryPage() {
               const tool = (item.tool || '').toLowerCase();
               if (tool.includes('optimizer')) router.push('/optimizer');
               else if (tool.includes('sandbox')) router.push('/sandbox');
-              else if (tool.includes('matcher')) router.push('/matcher');
+              else if (tool.includes('matcher')) router.push('/task-matcher');
               else if (tool.includes('saved')) router.push('/recipes/saved');
               else if (tool.includes('library') || tool.includes('recipe')) router.push('/recipes');
               else router.push('/dashboard');

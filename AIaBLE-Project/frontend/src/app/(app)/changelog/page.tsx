@@ -1,6 +1,7 @@
 'use client';
 
 import { Sparkles, Rocket, Bug, Zap } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const CHANGELOGS = [
   {
@@ -47,7 +48,32 @@ const CHANGELOGS = [
   }
 ];
 
+const t = {
+  vi: {
+    title: 'Tính năng mới',
+    desc: 'Theo dõi những cập nhật mới nhất, tính năng vừa ra mắt và các bản sửa lỗi của AIaBLE.'
+  },
+  en: {
+    title: "What's New",
+    desc: 'Track the latest updates, newly launched features, and bug fixes for AIaBLE.'
+  }
+};
+
 export default function ChangelogPage() {
+  const [lang, setLang] = useState('vi');
+
+  useEffect(() => {
+    setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    window.addEventListener('storage', handleLangChange);
+    window.addEventListener('app_lang_changed', handleLangChange);
+    return () => {
+      window.removeEventListener('storage', handleLangChange);
+      window.removeEventListener('app_lang_changed', handleLangChange);
+    };
+  }, []);
+
+  const text = t[lang as 'vi' | 'en'] || t.vi;
   const getTypeIcon = (type: string) => {
     switch(type) {
       case 'feature': return <Rocket className="w-4 h-4 text-emerald-500" />;
@@ -63,8 +89,8 @@ export default function ChangelogPage() {
         <div className="w-16 h-16 rounded-3xl bg-amber-100 flex items-center justify-center text-amber-600 shadow-xl shadow-amber-200/50 mb-6 rotate-12">
           <Sparkles className="w-8 h-8" />
         </div>
-        <h1 className="text-4xl font-black text-slate-900 mb-3">What's New</h1>
-        <p className="text-slate-500 max-w-md">Theo dõi những cập nhật mới nhất, tính năng vừa ra mắt và các bản sửa lỗi của AIaBLE.</p>
+        <h1 className="text-4xl font-black text-slate-900 mb-3">{text.title}</h1>
+        <p className="text-slate-500 max-w-md">{text.desc}</p>
       </div>
 
       <div className="space-y-10 relative">

@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { HelpCircle, Search, Mail, MessageSquare, FileText, ChevronRight } from 'lucide-react';
+import { HelpCircle, Search, Mail, MessageSquare, FileText, ChevronRight, BookOpen } from 'lucide-react';
 
 const FAQS = [
-  { question: 'Làm thế nào để đổi API Key?', answer: 'Bạn có thể truy cập vào Cài đặt > API Keys để nhập và lưu trữ mã API của riêng mình. Mã này chỉ lưu ở trình duyệt của bạn.' },
+  { question: 'Tính năng Đạo đức học thuật (Ethics Guardrail) là gì?', answer: 'Đây là bộ lọc tự động cảnh báo khi bạn yêu cầu AI làm thay hoàn toàn bài tập, viết code hộ 100% hoặc các hành vi vi phạm liêm chính học thuật. Tính năng này giúp định hướng bạn sử dụng AI như một người hướng dẫn, thay vì làm hộ.' },
   { question: 'AI Sandbox khác gì Optimize Prompt?', answer: 'AI Sandbox cho phép bạn so sánh kết quả của nhiều model (GPT, Claude, Gemini) cùng lúc, trong khi Optimize tập trung vào việc tự động viết lại prompt của bạn sao cho chuẩn xác nhất.' },
   { question: 'Dữ liệu của tôi có được bảo mật không?', answer: 'Hoàn toàn bảo mật. Các dự án, prompt và thông tin của bạn được lưu trữ an toàn. AIaBLE không sử dụng dữ liệu của người dùng để train model.' },
   { question: 'Tôi có thể chia sẻ Recipe của mình không?', answer: 'Có, trong phiên bản tới bạn sẽ có tuỳ chọn Publish recipe của mình lên Community Library để chia sẻ với mọi người.' },
@@ -15,12 +15,45 @@ const FAQS = [
   { question: 'Làm sao để lấy lại mật khẩu khi bị quên?', answer: 'Ở màn hình Đăng nhập, bạn hãy nhấp vào "Quên mật khẩu". Hệ thống sẽ gửi hướng dẫn khôi phục mật khẩu vào địa chỉ email mà bạn đã đăng ký.' },
 ];
 
+const GUIDES = [
+  {
+    title: '1. Cảnh báo Đạo đức học thuật (Ethics Guardrail)',
+    content: 'Để đảm bảo liêm chính học thuật, AIaBLE tích hợp sẵn bộ lọc đạo đức. Khi bạn đưa ra các yêu cầu vi phạm như "làm hộ bài tập" hoặc "viết code hoàn chỉnh để nộp", hệ thống sẽ nhắc nhở và tự động điều chỉnh câu lệnh (Prompt) của bạn sang hướng gợi ý cách làm hoặc hướng dẫn từng bước. Tính năng này luôn chạy ngầm để giúp bạn sử dụng AI một cách đúng đắn.'
+  },
+  {
+    title: '2. Tối ưu câu lệnh (Prompt Optimizer)',
+    content: 'Sử dụng khi bạn không biết cách hỏi AI sao cho đúng. Vào "Tối ưu Prompt", nhập ý tưởng thô sơ của bạn, chọn mô hình (Gemini/Groq/OpenRouter) và phong cách. Hệ thống sẽ tự động cấu trúc lại câu lệnh, phân tích độ rõ ràng và đưa ra các gợi ý cải thiện.'
+  },
+  {
+    title: '3. Phân rã bài tập lớn (AI Task-Matcher)',
+    content: 'Sử dụng khi bạn đối mặt với một bài tập lớn hoặc đồ án. Vào "Ghép Task", nhập đề tài (VD: Viết báo cáo Kỹ thuật phần mềm). Hệ thống sẽ vạch ra 5 bước thực hiện chi tiết, gợi ý công cụ AI phù hợp nhất cho từng bước kèm theo Prompt mẫu để bạn copy.'
+  },
+  {
+    title: '4. Kiểm thử nhiều AI (AI Sandbox)',
+    content: 'Sử dụng khi bạn muốn kiểm tra xem AI nào trả lời tốt nhất. Vào "AI Sandbox", nhập câu hỏi và bấm Chạy. Hệ thống sẽ đồng thời gửi câu hỏi đó tới 3 mô hình (Gemini, Groq, OpenRouter) để bạn dễ dàng so sánh kết quả trực tiếp trên cùng một giao diện.'
+  },
+  {
+    title: '5. Lưu trữ và quản lý tài liệu (Dự án & Recipes)',
+    content: 'Khi có kết quả AI ưng ý ở Sandbox hoặc Optimizer, hãy bấm biểu tượng Lưu (Thư mục) để đưa vào một Dự án. Bạn có thể vào mục "Dự án" để xem lại tài liệu, hoặc vào "Thư viện Recipes" để tham khảo các mẫu Prompt có sẵn từ cộng đồng.'
+  },
+  {
+    title: '6. Theo dõi Lịch sử và Hoạt động',
+    content: 'Mọi hoạt động sử dụng AI của bạn đều được ghi lại. Bạn có thể vào mục "Lịch sử" ở menu trái, hoặc nhấp vào Avatar > "Hồ sơ" để xem biểu đồ hoạt động 14 ngày gần nhất và quản lý các thành tựu (Badges) của bản thân.'
+  }
+];
+
 export default function HelpPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'guide' | 'faq'>('guide');
   
   const filteredFaqs = FAQS.filter(faq => 
     faq.question.toLowerCase().includes(searchQuery.toLowerCase()) || 
     faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredGuides = GUIDES.filter(guide => 
+    guide.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    guide.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -49,27 +82,60 @@ export default function HelpPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* FAQs */}
+        {/* Main Content Area */}
         <div className="md:col-span-2 space-y-6">
-          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-violet-600" />
-            Câu hỏi thường gặp
-          </h2>
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm divide-y divide-slate-100">
-            {filteredFaqs.length > 0 ? filteredFaqs.map((faq, idx) => (
-              <details key={idx} className="group p-6 cursor-pointer marker:content-['']" open={searchQuery.trim().length > 0}>
-                <summary className="flex items-center justify-between font-bold text-slate-800 select-none">
-                  {faq.question}
-                  <ChevronRight className="w-5 h-5 text-slate-400 group-open:rotate-90 transition-transform" />
-                </summary>
-                <div className="pt-4 text-slate-600 text-sm leading-relaxed pr-8">
-                  {faq.answer}
+          <div className="flex items-center gap-2 border-b border-slate-200">
+            <button 
+              onClick={() => setActiveTab('guide')}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition-colors ${activeTab === 'guide' ? 'border-violet-600 text-violet-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+            >
+              <BookOpen className="w-4 h-4" />
+              Hướng dẫn sử dụng
+            </button>
+            <button 
+              onClick={() => setActiveTab('faq')}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition-colors ${activeTab === 'faq' ? 'border-violet-600 text-violet-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+            >
+              <FileText className="w-4 h-4" />
+              Câu hỏi thường gặp
+            </button>
+          </div>
+
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm divide-y divide-slate-100 overflow-hidden">
+            {activeTab === 'faq' && (
+              filteredFaqs.length > 0 ? filteredFaqs.map((faq, idx) => (
+                <details key={idx} className="group p-6 cursor-pointer marker:content-['']" open={searchQuery.trim().length > 0}>
+                  <summary className="flex items-center justify-between font-bold text-slate-800 select-none">
+                    {faq.question}
+                    <ChevronRight className="w-5 h-5 text-slate-400 group-open:rotate-90 transition-transform" />
+                  </summary>
+                  <div className="pt-4 text-slate-600 text-sm leading-relaxed pr-8">
+                    {faq.answer}
+                  </div>
+                </details>
+              )) : (
+                <div className="p-8 text-center text-slate-500 text-sm">
+                  Không tìm thấy kết quả phù hợp trong Hỏi đáp
                 </div>
-              </details>
-            )) : (
-              <div className="p-8 text-center text-slate-500 text-sm">
-                Không tìm thấy kết quả phù hợp cho "{searchQuery}"
-              </div>
+              )
+            )}
+
+            {activeTab === 'guide' && (
+              filteredGuides.length > 0 ? filteredGuides.map((guide, idx) => (
+                <details key={`guide-${idx}`} className="group p-6 cursor-pointer marker:content-['']" open={idx === 0 || searchQuery.trim().length > 0}>
+                  <summary className="flex items-center justify-between font-bold text-slate-800 select-none">
+                    {guide.title}
+                    <ChevronRight className="w-5 h-5 text-slate-400 group-open:rotate-90 transition-transform" />
+                  </summary>
+                  <div className="pt-4 text-slate-600 text-sm leading-relaxed pr-8">
+                    {guide.content}
+                  </div>
+                </details>
+              )) : (
+                <div className="p-8 text-center text-slate-500 text-sm">
+                  Không tìm thấy kết quả phù hợp trong Hướng dẫn
+                </div>
+              )
             )}
           </div>
         </div>

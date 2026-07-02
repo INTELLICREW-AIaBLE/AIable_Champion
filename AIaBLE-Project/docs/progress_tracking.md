@@ -21,6 +21,19 @@ Dự án được cấu trúc dạng Monorepo (Next.js Frontend + Express/TypeSc
 
 *Cập nhật gần nhất: 02/07/2026*
 
+- **Hoàn Thiện Localization (Đa ngôn ngữ) & Sửa lỗi UI/UX (02/07/2026):**
+  - **Việt Hoá 100%:** Rà soát và dịch thuật toàn bộ các từ khóa tiếng Anh còn sót lại trên UI (như các badge mô hình trong Optimizer, danh mục Tag của Recipe, thanh trạng thái Task-Matcher, menu What's New). Đảm bảo giao diện 100% thuần Việt khi bật Tiếng Việt.
+  - **Sửa lỗi Code:** Khắc phục lỗi sập trang (`Invalid hook call`) trong component `RecipeCard` do sử dụng hook `useEffect` bên trong block import động, giúp tính năng Fast Refresh hoạt động ổn định.
+  - **Tối ưu UX Task-Matcher:** Gỡ bỏ nội dung văn bản điền sẵn trong ô nhập liệu nhiệm vụ, chuyển sang định dạng placeholder mờ để tránh người dùng phải xoá tay trước khi gõ.
+  - **Cập nhật Help Center:** Gỡ bỏ các hướng dẫn cũ liên quan đến "Cấu hình API Key" (do tính năng đã bị lược bỏ). Bổ sung tài liệu giải thích và hướng dẫn về "Cảnh báo Đạo đức học thuật" (Ethics Guardrail) để định hướng sinh viên sử dụng AI học tập liêm chính.
+
+- **Xử lý UX/UI, Tính ổn định Phiên đăng nhập & Bảo mật (02/07/2026):**
+  - **Auth Persistence:** Khắc phục lỗi Landing Page và Navbar không nhận diện được phiên đăng nhập. Tích hợp đọc Token giúp điều hướng trực tiếp vào Dashboard thay vì kẹt ở màn hình "Đăng nhập".
+  - **Quản lý Sandbox:** Tích hợp `AbortController`, chuyển đổi nút bấm sang dạng "Dừng AI" để người dùng có thể ngắt request ngay lập tức khi Model bị treo hoặc ảo giác.
+  - **Task-Matcher:** Sửa lỗi lệch ngôn ngữ bằng cách ép AI trả kết quả 100% tiếng Việt theo tuỳ chọn cấu hình; cập nhật UI thanh trạng thái phân tích từ tĩnh sang "Động" phản ánh đúng nhiệm vụ người dùng vừa nhập.
+  - **Bảo mật:** Vá lỗ hổng Payload DoS ở tính năng Optimizer bằng cách giới hạn đầu vào 3000 ký tự, kết hợp với bộ lọc API Limiter và xác minh chống ReDoS cho toàn bộ hệ Regex.
+  - **Tài liệu người dùng:** Xây dựng mới hoàn toàn 1 Tab "Hướng dẫn sử dụng" rất chi tiết trên trang Help, kèm thanh tìm kiếm thông minh.
+
 - **Cải tiến UI/UX & Hệ thống Thông báo (Notification System):**
   - Xây dựng hệ thống thông báo thời gian thực (real-time notification) bằng `CustomEvent` và `localStorage` (tại `lib/notifications.ts`).
   - Gắn thành công thông báo cho các thao tác quan trọng: Tạo/Xóa/Khôi phục dự án, Lưu prompt vào dự án, Đổi mật khẩu, Đổi cài đặt.

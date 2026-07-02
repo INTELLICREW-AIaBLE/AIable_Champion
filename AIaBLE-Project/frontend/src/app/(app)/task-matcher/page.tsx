@@ -8,6 +8,7 @@ import {
   Sparkles,
   X,
 } from 'lucide-react';
+import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 
 type TimelineStep = {
   stepName: string;
@@ -42,7 +43,13 @@ const t = {
     stepDesc: 'Mô tả bước',
     suggestTool: 'Công cụ đề xuất',
     promptSample: 'Prompt mẫu',
-    promptDefault: `Bạn là trợ lý học thuật.\n\nNhiệm vụ:\n{stepName}\n\nNgữ cảnh:\nTôi đang làm bài tập lớn...\n\nYêu cầu:\n- Trình bày rõ ràng\n- Có cấu trúc từng phần\n- Gợi ý ví dụ thực tế\n- Không làm thay hoàn toàn, chỉ hỗ trợ định hướng`
+    promptDefault: `Bạn là trợ lý học thuật.\n\nNhiệm vụ:\n{stepName}\n\nNgữ cảnh:\nTôi đang làm bài tập lớn...\n\nYêu cầu:\n- Trình bày rõ ràng\n- Có cấu trúc từng phần\n- Gợi ý ví dụ thực tế\n- Không làm thay hoàn toàn, chỉ hỗ trợ định hướng`,
+    subjects: {
+      'software engineering': 'Kỹ thuật phần mềm',
+      'marketing': 'Marketing',
+      'business administration': 'Quản trị kinh doanh',
+      'data science': 'Khoa học dữ liệu'
+    }
   },
   en: {
     title: 'AI Task-Matcher',
@@ -56,7 +63,13 @@ const t = {
     stepDesc: 'Step Description',
     suggestTool: 'Suggested Tool',
     promptSample: 'Sample Prompt',
-    promptDefault: `You are an academic assistant.\n\nTask:\n{stepName}\n\nContext:\nI'm working on an assignment...\n\nRequirements:\n- Present clearly\n- Structured sections\n- Provide real-world examples\n- Do not do it all for me, only assist with directions`
+    promptDefault: `You are an academic assistant.\n\nTask:\n{stepName}\n\nContext:\nI'm working on an assignment...\n\nRequirements:\n- Present clearly\n- Structured sections\n- Provide real-world examples\n- Do not do it all for me, only assist with directions`,
+    subjects: {
+      'software engineering': 'Software Engineering',
+      'marketing': 'Marketing',
+      'business administration': 'Business Administration',
+      'data science': 'Data Science'
+    }
   }
 };
 
@@ -77,17 +90,16 @@ export default function TaskMatcherPage() {
 
   const text = t[lang as 'en' | 'vi'] || t.vi;
 
-  const [taskDescription, setTaskDescription] = useState(text.placeholder);
+  const [taskDescription, setTaskDescription] = useState('');
 
   // Update placeholder dynamically when language changes
-  useEffect(() => {
-    setTaskDescription(text.placeholder);
-  }, [lang]);
+  // useEffect removed because we no longer set the input value to the placeholder
 
   const [subject, setSubject] = useState('software engineering');
   const [steps, setSteps] = useState<TimelineStep[]>(MOCK_STEPS);
   const [loading, setLoading] = useState(false);
   const [source, setSource] = useState('');
+  const [activeTask, setActiveTask] = useState<{subject: string, desc: string} | null>(null);
 
   useEffect(() => {
     async function fetchWorkflow() {
@@ -96,6 +108,7 @@ export default function TaskMatcherPage() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/task-matcher`);
         const json = await res.json();
         setSteps(Array.isArray(json.data) ? json.data : MOCK_STEPS);
+        setActiveTask({ subject: 'software engineering', desc: text.placeholder });
       } catch (error) {
         console.error('Failed to fetch task workflow:', error);
         setSteps(MOCK_STEPS);
@@ -109,15 +122,17 @@ export default function TaskMatcherPage() {
   const handleMatchTask = async () => {
     try {
       setLoading(true);
+      const finalDesc = taskDescription.trim() || text.placeholder;
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/task-matcher`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject, description: taskDescription }),
+        body: JSON.stringify({ subject, description: finalDesc, lang }),
       });
       const json = await res.json();
       if (!json.success) throw new Error(json.message || 'Task matcher failed');
       setSteps(Array.isArray(json.steps) ? json.steps : []);
       setSource(json.source || '');
+      setActiveTask({ subject, desc: finalDesc });
       
       // Log lịch sử hoạt động
       const token = localStorage.getItem('token');
@@ -131,7 +146,7 @@ export default function TaskMatcherPage() {
           body: JSON.stringify({
             action: 'Match workflow task',
             tool: 'Task Matcher',
-            detail: `Subject: ${subject} - ${taskDescription.substring(0, 40)}${taskDescription.length > 40 ? '...' : ''}`,
+            detail: `Subject: ${subject} - ${finalDesc.substring(0, 40)}${finalDesc.length > 40 ? '...' : ''}`,
             model: json.source || 'Groq'
           })
         }).catch(err => console.error('Lỗi khi lưu lịch sử:', err));
@@ -165,7 +180,8 @@ export default function TaskMatcherPage() {
         <input
           value={taskDescription}
           onChange={(e) => setTaskDescription(e.target.value)}
-          className="px-4 py-2.5 rounded-xl bg-white border border-slate-100 shadow-sm text-sm text-slate-700 focus:outline-none focus:border-violet-300"
+          placeholder={text.placeholder}
+          className="px-4 py-2.5 rounded-xl bg-white border border-slate-100 shadow-sm text-sm text-slate-700 focus:outline-none focus:border-violet-300 w-full"
         />
 
         <select
@@ -173,12 +189,11 @@ export default function TaskMatcherPage() {
           onChange={(e) => setSubject(e.target.value)}
           className="px-4 py-2.5 rounded-xl bg-white border border-slate-100 shadow-sm text-sm font-medium text-slate-600 focus:outline-none"
         >
-          <option value="software engineering">Software Engineering</option>
-          <option value="marketing">Marketing</option>
-          <option value="business administration">
-            Business Administration
-          </option>
-          <option value="data science">Data Science</option>
+          {Object.entries(text.subjects).map(([key, label]) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
         </select>
 
         <button
@@ -191,27 +206,29 @@ export default function TaskMatcherPage() {
         </button>
       </div>
 
-      <div className="rounded-2xl bg-violet-50 border border-violet-100 px-5 py-3">
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <Layers className="w-4 h-4 text-violet-600" />
-          <span className="font-bold text-violet-800">
-            Báo cáo SE — Kiến trúc Microservices
-          </span>
-          <span className="text-violet-400">•</span>
-          <span className="font-semibold text-violet-600">
-            {text.estimated}
-          </span>
+      {activeTask && (
+        <div className="rounded-2xl bg-violet-50 border border-violet-100 px-5 py-3">
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <Layers className="w-4 h-4 text-violet-600" />
+            <span className="font-bold text-violet-800">
+              {((text.subjects as any)[activeTask.subject] || activeTask.subject).toUpperCase()} — {activeTask.desc.substring(0, 40)}{activeTask.desc.length > 40 ? '...' : ''}
+            </span>
+            <span className="text-violet-400">•</span>
+            <span className="font-semibold text-violet-600">
+              {lang === 'vi' ? 'Đã phân tích' : 'Analyzed'}
+            </span>
 
-          {source && (
-            <>
-              <span className="text-violet-400">•</span>
-              <span className="font-semibold text-violet-600">
-                Source: {source}
-              </span>
-            </>
-          )}
+            {source && (
+              <>
+                <span className="text-violet-400">•</span>
+                <span className="font-semibold text-violet-600">
+                  Source: {source}
+                </span>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       <section className="space-y-3">
         {steps.map((step, index) => (
@@ -303,9 +320,9 @@ export default function TaskMatcherPage() {
                 <p className="text-xs font-bold text-violet-600 uppercase tracking-wide mb-2">
                   {text.promptSample}
                 </p>
-                <pre className="whitespace-pre-wrap text-sm text-slate-700 leading-relaxed font-mono">
-                  {selectedStep.suggestedPrompt || text.promptDefault.replace('{stepName}', selectedStep.stepName)}
-                </pre>
+                <div className="bg-white p-3 rounded-xl border border-slate-100/80">
+                  <MarkdownRenderer content={selectedStep.suggestedPrompt || text.promptDefault.replace('{stepName}', selectedStep.stepName)} />
+                </div>
               </div>
             </div>
           </aside>

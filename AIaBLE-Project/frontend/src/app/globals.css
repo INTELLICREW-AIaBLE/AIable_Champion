@@ -129,3 +129,47 @@ html.dark-mode-active .bg-purple-100 { background-color: hsl(270, 50%, 80%) !imp
 html.dark-mode-active .bg-indigo-100 { background-color: hsl(245, 50%, 80%) !important; }
 html.dark-mode-active .bg-fuchsia-100 { background-color: hsl(290, 50%, 80%) !important; }
 
+/* Custom basic styles for Markdown rendering (.prose) */
+.prose h1 { @apply text-xl font-black mt-5 mb-2.5 text-slate-900; }
+.prose h2 { @apply text-lg font-extrabold mt-4 mb-2 text-slate-800; }
+.prose h3 { @apply text-base font-bold mt-3 mb-1.5 text-slate-800; }
+.prose p { @apply mb-3 text-slate-700 leading-relaxed; }
+.prose ul { @apply list-disc pl-5 mb-4 space-y-1.5 text-slate-700; }
+.prose ol { @apply list-decimal pl-5 mb-4 space-y-1.5 text-slate-700; }
+.prose li { @apply mb-1; }
+.prose strong { @apply font-bold text-slate-900; }
+.prose em { @apply italic; }
+.prose code { @apply bg-slate-100 text-violet-600 px-1.5 py-0.5 rounded text-xs font-mono font-semibold; }
+.prose pre { @apply bg-slate-900 text-slate-100 p-4 rounded-xl overflow-x-auto text-xs font-mono mb-4 leading-relaxed; }
+.prose pre code { @apply bg-transparent text-slate-100 p-0 text-xs font-mono font-normal; }
+.prose blockquote { @apply border-l-4 border-violet-500 pl-4 italic text-slate-600 my-4 bg-violet-50/30 py-1 pr-2 rounded-r-md; }
+.prose a { @apply text-violet-600 hover:underline font-semibold; }
+.prose table { @apply w-full border-collapse my-5 text-sm; }
+.prose th, .prose td { @apply border border-slate-200 px-3.5 py-2.5 text-left; }
+.prose th { @apply bg-slate-50 font-bold text-slate-700; }
+
+/* Invert overrides for .prose elements in Dark Mode active */
+html.dark-mode-active .prose h1,
+html.dark-mode-active .prose h2,
+html.dark-mode-active .prose h3,
+html.dark-mode-active .prose strong {
+  color: hsl(240, 20%, 5%) !important;
+}
+
+html.dark-mode-active .prose p,
+html.dark-mode-active .prose li {
+  color: hsl(240, 14%, 25%) !important;
+}
+
+html.dark-mode-active .prose code {
+  background-color: hsl(240, 15%, 88%) !important;
+  color: hsl(262, 80%, 25%) !important;
+}
+
+html.dark-mode-active .prose blockquote {
+  border-left-color: hsl(262, 80%, 30%) !important;
+  background-color: hsl(240, 15%, 88%) !important;
+  color: hsl(240, 14%, 30%) !important;
+}
+
+

@@ -48,33 +48,33 @@ const CATEGORY_GROUPS = [
 const ALL_CATEGORIES = ['All', ...CATEGORY_GROUPS.flatMap(g => g.items.filter(i => i !== 'All'))];
 
 const CATEGORY_COLORS: Record<string, string> = {
-  coding:        'bg-violet-50 text-violet-700 border-violet-100 dark:bg-violet-900/30 dark:text-violet-300',
-  report:        'bg-emerald-50 text-emerald-700 border-emerald-100',
-  slide:         'bg-amber-50 text-amber-700 border-amber-100',
-  research:      'bg-sky-50 text-sky-700 border-sky-100',
-  writing:       'bg-pink-50 text-pink-700 border-pink-100',
-  planning:      'bg-teal-50 text-teal-700 border-teal-100',
-  math:          'bg-orange-50 text-orange-700 border-orange-100',
-  english:       'bg-blue-50 text-blue-700 border-blue-100',
-  business:      'bg-indigo-50 text-indigo-700 border-indigo-100',
-  design:        'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-100',
-  data:          'bg-cyan-50 text-cyan-700 border-cyan-100',
-  law:           'bg-slate-100 text-slate-700 border-slate-200',
-  economics:     'bg-lime-50 text-lime-700 border-lime-100',
-  creative:      'bg-rose-50 text-rose-700 border-rose-100',
-  marketing:     'bg-yellow-50 text-yellow-700 border-yellow-100',
-  hr:            'bg-green-50 text-green-700 border-green-100',
-  psychology:    'bg-purple-50 text-purple-700 border-purple-100',
-  science:       'bg-blue-50 text-blue-700 border-blue-100',
-  history:       'bg-stone-50 text-stone-700 border-stone-200',
-  career:        'bg-emerald-50 text-emerald-700 border-emerald-100',
-  ai_prompting:  'bg-violet-50 text-violet-700 border-violet-100',
+  coding: 'bg-violet-50 text-violet-700 border-violet-100 dark:bg-violet-900/30 dark:text-violet-300',
+  report: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+  slide: 'bg-amber-50 text-amber-700 border-amber-100',
+  research: 'bg-sky-50 text-sky-700 border-sky-100',
+  writing: 'bg-pink-50 text-pink-700 border-pink-100',
+  planning: 'bg-teal-50 text-teal-700 border-teal-100',
+  math: 'bg-orange-50 text-orange-700 border-orange-100',
+  english: 'bg-blue-50 text-blue-700 border-blue-100',
+  business: 'bg-indigo-50 text-indigo-700 border-indigo-100',
+  design: 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-100',
+  data: 'bg-cyan-50 text-cyan-700 border-cyan-100',
+  law: 'bg-slate-100 text-slate-700 border-slate-200',
+  economics: 'bg-lime-50 text-lime-700 border-lime-100',
+  creative: 'bg-rose-50 text-rose-700 border-rose-100',
+  marketing: 'bg-yellow-50 text-yellow-700 border-yellow-100',
+  hr: 'bg-green-50 text-green-700 border-green-100',
+  psychology: 'bg-purple-50 text-purple-700 border-purple-100',
+  science: 'bg-blue-50 text-blue-700 border-blue-100',
+  history: 'bg-stone-50 text-stone-700 border-stone-200',
+  career: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+  ai_prompting: 'bg-violet-50 text-violet-700 border-violet-100',
 };
 
 const DIFFICULTY_BADGE: Record<string, string> = {
-  beginner:     'bg-green-50 text-green-600 border-green-100',
+  beginner: 'bg-green-50 text-green-600 border-green-100',
   intermediate: 'bg-amber-50 text-amber-600 border-amber-100',
-  advanced:     'bg-red-50 text-red-600 border-red-100',
+  advanced: 'bg-red-50 text-red-600 border-red-100',
 };
 
 // ─── Recipe Card ──────────────────────────────────────────────────────────────
@@ -100,13 +100,13 @@ function RecipeCard({ recipe, onApply }: { recipe: Recipe; onApply: (r: Recipe) 
       {/* Top accent bar by category */}
       <div className={cn('h-1 w-full', `bg-gradient-to-r`,
         recipe.category === 'CODING' ? 'from-violet-400 to-purple-500' :
-        recipe.category === 'REPORT' ? 'from-emerald-400 to-teal-500' :
-        recipe.category === 'SLIDE'  ? 'from-amber-400 to-orange-500' :
-        recipe.category === 'RESEARCH' ? 'from-sky-400 to-blue-500' :
-        recipe.category === 'MATH' ? 'from-orange-400 to-red-400' :
-        recipe.category === 'DATA' ? 'from-cyan-400 to-blue-500' :
-        recipe.category === 'AI_PROMPTING' ? 'from-fuchsia-400 to-violet-500' :
-        'from-slate-300 to-slate-400'
+          recipe.category === 'REPORT' ? 'from-emerald-400 to-teal-500' :
+            recipe.category === 'SLIDE' ? 'from-amber-400 to-orange-500' :
+              recipe.category === 'RESEARCH' ? 'from-sky-400 to-blue-500' :
+                recipe.category === 'MATH' ? 'from-orange-400 to-red-400' :
+                  recipe.category === 'DATA' ? 'from-cyan-400 to-blue-500' :
+                    recipe.category === 'AI_PROMPTING' ? 'from-fuchsia-400 to-violet-500' :
+                      'from-slate-300 to-slate-400'
       )} />
 
       <div className="flex flex-col flex-1 p-4">
@@ -369,50 +369,50 @@ export default function RecipeLibraryPage() {
         ))}
       </div>
 
-      {/* ── Results info ────────────────────────────────────────────────────── */}
-      {!loading && (
-        <p className="text-xs text-slate-400 font-medium">
-          Hiển thị {(currentPage - 1) * RECIPES_PER_PAGE + 1}–{Math.min(currentPage * RECIPES_PER_PAGE, filteredRecipes.length)} trong tổng số <span className="text-violet-600 font-bold">{filteredRecipes.length}</span> recipes
-        </p>
-      )}
+        {/* ── Results info ────────────────────────────────────────────────────── */}
+        {!loading && (
+          <p className="text-xs text-slate-400 font-medium">
+            Hiển thị {(currentPage - 1) * RECIPES_PER_PAGE + 1}–{Math.min(currentPage * RECIPES_PER_PAGE, filteredRecipes.length)} trong tổng số <span className="text-violet-600 font-bold">{filteredRecipes.length}</span> recipes
+          </p>
+        )}
 
-      {/* ── Grid ────────────────────────────────────────────────────────────── */}
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 9 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border border-slate-100 bg-white p-4 animate-pulse">
-              <div className="h-1 w-full bg-slate-200 rounded mb-4" />
-              <div className="h-3 bg-slate-200 rounded w-1/3 mb-3" />
-              <div className="h-4 bg-slate-200 rounded w-3/4 mb-2" />
-              <div className="h-3 bg-slate-100 rounded w-full mb-1" />
-              <div className="h-3 bg-slate-100 rounded w-5/6 mb-4" />
-              <div className="flex gap-2 mt-6">
-                <div className="h-7 w-16 bg-slate-100 rounded-lg" />
-                <div className="h-7 w-20 bg-violet-100 rounded-lg ml-auto" />
+        {/* ── Grid ────────────────────────────────────────────────────────────── */}
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className="rounded-2xl border border-slate-100 bg-white p-4 animate-pulse">
+                <div className="h-1 w-full bg-slate-200 rounded mb-4" />
+                <div className="h-3 bg-slate-200 rounded w-1/3 mb-3" />
+                <div className="h-4 bg-slate-200 rounded w-3/4 mb-2" />
+                <div className="h-3 bg-slate-100 rounded w-full mb-1" />
+                <div className="h-3 bg-slate-100 rounded w-5/6 mb-4" />
+                <div className="flex gap-2 mt-6">
+                  <div className="h-7 w-16 bg-slate-100 rounded-lg" />
+                  <div className="h-7 w-20 bg-violet-100 rounded-lg ml-auto" />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      ) : paginatedRecipes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-          <BookOpen className="w-12 h-12 mb-3 opacity-30" />
-          <p className="text-sm font-medium">Không tìm thấy recipe nào</p>
-          <button onClick={() => { setSearchQuery(''); setActiveCategory('All'); setAiFilter('All'); }} className="mt-3 text-xs text-violet-600 hover:underline">
-            Xóa bộ lọc
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {paginatedRecipes.map(r => (
-            <RecipeCard key={r.id} recipe={r} onApply={handleApply} />
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        ) : paginatedRecipes.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+            <BookOpen className="w-12 h-12 mb-3 opacity-30" />
+            <p className="text-sm font-medium">Không tìm thấy recipe nào</p>
+            <button onClick={() => { setSearchQuery(''); setActiveCategory('All'); setAiFilter('All'); }} className="mt-3 text-xs text-violet-600 hover:underline">
+              Xóa bộ lọc
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {paginatedRecipes.map(r => (
+              <RecipeCard key={r.id} recipe={r} onApply={handleApply} />
+            ))}
+          </div>
+        )}
 
-      {/* ── Pagination ──────────────────────────────────────────────────────── */}
-      {!loading && totalPages > 1 && (
-        <Pagination currentPage={currentPage} totalPages={totalPages} onChange={p => { setCurrentPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
-      )}
-    </div>
-  );
+        {/* ── Pagination ──────────────────────────────────────────────────────── */}
+        {!loading && totalPages > 1 && (
+          <Pagination currentPage={currentPage} totalPages={totalPages} onChange={p => { setCurrentPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+        )}
+      </div>
+      );
 }

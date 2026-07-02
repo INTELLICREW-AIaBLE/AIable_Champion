@@ -13,6 +13,13 @@ export const handleOptimizePrompt = async (req: Request, res: Response) => {
       });
     }
 
+    if (prompt.length > 3000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Prompt quá dài. Vui lòng giới hạn dưới 3000 ký tự để hệ thống có thể phân tích tốt nhất.'
+      });
+    }
+
     const modelName = model || 'Gemini';
     const toneType = tone || 'academic';
 

@@ -4,9 +4,12 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { 
   Sparkles, Send, Copy, Check, RotateCcw, 
-  Zap, Settings2, Info, ChevronDown, FolderPlus 
+  Zap, Settings2, Info, ChevronDown, FolderPlus,
+  ImagePlus, Loader2, Edit2, Eye
 } from 'lucide-react';
 import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
+import Tesseract from 'tesseract.js';
+import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 
 type AIModel = 'Groq' | 'OpenRouter' | 'Gemini';
 
@@ -31,7 +34,7 @@ const t = {
     desc: 'Kiểm thử và so sánh kết quả trực tiếp từ nhiều mô hình AI (Groq, OpenRouter, Gemini) cùng một lúc.',
     reset: 'Reset',
     settings: 'Cài đặt mô hình',
-    masterPrompt: 'Master Prompt',
+    masterPrompt: 'Prompt Chính',
     promptHistory: 'Lịch sử Prompt',
     placeholder: 'Nhập prompt bạn muốn kiểm thử trên nhiều mô hình AI...',
     hint: 'Nhấn Ctrl + Enter để chạy',
@@ -40,6 +43,9 @@ const t = {
     errConn: 'Không thể kết nối đến server.',
     waiting: 'Chờ thực thi',
     errApi: 'Lỗi kết nối API',
+    scanImg: 'Quét văn bản từ ảnh',
+    scanning: 'Đang quét ảnh...',
+    scanErr: 'Không thể nhận diện văn bản. Vui lòng thử lại.',
     examples: [
       'Viết một email chuyên nghiệp từ chối lời mời phỏng vấn.',
       'Giải thích nguyên lý hoạt động của Quantum Computing cho học sinh cấp 2.',
@@ -60,6 +66,9 @@ const t = {
     errConn: 'Cannot connect to server.',
     waiting: 'Waiting to execute',
     errApi: 'API Connection Error',
+    scanImg: 'Scan text from image',
+    scanning: 'Scanning image...',
+    scanErr: 'Could not recognize text. Please try again.',
     examples: [
       'Write a professional email declining an interview invitation.',
       'Explain the principles of Quantum Computing to a middle schooler.',
@@ -116,6 +125,7 @@ function SkeletonLoader() {
 
 export default function SandboxPage() {
   const [lang, setLang] = useState('vi');
+  const [editModes, setEditModes] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setLang(localStorage.getItem('app_lang') || 'vi');
@@ -133,6 +143,19 @@ export default function SandboxPage() {
   const [prompt, setPrompt] = useState('');
   const [results, setResults] = useState<ModelResult[]>(INITIAL_MODELS);
   const [isRunning, setIsRunning] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const handleStop = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsRunning(false);
+      setResults(prev => prev.map(m => m.status === 'loading' ? { ...m, status: 'error', content: lang === 'vi' ? 'Đã hủy bởi người dùng.' : 'Aborted by user.' } : m));
+    }
+  };
+  
+  const [isScanning, setIsScanning] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [saveData, setSaveData] = useState<{prompt?: string, result?: string, aiModel?: string}>({});
@@ -185,10 +208,57 @@ export default function SandboxPage() {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await processImageFile(file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const processImageFile = async (file: File) => {
+    try {
+      setIsScanning(true);
+      const ocrLang = lang === 'vi' ? 'vie+eng' : 'eng';
+      
+      const result = await Tesseract.recognize(file, ocrLang, {
+        logger: (m) => console.log(m)
+      });
+      
+      const extractedText = result.data.text.trim();
+      if (extractedText) {
+        setPrompt(prev => prev ? `${prev}\n\n${extractedText}` : extractedText);
+        setTimeout(() => textareaRef.current?.focus(), 100);
+      } else {
+        alert(text.scanErr);
+      }
+    } catch (error) {
+      console.error('OCR Error:', error);
+      alert(text.scanErr);
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) {
+          e.preventDefault();
+          processImageFile(file);
+          break;
+        }
+      }
+    }
+  };
+
   const handleRun = async () => {
     if (!prompt.trim()) return;
     
     setIsRunning(true);
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
     
     // Set all to loading
     setResults(prev => prev.map(m => ({ ...m, status: 'loading', content: '', timeMs: undefined })));
@@ -197,7 +267,11 @@ export default function SandboxPage() {
     const runModel = async (index: number, modelName: string, delayMs: number) => {
       // Đợi một khoảng thời gian trước khi gọi API để tránh lỗi 429 Too Many Requests của Gemini Free Tier
       if (delayMs > 0) {
-        await new Promise(r => setTimeout(r, delayMs));
+        await new Promise(r => {
+          const timeoutId = setTimeout(r, delayMs);
+          signal.addEventListener('abort', () => clearTimeout(timeoutId));
+        });
+        if (signal.aborted) return { model: modelName, content: 'Aborted' };
       }
       
       const startTime = Date.now();
@@ -205,7 +279,8 @@ export default function SandboxPage() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/sandbox`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt, model: modelName })
+          body: JSON.stringify({ prompt, model: modelName }),
+          signal
         });
         const data = await res.json();
         
@@ -222,6 +297,7 @@ export default function SandboxPage() {
         });
         return { model: modelName, content: data.success ? data.data : data.message };
       } catch (error: any) {
+        if (error.name === 'AbortError') return { model: modelName, content: 'Aborted' };
         setResults(prev => {
           const newResults = [...prev];
           newResults[index] = { 
@@ -241,7 +317,9 @@ export default function SandboxPage() {
       runModel(1, 'OpenRouter', 1500),
       runModel(2, 'Gemini', 3000)
     ]).then((runResults) => {
+      if (signal.aborted) return;
       setIsRunning(false);
+      abortControllerRef.current = null;
       
       // Log lịch sử hoạt động
       const token = localStorage.getItem('token');
@@ -304,13 +382,32 @@ export default function SandboxPage() {
       </div>
 
       {/* ── Prompt Input Area ──────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden focus-within:border-violet-400 focus-within:ring-1 focus-within:ring-violet-400 transition-all">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden focus-within:border-violet-400 focus-within:ring-1 focus-within:ring-violet-400 transition-all relative">
         <div className="flex items-center justify-between px-4 py-3 bg-slate-50/50 border-b border-slate-100">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-violet-500" />
             <span className="text-sm font-bold text-slate-700">{text.masterPrompt}</span>
           </div>
-          <div className="relative">
+          <div className="relative flex items-center gap-3">
+            
+            {/* Nút Upload Ảnh */}
+            <input 
+              type="file" 
+              accept="image/*" 
+              className="hidden" 
+              ref={fileInputRef} 
+              onChange={handleImageUpload} 
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isScanning}
+              title={text.scanImg}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-violet-600 bg-violet-50 hover:bg-violet-100 disabled:opacity-50 transition"
+            >
+              {isScanning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImagePlus className="w-3.5 h-3.5" />}
+              <span className="hidden sm:inline">{isScanning ? text.scanning : text.scanImg}</span>
+            </button>
+            
             <button 
               onClick={() => setShowExamples(!showExamples)}
               className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-800 font-semibold transition"
@@ -356,34 +453,46 @@ export default function SandboxPage() {
                 handleRun();
               }
             }}
+            onPaste={handlePaste}
           />
         </div>
         
-        <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-t border-slate-100">
+        {/* Lớp phủ khi đang quét ảnh (Paste/Upload) */}
+        {isScanning && (
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10 rounded-2xl">
+            <div className="flex flex-col items-center gap-2 text-violet-600 bg-white px-4 py-3 rounded-xl shadow-lg border border-violet-100 animate-in zoom-in duration-200">
+              <Loader2 className="w-6 h-6 animate-spin" />
+              <span className="text-sm font-bold">{text.scanning}</span>
+            </div>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-t border-slate-100 relative z-20">
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <Info className="w-4 h-4" />
             {text.hint}
           </div>
-          <button
-            onClick={handleRun}
-            disabled={!prompt.trim() || isRunning}
-            className="flex items-center gap-2 px-6 py-2 rounded-xl bg-violet-600 text-sm font-bold text-white hover:bg-violet-700 transition shadow-md shadow-violet-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none active:scale-95"
-          >
-            {isRunning ? (
-              <>
-                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                </svg>
-                {text.running}
-              </>
-            ) : (
-              <>
-                <Send className="w-4 h-4" />
-                {text.runBtn}
-              </>
-            )}
-          </button>
+          {isRunning ? (
+            <button
+              onClick={handleStop}
+              className="flex items-center gap-2 px-6 py-2 rounded-xl bg-red-500 text-sm font-bold text-white hover:bg-red-600 transition shadow-md shadow-red-200 active:scale-95"
+            >
+              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+              </svg>
+              {lang === 'vi' ? 'Dừng AI' : 'Stop AI'}
+            </button>
+          ) : (
+            <button
+              onClick={handleRun}
+              disabled={!prompt.trim()}
+              className="flex items-center gap-2 px-6 py-2 rounded-xl bg-violet-600 text-sm font-bold text-white hover:bg-violet-700 transition shadow-md shadow-violet-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none active:scale-95"
+            >
+              <Send className="w-4 h-4" />
+              {text.runBtn}
+            </button>
+          )}
         </div>
       </div>
 
@@ -422,6 +531,15 @@ export default function SandboxPage() {
                     <FolderPlus className="w-4 h-4" />
                   </button>
                 )}
+                {res.status === 'success' && (
+                  <button
+                    onClick={() => setEditModes(prev => ({ ...prev, [res.model]: !prev[res.model] }))}
+                    className="p-1.5 rounded-md text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-all"
+                    title={editModes[res.model] ? "Switch to Preview" : "Switch to Edit"}
+                  >
+                    {editModes[res.model] ? <Eye className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
+                  </button>
+                )}
                 <CopyButton text={res.content} />
               </div>
             </div>
@@ -442,11 +560,18 @@ export default function SandboxPage() {
               )}
 
               {res.status === 'success' && (
-                <textarea
-                  value={res.content}
-                  onChange={(e) => handleContentChange(res.model, e.target.value)}
-                  className="w-full min-h-[250px] p-0 bg-transparent border-0 prose prose-sm prose-slate max-w-none text-slate-900 font-medium text-sm leading-relaxed focus:ring-0 focus:outline-none resize-y animate-in fade-in slide-in-from-bottom-2 duration-500"
-                />
+                editModes[res.model] ? (
+                  <textarea
+                    value={res.content}
+                    onChange={(e) => handleContentChange(res.model, e.target.value)}
+                    className="w-full min-h-[250px] p-2 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-sm leading-relaxed focus:ring-1 focus:ring-violet-400 focus:outline-none resize-y animate-in fade-in duration-300"
+                  />
+                ) : (
+                  <MarkdownRenderer 
+                    content={res.content}
+                    className="min-h-[250px] overflow-y-auto animate-in fade-in duration-300"
+                  />
+                )
               )}
 
               {res.status === 'error' && (

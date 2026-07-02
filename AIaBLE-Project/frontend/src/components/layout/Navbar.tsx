@@ -53,8 +53,12 @@ const t = {
 
 export function Navbar() {
   const [lang, setLang] = useState('vi');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsLoggedIn(!!localStorage.getItem('token'));
+    }
     setLang(localStorage.getItem('app_lang') || 'vi');
     const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
     window.addEventListener('storage', handleLangChange);
@@ -87,21 +91,68 @@ export function Navbar() {
         </div>
 
         {/* Right Controls */}
-        <div className="flex items-center gap-2.5 shrink-0">
-          {/* Login */}
-          <Link
-            href="/login"
-            className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition duration-200 shadow-sm whitespace-nowrap"
-          >
-            {text.login}
-          </Link>
-          {/* Register */}
-          <Link
-            href="/register"
-            className="inline-flex items-center justify-center rounded-lg bg-violet-600 px-4 py-1.5 text-sm font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-md shadow-violet-200 whitespace-nowrap"
-          >
-            {text.register}
-          </Link>
+        <div className="flex items-center gap-3.5 shrink-0">
+          {/* Beautiful Sliding Pill Language Switcher */}
+          <div className="relative flex items-center bg-slate-100 border border-slate-200/50 rounded-full p-0.5 shadow-inner select-none">
+            <button
+              onClick={() => {
+                if (lang !== 'vi') {
+                  setLang('vi');
+                  localStorage.setItem('app_lang', 'vi');
+                  window.dispatchEvent(new Event('app_lang_changed'));
+                }
+              }}
+              className={`px-3 py-1 text-[11px] font-extrabold rounded-full transition-all duration-300 whitespace-nowrap ${
+                lang === 'vi' 
+                  ? 'bg-white text-violet-600 shadow-sm border border-slate-200/10' 
+                  : 'text-slate-400 hover:text-slate-700'
+              }`}
+            >
+              VI
+            </button>
+            <button
+              onClick={() => {
+                if (lang !== 'en') {
+                  setLang('en');
+                  localStorage.setItem('app_lang', 'en');
+                  window.dispatchEvent(new Event('app_lang_changed'));
+                }
+              }}
+              className={`px-3 py-1 text-[11px] font-extrabold rounded-full transition-all duration-300 whitespace-nowrap ${
+                lang === 'en' 
+                  ? 'bg-white text-violet-600 shadow-sm border border-slate-200/10' 
+                  : 'text-slate-400 hover:text-slate-700'
+              }`}
+            >
+              EN
+            </button>
+          </div>
+
+          {isLoggedIn ? (
+            <Link
+              href="/home"
+              className="inline-flex items-center justify-center rounded-lg bg-violet-600 px-4 py-1.5 text-sm font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-md shadow-violet-200 whitespace-nowrap"
+            >
+              {lang === 'en' ? 'Dashboard' : 'Vào không gian'}
+            </Link>
+          ) : (
+            <>
+              {/* Login */}
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition duration-200 shadow-sm whitespace-nowrap"
+              >
+                {text.login}
+              </Link>
+              {/* Register */}
+              <Link
+                href="/register"
+                className="inline-flex items-center justify-center rounded-lg bg-violet-600 px-4 py-1.5 text-sm font-bold text-white hover:bg-violet-700 active:bg-violet-800 transition duration-200 shadow-md shadow-violet-200 whitespace-nowrap"
+              >
+                {text.register}
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

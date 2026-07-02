@@ -20,10 +20,10 @@ interface Project {
 
 const t = {
   vi: {
-    title: 'Projects của bạn',
+    title: 'Dự án của bạn',
     desc: 'Quản lý dự án và theo dõi tiến độ công việc.',
     searchPlaceholder: 'Tìm kiếm dự án...',
-    createBtn: 'Tạo Project',
+    createBtn: 'Tạo Dự án',
     loading: 'Đang tải projects...',
     notFound: 'Không tìm thấy project nào',
     noProjects: 'Chưa có project nào',
