@@ -4,10 +4,21 @@ import { Sparkles, Rocket, Bug, Zap } from 'lucide-react';
 
 const CHANGELOGS = [
   {
-    version: 'v1.2.0',
-    date: '28 Th06, 2026',
-    title: 'Trải nghiệm cá nhân hoá & UI Mới',
+    version: 'v1.3.0',
+    date: '02 Th07, 2026',
+    title: 'Tối ưu UI, Phím Tắt & Sandbox',
     badge: 'Mới nhất',
+    items: [
+      { type: 'feature', text: 'Triển khai hệ thống phím tắt toàn cục (Global Shortcuts): Shift+K, Shift+Enter, Shift+S và phím điều hướng nhanh (G+H/P/S).' },
+      { type: 'improve', text: 'Cho phép chỉnh sửa trực tiếp (Textarea) các kết quả do AI sinh ra trong Sandbox trước khi lưu.' },
+      { type: 'bug', text: 'Khắc phục triệt để lỗi bộ nhớ đệm (Cache) khiến Sandbox trả về kết quả cũ với prompt mới.' },
+      { type: 'improve', text: 'Tối giản UI: Lược bỏ các tuỳ chọn cài đặt và nút cấu hình không cần thiết.' }
+    ]
+  },
+  {
+    version: 'v1.2.0',
+    date: '30 Th06, 2026',
+    title: 'Trải nghiệm cá nhân hoá & UI Mới',
     items: [
       { type: 'feature', text: 'Ra mắt tính năng tải ảnh Avatar và Ảnh bìa cá nhân.' },
       { type: 'feature', text: 'Bổ sung bản đồ Google Maps tương tác vào phần chọn địa điểm.' },
@@ -17,7 +28,7 @@ const CHANGELOGS = [
   },
   {
     version: 'v1.1.0',
-    date: '15 Th06, 2026',
+    date: '26 Th06, 2026',
     title: 'Hệ thống Auth & AI Sandbox',
     items: [
       { type: 'feature', text: 'Hoàn thiện luồng Đăng nhập / Đăng ký.' },
@@ -27,8 +38,8 @@ const CHANGELOGS = [
   },
   {
     version: 'v1.0.0',
-    date: '01 Th06, 2026',
-    title: 'Chính thức ra mắt AIaBLE',
+    date: '22 Th06, 2026',
+    title: 'Chính thức khởi chạy dự án AIaBLE',
     items: [
       { type: 'feature', text: 'Phát hành bộ khung AI Recipe Library.' },
       { type: 'feature', text: 'Tính năng Optimize Prompt tự động hoá quy trình.' },

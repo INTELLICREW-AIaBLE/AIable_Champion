@@ -136,6 +136,7 @@ export default function SandboxPage() {
   
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [saveData, setSaveData] = useState<{prompt?: string, result?: string, aiModel?: string}>({});
+  const [showExamples, setShowExamples] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -264,21 +265,35 @@ export default function SandboxPage() {
             <Zap className="w-4 h-4 text-violet-500" />
             <span className="text-sm font-bold text-slate-700">{text.masterPrompt}</span>
           </div>
-          <div className="relative group">
-            <button className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-800 font-semibold transition">
+          <div className="relative">
+            <button 
+              onClick={() => setShowExamples(!showExamples)}
+              className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-800 font-semibold transition"
+            >
               {text.samplePrompt} <ChevronDown className="w-3 h-3" />
             </button>
-            <div className="absolute right-0 top-6 w-72 bg-white border border-slate-100 rounded-xl shadow-lg py-1 hidden group-hover:block z-20">
-              {text.examples.map((ex, i) => (
-                <button
-                  key={i}
-                  onClick={() => setPrompt(ex)}
-                  className="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:bg-violet-50 hover:text-violet-700 transition border-b border-slate-50 last:border-0 leading-relaxed"
-                >
-                  {ex}
-                </button>
-              ))}
-            </div>
+            
+            {showExamples && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowExamples(false)} />
+                <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-slate-100 rounded-xl shadow-lg py-1 z-20 animate-in fade-in zoom-in-95 duration-200">
+                  {text.examples.map((ex, i) => (
+                    <button
+                      type="button"
+                      key={i}
+                      onClick={() => {
+                        setPrompt(ex);
+                        setShowExamples(false);
+                        textareaRef.current?.focus();
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:bg-violet-50 hover:text-violet-700 transition border-b border-slate-50 last:border-0 leading-relaxed"
+                    >
+                      {ex}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
         

@@ -267,6 +267,7 @@ export default function OptimizerPage() {
   const [showEthics, setShowEthics] = useState(false);
   const [activeView, setActiveView] = useState<'split' | 'before' | 'after'>('split');
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showExamples, setShowExamples] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [lang, setLang] = useState('vi');
@@ -450,21 +451,35 @@ export default function OptimizerPage() {
               {charCount}/2000 {text.chars} · {wordCount} {text.words}
             </span>
             {/* Example prompts */}
-            <div className="relative group">
-              <button className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-800 font-semibold transition">
+            <div className="relative">
+              <button 
+                onClick={() => setShowExamples(!showExamples)}
+                className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-800 font-semibold transition"
+              >
                 {text.example} <ChevronDown className="w-3 h-3" />
               </button>
-              <div className="absolute right-0 top-6 w-64 bg-white border border-slate-100 rounded-xl shadow-lg py-1 hidden group-hover:block z-10">
-                {text.examples.map((ex) => (
-                  <button
-                    key={ex}
-                    onClick={() => setRaw(ex)}
-                    className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-violet-50 hover:text-violet-700 transition"
-                  >
-                    {ex}
-                  </button>
-                ))}
-              </div>
+              
+              {showExamples && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowExamples(false)} />
+                  <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-slate-100 rounded-xl shadow-lg py-1 z-20 animate-in fade-in zoom-in-95 duration-200">
+                    {text.examples.map((ex) => (
+                      <button
+                        type="button"
+                        key={ex}
+                        onClick={() => {
+                          setRaw(ex);
+                          setShowExamples(false);
+                          textareaRef.current?.focus();
+                        }}
+                        className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-violet-50 hover:text-violet-700 transition"
+                      >
+                        {ex}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
