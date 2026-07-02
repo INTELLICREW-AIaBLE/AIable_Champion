@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Inter, Sora } from "next/font/google";
+import { Inter, Be_Vietnam_Pro } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { GatewayGuard } from "@/components/layout/GatewayGuard";
 
 const inter = Inter({ subsets: ["latin", "vietnamese"], variable: "--font-sans" });
-const sora = Sora({ subsets: ["latin", "latin-ext"], variable: "--font-heading" });
+const beVietnamPro = Be_Vietnam_Pro({ subsets: ["latin", "vietnamese"], weight: ["400", "500", "600", "700", "800"], variable: "--font-heading" });
 
 export const metadata: Metadata = {
   title: "AIaBLE — The Next-Gen Academic AI Workspace",
