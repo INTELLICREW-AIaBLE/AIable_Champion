@@ -111,13 +111,13 @@ export function Footer() {
           
           {/* Brand & Introduction Column */}
           <div className="lg:col-span-2 space-y-4 pr-0 lg:pr-8">
-            <Link href="/" className="flex items-center group ignore-dark-mode">
+            <Link href="/" className="flex items-center group">
               <Image 
                 src="/logo.png" 
                 alt="AIaBLE Logo" 
                 width={130} 
                 height={30} 
-                className="h-7.5 w-auto object-contain dark:brightness-110" 
+                className="h-7.5 w-auto object-contain logo-img" 
               />
             </Link>
             <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">

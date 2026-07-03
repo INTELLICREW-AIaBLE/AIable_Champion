@@ -85,6 +85,12 @@ html.dark-mode-active .ignore-dark-mode video {
   filter: none !important;
 }
 
+/* Logo: adapt to dark mode naturally — nền trắng → tối, màu purple giữ được tông */
+/* Chỉ apply hue-rotate(180deg) để counter hue-rotate của trang, giữ màu gốc sau invert */
+html.dark-mode-active .logo-img {
+  filter: hue-rotate(180deg) !important;
+}
+
 /* Custom Overrides for precise inverted colors */
 /* Target Card: #22222e (HSL 240, 15%, 16%) -> Pre-inverted: HSL 240, 15%, 84% */
 html.dark-mode-active .bg-white {

@@ -111,14 +111,14 @@ export default function RegisterPage() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-100 px-8 py-10">
 
         {/* Logo */}
-        <div className="flex items-center justify-center mb-6 ignore-dark-mode">
+        <div className="flex items-center justify-center mb-6">
           <Image
             src="/logo.png"
             alt="AIaBLE Logo"
             width={160}
             height={36}
             priority
-            className="h-9 w-auto object-contain"
+            className="h-9 w-auto object-contain logo-img"
           />
         </div>
 
