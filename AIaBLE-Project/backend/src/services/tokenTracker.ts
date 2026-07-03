@@ -1,14 +1,11 @@
-import fs from 'fs';
-import path from 'path';
-
-const TOKENS_FILE = path.join(__dirname, '../data/api_tokens.json');
+import ApiToken from '../models/ApiToken';
 
 export interface ApiTokenInfo {
   name: string;
   usedTokens: number;
   limit: number;
   warningThreshold: number; // percentage (e.g. 80 for 80%)
-  lastWarningSent?: number; // timestamp
+  lastWarningSent?: Date;
 }
 
 const DEFAULT_TOKENS: ApiTokenInfo[] = [
@@ -17,39 +14,50 @@ const DEFAULT_TOKENS: ApiTokenInfo[] = [
   { name: 'OpenRouter', usedTokens: 0, limit: 200000, warningThreshold: 80 }
 ];
 
-export const readTokenInfo = (): ApiTokenInfo[] => {
+export const readTokenInfo = async (): Promise<any[]> => {
   try {
-    if (!fs.existsSync(TOKENS_FILE)) {
-      fs.mkdirSync(path.dirname(TOKENS_FILE), { recursive: true });
-      fs.writeFileSync(TOKENS_FILE, JSON.stringify(DEFAULT_TOKENS, null, 2));
-      return DEFAULT_TOKENS;
+    let tokens = await ApiToken.find({});
+    if (tokens.length === 0) {
+      // Initialize default API tokens into database
+      await ApiToken.insertMany(DEFAULT_TOKENS);
+      tokens = await ApiToken.find({});
     }
-    const data = fs.readFileSync(TOKENS_FILE, 'utf-8');
-    const parsed = JSON.parse(data);
-    // Ensure all default tokens exist in parsed array
+    
+    // Ensure all default tokens exist in database
     let changed = false;
-    DEFAULT_TOKENS.forEach(def => {
-      if (!parsed.some((p: any) => p.name === def.name)) {
-        parsed.push(def);
+    for (const def of DEFAULT_TOKENS) {
+      if (!tokens.some(t => t.name.toLowerCase() === def.name.toLowerCase())) {
+        const newApi = new ApiToken(def);
+        await newApi.save();
         changed = true;
       }
-    });
-    if (changed) {
-      fs.writeFileSync(TOKENS_FILE, JSON.stringify(parsed, null, 2));
     }
-    return parsed;
+    if (changed) {
+      tokens = await ApiToken.find({});
+    }
+    return tokens;
   } catch (err) {
-    console.error('Error reading tokens file:', err);
+    console.error('Error reading tokens from database:', err);
     return DEFAULT_TOKENS;
   }
 };
 
-export const writeTokenInfo = (tokens: ApiTokenInfo[]) => {
+export const writeTokenInfo = async (tokens: any[]) => {
   try {
-    fs.mkdirSync(path.dirname(TOKENS_FILE), { recursive: true });
-    fs.writeFileSync(TOKENS_FILE, JSON.stringify(tokens, null, 2));
+    for (const t of tokens) {
+      await ApiToken.updateOne(
+        { name: t.name },
+        { 
+          $set: { 
+            usedTokens: Number(t.usedTokens), 
+            limit: Number(t.limit), 
+            warningThreshold: Number(t.warningThreshold) 
+          } 
+        }
+      );
+    }
   } catch (err) {
-    console.error('Error writing tokens file:', err);
+    console.error('Error writing tokens to database:', err);
   }
 };
 
@@ -58,9 +66,10 @@ export const writeTokenInfo = (tokens: ApiTokenInfo[]) => {
  */
 export const trackTokens = async (apiName: string, tokensCount: number): Promise<string | null> => {
   try {
-    const tokens = readTokenInfo();
-    const tokenObj = tokens.find(t => t.name.toLowerCase() === apiName.toLowerCase());
+    // Ensure tokens table is initialized
+    await readTokenInfo();
     
+    const tokenObj = await ApiToken.findOne({ name: new RegExp(`^${apiName}$`, 'i') });
     if (!tokenObj) return null;
 
     tokenObj.usedTokens += tokensCount;
@@ -71,17 +80,17 @@ export const trackTokens = async (apiName: string, tokensCount: number): Promise
     if (usagePercent >= tokenObj.warningThreshold) {
       // Limit warnings to once every 1 hour to avoid spamming
       const oneHour = 60 * 60 * 1000;
-      const now = Date.now();
-      if (!tokenObj.lastWarningSent || (now - tokenObj.lastWarningSent > oneHour)) {
+      const now = new Date();
+      if (!tokenObj.lastWarningSent || (now.getTime() - new Date(tokenObj.lastWarningSent).getTime() > oneHour)) {
         tokenObj.lastWarningSent = now;
         warningMessage = `Cảnh báo: API ${tokenObj.name} đã sử dụng ${tokenObj.usedTokens.toLocaleString()} / ${tokenObj.limit.toLocaleString()} tokens (${usagePercent.toFixed(1)}%). Hạn mức sắp hết!`;
       }
     }
 
-    writeTokenInfo(tokens);
+    await tokenObj.save();
     return warningMessage;
   } catch (err) {
-    console.error('Error tracking tokens:', err);
+    console.error('Error tracking tokens in database:', err);
     return null;
   }
 };
