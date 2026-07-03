@@ -46,7 +46,14 @@ app.use(helmet()); // Bảo vệ HTTP headers
 app.use(mongoSanitize()); // Ngăn chặn NoSQL Injection (Hack dữ liệu MongoDB)
 const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:3000'].filter(Boolean) as string[];
 app.use(cors({
-  origin: allowedOrigins.length > 0 ? allowedOrigins : '*',
+  origin: (origin, callback) => {
+    // Cho phép truy cập nếu chưa cấu hình CLIENT_URL trên Render, hoặc origin thuộc allowedOrigins
+    if (!origin || !process.env.CLIENT_URL || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Blocked by CORS policy'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
