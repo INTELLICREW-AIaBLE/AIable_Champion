@@ -181,7 +181,7 @@ export default function SettingsPage() {
         setConfirmPassword('');
       } else {
         alert(data.message || 'Lỗi khi cập nhật mật khẩu');
-        addNotification('Lỗi', data.message || 'Lỗi khi cập nhật mật khẩu', 'error');
+        addNotification('Lỗi', data.message || 'Lỗi khi cập nhật mật khẩu');
       }
     } catch (err) {
       alert('Không thể kết nối đến server');
