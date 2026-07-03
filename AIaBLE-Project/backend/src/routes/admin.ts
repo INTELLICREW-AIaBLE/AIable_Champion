@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
   getDashboardStats,
-  getAllUsers, getUserDetail, updateUserRole, deleteUser,
+  getAllUsers, getUserDetail, updateUserRole, toggleUserLock, deleteUser,
   getActivityLog,
   adminGetRecipes, adminCreateRecipe, adminUpdateRecipe, adminDeleteRecipe,
   getSystemHealth,
@@ -22,6 +22,7 @@ router.get('/health', getSystemHealth);
 router.get('/users', getAllUsers);
 router.get('/users/:id', getUserDetail);
 router.patch('/users/:id/role', updateUserRole);
+router.patch('/users/:id/lock', toggleUserLock);
 router.delete('/users/:id', deleteUser);
 
 // Activity log

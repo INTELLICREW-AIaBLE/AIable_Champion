@@ -42,7 +42,7 @@ app.use(compression({
 // Middlewares
 app.use(cors({
   origin: '*', // For development, allow all. Change to specific frontend domain in production
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json({ limit: '50mb' }));

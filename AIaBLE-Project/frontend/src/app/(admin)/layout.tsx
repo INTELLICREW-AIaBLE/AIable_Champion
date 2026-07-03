@@ -26,7 +26,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-slate-50 flex font-sans">
+    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-50 via-slate-50 to-slate-100 flex font-sans">
       {/* ── Admin Sidebar ── */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 sticky top-0 h-screen shadow-sm">
         <div className="h-16 flex items-center px-6 border-b border-slate-100">

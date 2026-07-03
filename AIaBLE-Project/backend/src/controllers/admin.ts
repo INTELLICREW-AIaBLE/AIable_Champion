@@ -123,6 +123,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
       email: u.email,
       username: u.username || '',
       role: u.role || 'user',
+      isLocked: u.isLocked || false,
       bio: u.bio || '',
       location: u.location || '',
       createdAt: u.createdAt || null,
@@ -154,6 +155,20 @@ export const updateUserRole = async (req: Request, res: Response) => {
     const updated = await User.findOneAndUpdate({ id: req.params.id }, { role: req.body.role || 'user' });
     if (!updated) return res.status(404).json({ success: false, message: 'User not found' });
     res.json({ success: true, message: 'Role updated' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+};
+
+export const toggleUserLock = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findOne({ id: req.params.id });
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    
+    user.isLocked = !user.isLocked;
+    await user.save();
+    
+    res.json({ success: true, message: user.isLocked ? 'User locked' : 'User unlocked', isLocked: user.isLocked });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi server' });
   }
@@ -270,6 +285,12 @@ export const getSystemHealth = async (req: Request, res: Response) => {
     const users = await User.find({});
     const recipes = readRecipes();
 
+    const maskKey = (key?: string) => {
+      if (!key) return null;
+      if (key.length <= 8) return '***';
+      return `${key.slice(0, 4)}...${key.slice(-4)}`;
+    };
+
     res.json({
       success: true,
       data: {
@@ -286,9 +307,11 @@ export const getSystemHealth = async (req: Request, res: Response) => {
           recipes: recipes.length,
         },
         env: {
-          hasGeminiKey: !!process.env.GEMINI_API_KEY,
-          hasGoogleSearch: !!process.env.GOOGLE_SEARCH_API_KEY,
-          hasSmtp: !!process.env.SMTP_EMAIL,
+          geminiKey: maskKey(process.env.GEMINI_API_KEY),
+          groqKey: maskKey(process.env.GROQ_API_KEY),
+          openRouterKey: maskKey(process.env.OPENROUTER_API_KEY),
+          googleSearch: !!process.env.GOOGLE_SEARCH_API_KEY,
+          smtp: !!process.env.SMTP_EMAIL,
           nodeVersion: process.version,
         },
         timestamp: new Date().toISOString(),

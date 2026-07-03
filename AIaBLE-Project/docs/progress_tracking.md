@@ -19,7 +19,20 @@ Dự án được cấu trúc dạng Monorepo (Next.js Frontend + Express/TypeSc
 
 ## ✅ Các Công Việc Vừa Hoàn Thành (Recent Updates)
 
-*Cập nhật gần nhất: 02/07/2026*
+*Cập nhật gần nhất: 03/07/2026*
+
+- **Xây dựng Hệ thống Quản trị (Admin Dashboard & Infrastructure) (03/07/2026):**
+  - **Tách biệt Layout:** Tạo Route Group `(admin)` độc lập với layout riêng (giao diện sáng chuẩn) để tránh xung đột với công cụ Dark Mode của trình duyệt, thay thế hoàn toàn thư mục `(app)/admin` cũ rườm rà.
+  - **Phân quyền Đăng nhập:** Cập nhật API Đăng nhập trả về trường `role` và lưu vào localStorage. Tự động điều hướng Admin vào `/admin/dashboard` và User vào `/home`. Xử lý xóa quyền (role) khi Logout để bảo mật phiên.
+  - **Quản lý Người Dùng (User Management):** 
+    - Thêm trường `isLocked` vào CSDL MongoDB. Xây dựng API và giao diện Khóa/Mở khóa (Ban/Unban) tài khoản chỉ với 1 thao tác.
+    - Chặn hoàn toàn quyền đăng nhập của các tài khoản bị khóa (trả về lỗi 403 ở Backend).
+    - Thay thế hộp thoại `confirm()` mặc định bằng Custom Modal xịn xò, yêu cầu xác nhận trước khi Khóa/Mở khóa hoặc Xóa tài khoản vĩnh viễn.
+  - **Dashboard & Thống kê LLM:** 
+    - Mở rộng Dashboard hiển thị số lượng người dùng, prompt, tần suất gọi API của từng công cụ.
+    - Bổ sung bảng **"Tình hình hoạt động LLMs"**, liệt kê top 5 mô hình AI được gọi nhiều nhất (phân tích trực tiếp từ dữ liệu lịch sử hệ thống).
+  - **Fix lỗi hạ tầng:** Cấu hình sửa lỗi CORS (bổ sung method `PATCH` bị thiếu) cho các tính năng cập nhật quyền và trạng thái. Đồng bộ nhận diện thương hiệu bằng cách thay thế icon bảo mật thành logo AIaBLE chính thức trong Sidebar Admin.
+
 
 - **Hoàn Thiện Localization (Đa ngôn ngữ) & Sửa lỗi UI/UX (02/07/2026):**
   - **Việt Hoá 100%:** Rà soát và dịch thuật toàn bộ các từ khóa tiếng Anh còn sót lại trên UI (như các badge mô hình trong Optimizer, danh mục Tag của Recipe, thanh trạng thái Task-Matcher, menu What's New). Đảm bảo giao diện 100% thuần Việt khi bật Tiếng Việt.

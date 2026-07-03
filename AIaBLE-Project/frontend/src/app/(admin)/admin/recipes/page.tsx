@@ -105,6 +105,7 @@ export default function AdminRecipesPage() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const [modal, setModal] = useState<{ open: boolean; recipe?: any }>({ open: false });
+  const [confirmAction, setConfirmAction] = useState<{ id: string; name: string } | null>(null);
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast({ msg, type });
@@ -152,7 +153,6 @@ export default function AdminRecipesPage() {
   };
 
   const handleDeleteRecipe = async (id: string) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa Recipe này khỏi hệ thống?')) return;
     try {
       const r = await fetch(`${API}/api/admin/recipes/${id}`, { method: 'DELETE', headers: authHeaders() });
       const j = await r.json();
@@ -260,18 +260,19 @@ export default function AdminRecipesPage() {
                       </div>
                     </td>
                     <td className="px-5 py-4">
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2">
                         <button 
                           onClick={() => setModal({ open: true, recipe: r })}
-                          title="Chỉnh sửa"
-                          className="p-2 rounded-xl text-slate-400 hover:bg-violet-50 hover:text-violet-600 focus:ring-4 focus:ring-violet-50 transition"
+                          title="Chỉnh sửa Recipe"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all shadow-sm border-violet-200 bg-violet-50 text-violet-600 hover:bg-violet-100 hover:border-violet-300"
                         >
-                          <Edit3 className="w-4 h-4" />
+                          <Edit3 className="w-3.5 h-3.5" />
+                          Chỉnh sửa
                         </button>
                         <button 
-                          onClick={() => handleDeleteRecipe(r.id)}
-                          title="Xóa Recipe"
-                          className="p-2 rounded-xl text-slate-400 hover:bg-red-50 hover:text-red-600 focus:ring-4 focus:ring-red-50 transition"
+                          onClick={() => setConfirmAction({ id: r.id, name: r.title })}
+                          title="Xóa Recipe vĩnh viễn"
+                          className="p-1.5 rounded-xl border border-slate-200 bg-white text-slate-400 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all shadow-sm"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -300,6 +301,35 @@ export default function AdminRecipesPage() {
         )}>
           {toast.type === 'success' ? <Check className="w-5 h-5" /> : <ShieldAlert className="w-5 h-5" />}
           {toast.msg}
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {confirmAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl animate-in zoom-in-95">
+            <h3 className="text-lg font-black text-slate-900 mb-2">Xác nhận Xóa Recipe</h3>
+            <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+              Bạn có chắc chắn muốn xóa công thức <span className="font-bold text-slate-700">"{confirmAction.name}"</span> vĩnh viễn không? Hành động này không thể hoàn tác.
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button 
+                onClick={() => setConfirmAction(null)}
+                className="px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100 transition"
+              >
+                Hủy
+              </button>
+              <button 
+                onClick={() => {
+                  handleDeleteRecipe(confirmAction.id);
+                  setConfirmAction(null);
+                }}
+                className="px-4 py-2 rounded-xl text-sm font-bold text-white transition shadow-sm bg-red-600 hover:bg-red-700"
+              >
+                Đồng ý Xóa
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

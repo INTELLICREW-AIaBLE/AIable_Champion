@@ -73,6 +73,10 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ success: false, message: 'Email hoặc mật khẩu không đúng.' });
     }
 
+    if (user.isLocked) {
+      return res.status(403).json({ success: false, message: 'Tài khoản của bạn đã bị khóa.' });
+    }
+
     // Return fake token
     res.json({
       success: true,
@@ -118,6 +122,10 @@ export const googleLogin = async (req: Request, res: Response) => {
         password: 'google-oauth-dummy-password',
         username: email.split('@')[0]
       });
+    }
+
+    if (user.isLocked) {
+      return res.status(403).json({ success: false, message: 'Tài khoản của bạn đã bị khóa.' });
     }
 
     res.json({

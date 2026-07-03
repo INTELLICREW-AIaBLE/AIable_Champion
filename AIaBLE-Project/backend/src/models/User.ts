@@ -13,6 +13,7 @@ export interface IUser extends Document {
   cover?: string;
   birthday?: string;
   role?: string;
+  isLocked?: boolean;
   savedRecipes?: any[];
   history?: any[];
 }
@@ -30,6 +31,7 @@ const userSchema = new Schema<IUser>({
   cover: { type: String, default: '' },
   birthday: { type: String, default: '' },
   role: { type: String, default: 'user' },
+  isLocked: { type: Boolean, default: false },
   savedRecipes: { type: [Schema.Types.Mixed], default: [] },
   history: { type: [Schema.Types.Mixed], default: [] }
 }, {
