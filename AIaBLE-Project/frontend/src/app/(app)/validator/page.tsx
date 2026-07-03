@@ -21,7 +21,7 @@ import Tesseract from 'tesseract.js';
 
 interface ValidationResult {
   score: number;
-  hallucinations: { text: string; reason: string; severity: 'high' | 'medium' | 'low' }[];
+  claims: { text: string; reason: string; status: 'verified' | 'unverified' | 'disputed'; sources: {title: string, url: string}[] }[];
   suggestions: string[];
   isSafe: boolean;
   formatting: { label: string; passed: boolean }[];
@@ -55,8 +55,9 @@ const t = {
     check3: 'Không có phát ngôn bị bác bỏ',
     suggestTitle: 'Gợi ý cải thiện',
     suggestMsg1: 'Kiểm tra lại các nguồn thông tin nếu có phát ngôn chưa xác thực.',
-    dangerTitle: 'Phát hiện nguy cơ ảo giác (Hallucinations)',
-    reasonLabel: 'Lý do: ',
+    dangerTitle: 'Chi tiết phân tích phát ngôn',
+    reasonLabel: 'Đánh giá: ',
+    sourceLabel: 'Nguồn: ',
     errConn: 'Không thể kết nối đến server backend.',
     errGen: 'Có lỗi xảy ra khi kiểm định.',
     scanImg: 'Quét văn bản từ ảnh',
@@ -90,8 +91,9 @@ const t = {
     check3: 'No disputed claims',
     suggestTitle: 'Suggestions for Improvement',
     suggestMsg1: 'Double check information sources for unverified claims.',
-    dangerTitle: 'Hallucination Risks Detected',
-    reasonLabel: 'Reason: ',
+    dangerTitle: 'Claim Analysis Details',
+    reasonLabel: 'Assessment: ',
+    sourceLabel: 'Source: ',
     errConn: 'Cannot connect to backend server.',
     errGen: 'An error occurred during validation.',
     scanImg: 'Scan text from image',
@@ -175,7 +177,8 @@ export default function ValidatorPage() {
   };
 
   const charCount = output.length;
-  const canValidate = output.trim().length >= 20 && !loading;
+  const combinedText = `${context.trim()}\n\n${output.trim()}`.trim();
+  const canValidate = combinedText.length >= 20 && !loading;
 
   const handleValidate = async () => {
     if (!canValidate) return;
@@ -189,7 +192,7 @@ export default function ValidatorPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          text: output,
+          text: combinedText,
           geminiKey: typeof window !== 'undefined' ? localStorage.getItem('geminiKey') || undefined : undefined
         }),
       });
@@ -201,13 +204,12 @@ export default function ValidatorPage() {
         const formattedResult: ValidationResult = {
           score: json.overallScore || 0,
           isSafe: json.disputedCount === 0,
-          hallucinations: (json.claims || [])
-            .filter((c: any) => c.status === 'disputed' || c.status === 'unverified')
-            .map((c: any) => ({
+          claims: (json.claims || []).map((c: any) => ({
               text: c.claim,
               reason: c.explanation,
-              severity: c.status === 'disputed' ? 'high' : 'medium'
-            })),
+              status: c.status,
+              sources: c.sources || []
+          })),
           suggestions: [
             json.summary || '',
             text.suggestMsg1,
@@ -518,32 +520,49 @@ export default function ValidatorPage() {
         )}
       </div>
 
-      {/* ── Hallucination Findings (Bottom Full Width) ─────────────────────────── */}
-      {result && !loading && result.hallucinations.length > 0 && (
-         <div className="bg-white rounded-2xl border border-red-100 shadow-sm shadow-red-50 p-5">
+      {/* ── Detailed Claims Analysis (Bottom Full Width) ─────────────────────────── */}
+      {result && !loading && result.claims.length > 0 && (
+         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
             <h3 className="text-base font-black text-slate-800 flex items-center gap-2 mb-4">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
+              <ShieldCheck className="w-5 h-5 text-violet-600" />
               {text.dangerTitle}
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {result.hallucinations.map((h, i) => (
-                <div key={i} className="bg-red-50/50 border border-red-100 rounded-xl p-4">
+              {result.claims.map((c, i) => (
+                <div key={i} className={`border rounded-xl p-4 ${
+                  c.status === 'disputed' ? 'bg-red-50/50 border-red-100' :
+                  c.status === 'unverified' ? 'bg-amber-50/50 border-amber-100' : 'bg-emerald-50/50 border-emerald-100'
+                }`}>
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                      h.severity === 'high' ? 'bg-red-200 text-red-700' : 
-                      h.severity === 'medium' ? 'bg-amber-200 text-amber-700' : 'bg-slate-200 text-slate-700'
+                      c.status === 'disputed' ? 'bg-red-200 text-red-700' : 
+                      c.status === 'unverified' ? 'bg-amber-200 text-amber-700' : 'bg-emerald-200 text-emerald-700'
                     }`}>
-                      {h.severity} risk
+                      {c.status}
                     </span>
                   </div>
-                  <p className="text-sm font-semibold text-slate-800 mb-1.5 line-clamp-2">
-                    "{h.text}"
+                  <p className="text-sm font-semibold text-slate-800 mb-2 line-clamp-2">
+                    "{c.text}"
                   </p>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    <span className="font-semibold text-red-600">{text.reasonLabel}</span>
-                    {h.reason}
+                  <p className="text-xs text-slate-600 leading-relaxed mb-2">
+                    <span className={`font-semibold ${c.status === 'disputed' ? 'text-red-600' : c.status === 'unverified' ? 'text-amber-600' : 'text-emerald-600'}`}>{text.reasonLabel}</span>
+                    {c.reason}
                   </p>
+                  {c.sources && c.sources.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-black/5">
+                      <p className="text-[10px] font-bold text-slate-500 uppercase mb-1">{text.sourceLabel}</p>
+                      <ul className="space-y-1">
+                        {c.sources.map((src, idx) => (
+                          <li key={idx} className="truncate">
+                            <a href={src.url} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-blue-600 hover:underline">
+                              {src.title || src.url}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

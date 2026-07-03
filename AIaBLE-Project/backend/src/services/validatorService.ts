@@ -48,6 +48,8 @@ export const validateText = async (
   const extractPrompt = `
 You are a fact-checking assistant. Given the following text written in Vietnamese or English, extract all factual claims that can be independently verified (statistics, named events, historical facts, scientific claims, quotes, etc.).
 
+CRITICAL RULE: You MUST extract the claims EXACTLY as they are written in the text. DO NOT correct any factual errors, wrong dates, or typos! If the text contains false information (e.g., a wrong year), you must extract that EXACT false information. Your job here is only extraction, not correction.
+
 Return ONLY a valid JSON array of strings. Each string is one claim. Maximum 8 claims. No markdown, no explanation.
 
 Text:

@@ -154,18 +154,7 @@ export default function HelpPage() {
               <div>
                 <p className="font-bold text-sm text-slate-900 mb-1">Email Hỗ Trợ</p>
                 <p className="text-xs text-slate-500 mb-2">Phản hồi trong vòng 24h làm việc.</p>
-                <a href="mailto:support@alable.edu.vn" className="text-sm font-semibold text-violet-600 hover:underline">support@alable.edu.vn</a>
-              </div>
-            </div>
-            <div className="h-px bg-slate-100" />
-            <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0 text-blue-600">
-                <MessageSquare className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="font-bold text-sm text-slate-900 mb-1">Live Chat</p>
-                <p className="text-xs text-slate-500 mb-2">Trực tiếp với tư vấn viên.</p>
-                <button className="text-sm font-semibold text-blue-600 hover:underline">Bắt đầu chat</button>
+                <a href="mailto:aiable.support.su26@gmail.com" className="text-sm font-semibold text-violet-600 hover:underline">aiable.support.su26@gmail.com</a>
               </div>
             </div>
           </div>

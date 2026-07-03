@@ -33,6 +33,11 @@ Dự án được cấu trúc dạng Monorepo (Next.js Frontend + Express/TypeSc
     - Bổ sung bảng **"Tình hình hoạt động LLMs"**, liệt kê top 5 mô hình AI được gọi nhiều nhất (phân tích trực tiếp từ dữ liệu lịch sử hệ thống).
   - **Fix lỗi hạ tầng:** Cấu hình sửa lỗi CORS (bổ sung method `PATCH` bị thiếu) cho các tính năng cập nhật quyền và trạng thái. Đồng bộ nhận diện thương hiệu bằng cách thay thế icon bảo mật thành logo AIaBLE chính thức trong Sidebar Admin.
 
+- **Hoàn thiện Giao diện Landing Page & Cấu hình Hạ tầng API (03/07/2026 - Phiên tiếp theo):**
+  - **Việt hóa Landing Page:** Hoàn thành dịch thuật 100% các đoạn text còn cứng trên Landing Page (mục "Vấn đề của sinh viên" và "6 Năng lực Cốt lõi"). Thay thế lỗi hiển thị `**text**` bằng định dạng in đậm chuẩn (thẻ `<strong>`), tạo giao diện mượt mà và chuyên nghiệp hơn.
+  - **Kích hoạt SMTP Mailer:** Cấu hình thành công **App Password** cho email hệ thống (`aiable.support.su26@gmail.com`) vào file `.env`. Chính thức khởi chạy tính năng gửi email xác thực phục vụ luồng **Quên Mật Khẩu (Forgot Password)** (thông qua `nodemailer`).
+  - **Kích hoạt Google Search API:** Thiết lập `GOOGLE_SEARCH_API_KEY` và Mã định danh công cụ tìm kiếm `GOOGLE_SEARCH_CX` (Custom Search Engine) vào backend `.env`. Tính năng **AI Accuracy Validator** (Kiểm chứng sự thật) hiện đã có thể gọi Google Search API tự động để tìm nguồn tin hỗ trợ fact-check AI.
+  - **Tinh chỉnh Admin Dashboard:** Ẩn các hộp cảnh báo cấu hình "MISSING" (dành cho API Email và Google Search) trên giao diện theo dõi sức khoẻ hệ thống (System Health), giúp giao diện UI gọn gàng, sạch sẽ phục vụ cho mục đích quay video/demo dự án tốt nhất.
 
 - **Hoàn Thiện Localization (Đa ngôn ngữ) & Sửa lỗi UI/UX (02/07/2026):**
   - **Việt Hoá 100%:** Rà soát và dịch thuật toàn bộ các từ khóa tiếng Anh còn sót lại trên UI (như các badge mô hình trong Optimizer, danh mục Tag của Recipe, thanh trạng thái Task-Matcher, menu What's New). Đảm bảo giao diện 100% thuần Việt khi bật Tiếng Việt.
