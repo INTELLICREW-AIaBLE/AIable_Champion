@@ -319,7 +319,6 @@ export default function ValidatorPage() {
               value={output}
               onChange={(e) => setOutput(e.target.value)}
               placeholder={text.inputPlaceholder}
-              maxLength={5000}
               rows={8}
               className="w-full px-5 py-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
               onPaste={(e) => handlePaste(e, 'output')}
@@ -368,7 +367,6 @@ export default function ValidatorPage() {
               value={context}
               onChange={(e) => setContext(e.target.value)}
               placeholder={text.contextPlaceholder}
-              maxLength={5000}
               rows={3}
               className="w-full px-5 py-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
               onPaste={(e) => handlePaste(e, 'context')}

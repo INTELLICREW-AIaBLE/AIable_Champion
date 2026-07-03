@@ -444,7 +444,6 @@ export default function SandboxPage() {
             ref={textareaRef}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            maxLength={5000}
             placeholder={text.placeholder}
             rows={4}
             className="w-full text-sm text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
