@@ -132,10 +132,11 @@ Rules & Constraints:
 1. Trạng thái (Status mapping): 
    - "verified" (Hợp lệ): claim is confirmed by reliable search results.
    - "disputed" (Sai lệch): claim contradicts search results or is proven false.
-   - "unverified" (Không xác định): not enough evidence.
-2. Ưu tiên các nguồn tin có domain chính thống, tránh các trang blog cá nhân hoặc diễn đàn. 
-3. Nếu không tìm thấy nguồn tin cậy hoặc search results rỗng, bạn PHẢI ghi rõ "Không đủ bằng chứng" trong phần explanation thay vì tự suy diễn.
-4. Trong explanation, hãy trích dẫn ngắn gọn nguồn hỗ trợ nếu có.
+   - "unverified" (Không xác định): not enough evidence in search results.
+2. Ưu tiên các nguồn tin có domain chính thống.
+3. Nếu trạng thái là "disputed", trong phần \`explanation\` BẮT BUỘC phải đưa ra thông tin đúng dựa trên kết quả tìm kiếm.
+4. Nếu trạng thái là "unverified" (không có kết quả tìm kiếm), hãy dùng kiến thức nền tảng của bạn để đưa ra thông tin có khả năng đúng nhất trong \`explanation\`, nhưng phải ghi chú rõ là "Cần đối chiếu thêm".
+5. Trong \`explanation\`, hãy trích dẫn ngắn gọn nếu có.
 `;
 
     let status: AnalyzedClaim['status'] = 'unverified';
