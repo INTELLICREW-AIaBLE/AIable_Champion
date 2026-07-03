@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
+import { trackTokens } from './tokenTracker';
 
 dotenv.config();
 
@@ -52,6 +53,10 @@ export const callOpenRouter = async (
 
     const text = response.choices[0]?.message?.content || '';
 
+    // Track tokens
+    const tokenCount = response.usage?.total_tokens || Math.ceil((prompt.length + text.length) / 3);
+    await trackTokens('OpenRouter', tokenCount);
+
     // Store in cache
     cache.set(cacheKey, { result: text, timestamp: Date.now() });
 
@@ -93,6 +98,10 @@ export const callOpenRouterStream = async (
       fullText += content;
       if (onChunk && content) onChunk(content);
     }
+
+    // Track tokens (estimate)
+    const tokenCount = Math.ceil((prompt.length + fullText.length) / 3);
+    await trackTokens('OpenRouter', tokenCount);
 
     return fullText;
   } catch (error: any) {

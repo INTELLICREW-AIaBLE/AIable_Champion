@@ -137,7 +137,7 @@ export default function LandingPage() {
 
   const text = t[lang as 'en' | 'vi'] || t.vi;
   return (
-    <div className="bg-slate-50 min-h-screen overflow-hidden pb-16">
+    <div className="bg-slate-50 min-h-screen overflow-x-hidden pb-16">
       <Navbar />
       {/* Decorative Gradients & Grid Background */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] bg-gradient-to-b from-violet-100/50 via-indigo-50/20 to-transparent rounded-full blur-3xl pointer-events-none" />

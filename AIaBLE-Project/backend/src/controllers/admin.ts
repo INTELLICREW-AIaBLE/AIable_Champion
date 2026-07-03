@@ -86,6 +86,19 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     // Saved recipes count
     const totalSavedRecipes = users.reduce((acc, u: any) => acc + (u.savedRecipes?.length || 0), 0);
 
+    // Check for API token warnings
+    const apiTokens = readTokenInfo();
+    const tokenWarnings: any[] = [];
+    apiTokens.forEach(t => {
+      const usagePercent = (t.usedTokens / t.limit) * 100;
+      if (usagePercent >= t.warningThreshold) {
+        tokenWarnings.push({
+          name: t.name,
+          message: `API ${t.name} đã dùng ${usagePercent.toFixed(1)}% (${t.usedTokens.toLocaleString()}/${t.limit.toLocaleString()} tokens).`
+        });
+      }
+    });
+
     res.json({
       success: true,
       data: {
@@ -106,6 +119,7 @@ export const getDashboardStats = async (req: Request, res: Response) => {
           byModel: Object.entries(modelCount).map(([name, value]) => ({ name, value })),
           topSubjects: Object.entries(subjectCount).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value).slice(0, 8),
         },
+        tokenWarnings,
       },
     });
   } catch (err) {
@@ -319,5 +333,57 @@ export const getSystemHealth = async (req: Request, res: Response) => {
     });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+};
+
+// ─── API Tokens Tracking (Admin) ────────────────────────────────────────────────
+import { readTokenInfo, writeTokenInfo } from '../services/tokenTracker';
+
+export const getApiTokens = async (req: Request, res: Response) => {
+  try {
+    const tokens = readTokenInfo();
+    res.json({ success: true, data: tokens });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi server khi lấy thông tin API tokens' });
+  }
+};
+
+export const updateApiTokenLimit = async (req: Request, res: Response) => {
+  try {
+    const { name, limit, warningThreshold } = req.body;
+    if (!name || limit === undefined || warningThreshold === undefined) {
+      return res.status(400).json({ success: false, message: 'Thiếu thông tin name, limit hoặc warningThreshold' });
+    }
+    const tokens = readTokenInfo();
+    const tokenObj = tokens.find(t => t.name.toLowerCase() === name.toLowerCase());
+    if (!tokenObj) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy API này' });
+    }
+    tokenObj.limit = Number(limit);
+    tokenObj.warningThreshold = Number(warningThreshold);
+    writeTokenInfo(tokens);
+    res.json({ success: true, message: 'Cập nhật hạn mức thành công', data: tokenObj });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi server khi cập nhật hạn mức API' });
+  }
+};
+
+export const resetApiTokenUsage = async (req: Request, res: Response) => {
+  try {
+    const { name } = req.body;
+    if (!name) {
+      return res.status(400).json({ success: false, message: 'Thiếu thông tin name' });
+    }
+    const tokens = readTokenInfo();
+    const tokenObj = tokens.find(t => t.name.toLowerCase() === name.toLowerCase());
+    if (!tokenObj) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy API này' });
+    }
+    tokenObj.usedTokens = 0;
+    delete tokenObj.lastWarningSent; // Cho phép gửi lại cảnh báo nếu chạm ngưỡng sau đó
+    writeTokenInfo(tokens);
+    res.json({ success: true, message: 'Reset token đã dùng thành công', data: tokenObj });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi server khi reset token đã dùng' });
   }
 };

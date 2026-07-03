@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
+import { trackTokens } from './tokenTracker';
 
 dotenv.config();
 
@@ -40,6 +41,11 @@ export const callGemini = async (prompt: string, userKey?: string): Promise<stri
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
+
+    // Track tokens
+    const usage = (response as any).usageMetadata;
+    const tokenCount = usage?.totalTokenCount || Math.ceil((prompt.length + text.length) / 3);
+    await trackTokens('Gemini', tokenCount);
 
     // Store in cache
     promptCache.set(cacheKey, { result: text, timestamp: Date.now() });
@@ -83,6 +89,10 @@ export const callGeminiStream = async (
       fullText += chunkText;
       if (onChunk) onChunk(chunkText);
     }
+
+    // Track tokens (estimate)
+    const tokenCount = Math.ceil((prompt.length + fullText.length) / 3);
+    await trackTokens('Gemini', tokenCount);
 
     return fullText;
   } catch (error: any) {

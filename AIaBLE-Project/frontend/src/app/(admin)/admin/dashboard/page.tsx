@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   Users, BookOpen, Zap, TrendingUp, RefreshCw, 
   Wand2, GitBranch, FlaskConical, Shield,
-  Server, Clock, Cpu, Database, Wifi
+  Server, Clock, Cpu, Database, Wifi, AlertTriangle, Edit2, RotateCcw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -50,23 +50,29 @@ function StatCard({ label, value, icon: Icon, color, gradient }: { label: string
     </div>
   );
 }
-
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [stats, setStats] = useState<any>(null);
   const [health, setHealth] = useState<any>(null);
+  const [tokens, setTokens] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const [editingToken, setEditingToken] = useState<string | null>(null);
+  const [editLimit, setEditLimit] = useState<number>(0);
+  const [editThreshold, setEditThreshold] = useState<number>(0);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [statsRes, healthRes] = await Promise.all([
+      const [statsRes, healthRes, tokensRes] = await Promise.all([
         fetch(`${API}/api/admin/stats`, { headers: authHeaders() }),
-        fetch(`${API}/api/admin/health`, { headers: authHeaders() })
+        fetch(`${API}/api/admin/health`, { headers: authHeaders() }),
+        fetch(`${API}/api/admin/tokens`, { headers: authHeaders() })
       ]);
       
       const statsJson = await statsRes.json();
       const healthJson = await healthRes.json();
+      const tokensJson = await tokensRes.json();
 
       if (statsRes.status === 401 || statsRes.status === 403) {
         router.push('/home'); // Redirect if not admin
@@ -75,6 +81,20 @@ export default function AdminDashboardPage() {
 
       if (statsJson.success) setStats(statsJson.data);
       if (healthJson.success) setHealth(healthJson.data);
+      if (tokensJson.success) setTokens(tokensJson.data);
+
+      // Trigger client side notifications for API token warnings
+      if (statsJson.success && statsJson.data.tokenWarnings) {
+        statsJson.data.tokenWarnings.forEach((w: any) => {
+          const key = `notif_token_${w.name}_${Math.floor(Date.now() / (60 * 60 * 1000))}`; // Limit to once per hour per api
+          if (!localStorage.getItem(key)) {
+            import('@/lib/notifications').then(({ addNotification }) => {
+              addNotification(`Hạn mức API sắp hết`, w.message);
+            });
+            localStorage.setItem(key, 'true');
+          }
+        });
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -85,6 +105,44 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const handleUpdateLimit = async (name: string) => {
+    try {
+      const res = await fetch(`${API}/api/admin/tokens/limit`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ name, limit: editLimit, warningThreshold: editThreshold })
+      });
+      const json = await res.json();
+      if (json.success) {
+        setEditingToken(null);
+        fetchData();
+      } else {
+        alert(json.message || 'Cập nhật thất bại');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleResetUsage = async (name: string) => {
+    if (!window.confirm(`Bạn có chắc muốn reset số lượng token đã dùng của API ${name}?`)) return;
+    try {
+      const res = await fetch(`${API}/api/admin/tokens/reset`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ name })
+      });
+      const json = await res.json();
+      if (json.success) {
+        fetchData();
+      } else {
+        alert(json.message || 'Reset thất bại');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   if (loading) {
     return (
@@ -106,6 +164,31 @@ export default function AdminDashboardPage() {
           <RefreshCw className="w-4 h-4" /> Làm mới
         </button>
       </div>
+
+      {/* Dangerous API Token Warning Banner */}
+      {stats && stats.tokenWarnings && stats.tokenWarnings.length > 0 && (
+        <div className="bg-rose-50 border border-rose-200/60 rounded-3xl p-5 flex flex-col gap-3.5 shadow-sm">
+          <div className="flex items-center gap-3 text-rose-800">
+            <div className="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 shrink-0">
+              <AlertTriangle className="w-5 h-5 animate-bounce" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-sm uppercase tracking-wider">Cảnh báo hạn mức API</h3>
+              <p className="text-xs font-semibold text-rose-600/80 mt-0.5">Một số API Key đã gần đạt hoặc vượt ngưỡng giới hạn cấu hình</p>
+            </div>
+          </div>
+          <div className="divide-y divide-rose-100 bg-white/60 rounded-2xl border border-rose-100 overflow-hidden">
+            {stats.tokenWarnings.map((w: any, idx: number) => (
+              <div key={idx} className="px-5 py-3.5 flex items-center justify-between gap-4 text-xs font-bold text-slate-700">
+                <span className="flex items-center gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
+                  {w.message}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {stats && (
         <>
@@ -213,6 +296,153 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         </>
+      )}
+
+      {/* ── API Token Management ── */}
+      {tokens && tokens.length > 0 && (
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-black text-slate-800">Quản lý Hạn mức Token API</h2>
+              <p className="text-xs font-semibold text-slate-500 mt-0.5">Theo dõi lượng token tiêu thụ và cấu hình ngưỡng cảnh báo</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {tokens.map((t: any) => {
+              const usagePercent = t.limit > 0 ? (t.usedTokens / t.limit) * 100 : 0;
+              const isEditing = editingToken === t.name;
+              const isDanger = usagePercent >= t.warningThreshold;
+              
+              return (
+                <div key={t.name} className={cn(
+                  "bg-white rounded-3xl border shadow-sm p-6 relative overflow-hidden transition-all hover:shadow-md",
+                  isDanger ? "border-amber-200 bg-amber-50/5" : "border-slate-100"
+                )}>
+                  {/* Visual danger indicator */}
+                  {isDanger && (
+                    <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-amber-500 to-rose-500" />
+                  )}
+                  
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                        isDanger ? "bg-amber-100 text-amber-600 animate-pulse" : "bg-violet-50 text-violet-600"
+                      )}>
+                        {isDanger ? <AlertTriangle className="w-5 h-5" /> : <Cpu className="w-5 h-5" />}
+                      </div>
+                      <div>
+                        <p className="text-sm font-black text-slate-800">{t.name}</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">AI Integration</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => {
+                          if (isEditing) {
+                            setEditingToken(null);
+                          } else {
+                            setEditingToken(t.name);
+                            setEditLimit(t.limit);
+                            setEditThreshold(t.warningThreshold);
+                          }
+                        }}
+                        className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-100 text-slate-500 hover:text-slate-700 transition"
+                        title="Cấu hình"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleResetUsage(t.name)}
+                        className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-100 text-slate-500 hover:text-rose-600 transition"
+                        title="Reset số dùng"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {isEditing ? (
+                    <div className="space-y-3.5 py-1">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Hạn mức (tokens)</label>
+                        <input
+                          type="number"
+                          value={editLimit}
+                          onChange={(e) => setEditLimit(Number(e.target.value))}
+                          className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500 font-semibold text-slate-700"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Cảnh báo khi đạt (%)</label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="99"
+                          value={editThreshold}
+                          onChange={(e) => setEditThreshold(Number(e.target.value))}
+                          className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500 font-semibold text-slate-700"
+                        />
+                      </div>
+                      <div className="flex gap-2 justify-end pt-1">
+                        <button
+                          onClick={() => setEditingToken(null)}
+                          className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-500 hover:bg-slate-50 transition"
+                        >
+                          Hủy
+                        </button>
+                        <button
+                          onClick={() => handleUpdateLimit(t.name)}
+                          className="px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold transition"
+                        >
+                          Lưu
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-end">
+                        <div>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase">Đã sử dụng</span>
+                          <p className="text-lg font-black text-slate-800 mt-0.5">{t.usedTokens.toLocaleString()}</p>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase">Hạn mức</span>
+                          <p className="text-sm font-bold text-slate-600 mt-0.5">{t.limit.toLocaleString()}</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between items-center text-xs mb-1.5">
+                          <span className="font-semibold text-slate-500">Mức sử dụng</span>
+                          <span className={cn(
+                            "font-bold",
+                            isDanger ? "text-amber-600" : "text-violet-600"
+                          )}>
+                            {usagePercent.toFixed(1)}%
+                          </span>
+                        </div>
+                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div className={cn(
+                            "h-2 rounded-full transition-all duration-500",
+                            usagePercent >= 90 ? "bg-rose-500" : usagePercent >= t.warningThreshold ? "bg-amber-500" : "bg-violet-500"
+                          )} style={{ width: `${Math.min(usagePercent, 100)}%` }} />
+                        </div>
+                      </div>
+
+                      {isDanger && (
+                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-600 bg-amber-50/50 border border-amber-100 p-2 rounded-xl">
+                          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                          <span>Đã vượt ngưỡng cấu hình ({t.warningThreshold}%)!</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       )}
 
       {/* System Health Section */}

@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
+import { trackTokens } from './tokenTracker';
 
 dotenv.config();
 
@@ -48,6 +49,10 @@ export const callGroq = async (
 
     const text = response.choices[0]?.message?.content || '';
 
+    // Track tokens
+    const tokenCount = response.usage?.total_tokens || Math.ceil((prompt.length + text.length) / 3);
+    await trackTokens('Groq', tokenCount);
+
     // Store in cache
     cache.set(cacheKey, { result: text, timestamp: Date.now() });
 
@@ -89,6 +94,10 @@ export const callGroqStream = async (
       fullText += content;
       if (onChunk && content) onChunk(content);
     }
+
+    // Track tokens (estimate)
+    const tokenCount = Math.ceil((prompt.length + fullText.length) / 3);
+    await trackTokens('Groq', tokenCount);
 
     return fullText;
   } catch (error: any) {

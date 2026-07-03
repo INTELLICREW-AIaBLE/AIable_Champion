@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Sun, Moon } from 'lucide-react';
 
 function NeuralNetDot({ cx, cy, r = 3.5, opacity = 1 }: { cx: number; cy: number; r?: number; opacity?: number }) {
   return <circle cx={cx} cy={cy} r={r} fill="#8B5CF6" opacity={opacity} />;
@@ -53,27 +54,62 @@ const t = {
 
 export function Navbar() {
   const [lang, setLang] = useState('vi');
+  const [theme, setTheme] = useState('light');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsLoggedIn(!!localStorage.getItem('token'));
+      
+      const savedTheme = localStorage.getItem('app_theme') || 'light';
+      setTheme(savedTheme);
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode-active');
+      } else {
+        document.documentElement.classList.remove('dark-mode-active');
+      }
     }
     setLang(localStorage.getItem('app_lang') || 'vi');
+    
     const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
+    const handleThemeChange = () => {
+      const savedTheme = localStorage.getItem('app_theme') || 'light';
+      setTheme(savedTheme);
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode-active');
+      } else {
+        document.documentElement.classList.remove('dark-mode-active');
+      }
+    };
+
     window.addEventListener('storage', handleLangChange);
     window.addEventListener('app_lang_changed', handleLangChange);
+    window.addEventListener('app_theme_changed', handleThemeChange);
+    
     return () => {
       window.removeEventListener('storage', handleLangChange);
       window.removeEventListener('app_lang_changed', handleLangChange);
+      window.removeEventListener('app_theme_changed', handleThemeChange);
     };
   }, []);
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    localStorage.setItem('app_theme', next);
+    if (next === 'dark') {
+      document.documentElement.classList.add('dark-mode-active');
+    } else {
+      document.documentElement.classList.remove('dark-mode-active');
+    }
+    window.dispatchEvent(new Event('app_theme_changed'));
+  };
 
   const currentLang = (lang === 'en' ? 'en' : 'vi') as 'en' | 'vi';
   const text = t[currentLang];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
+    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm transition-colors duration-300">
       <div className="flex h-14 items-center px-4 gap-2">
         {/* Logo */}
         <Link href="/" className="flex items-center shrink-0 w-52 group logo-container">
@@ -95,6 +131,15 @@ export function Navbar() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-3.5 shrink-0">
+          {/* Beautiful Dark Mode Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-full border border-slate-200/60 bg-slate-50 text-slate-500 hover:text-violet-600 hover:bg-violet-50 transition shadow-sm"
+            title={theme === 'dark' ? 'Chế độ sáng' : 'Chế độ tối'}
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-500 animate-[spin_8s_linear_infinite]" /> : <Moon className="w-4 h-4 text-slate-600" />}
+          </button>
+
           {/* Beautiful Sliding Pill Language Switcher */}
           <div className="relative flex items-center bg-slate-100 border border-slate-200/50 rounded-full p-0.5 shadow-inner select-none">
             <button

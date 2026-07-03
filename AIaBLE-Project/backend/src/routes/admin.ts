@@ -5,6 +5,7 @@ import {
   getActivityLog,
   adminGetRecipes, adminCreateRecipe, adminUpdateRecipe, adminDeleteRecipe,
   getSystemHealth,
+  getApiTokens, updateApiTokenLimit, resetApiTokenUsage,
 } from '../controllers/admin';
 
 import { requireAdmin } from '../middleware/adminMiddleware';
@@ -17,6 +18,11 @@ router.use(requireAdmin);
 // Dashboard
 router.get('/stats', getDashboardStats);
 router.get('/health', getSystemHealth);
+
+// API Tokens
+router.get('/tokens', getApiTokens);
+router.post('/tokens/limit', updateApiTokenLimit);
+router.post('/tokens/reset', resetApiTokenUsage);
 
 // Users
 router.get('/users', getAllUsers);
