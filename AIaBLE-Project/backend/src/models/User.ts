@@ -16,6 +16,8 @@ export interface IUser extends Document {
   isLocked?: boolean;
   savedRecipes?: any[];
   history?: any[];
+  resetToken?: string;
+  resetTokenExpiry?: number;
 }
 
 const userSchema = new Schema<IUser>({
@@ -33,7 +35,9 @@ const userSchema = new Schema<IUser>({
   role: { type: String, default: 'user' },
   isLocked: { type: Boolean, default: false },
   savedRecipes: { type: [Schema.Types.Mixed], default: [] },
-  history: { type: [Schema.Types.Mixed], default: [] }
+  history: { type: [Schema.Types.Mixed], default: [] },
+  resetToken: { type: String },
+  resetTokenExpiry: { type: Number }
 }, {
   timestamps: true // Tự động tạo createdAt, updatedAt
 });

@@ -550,6 +550,12 @@ export default function OptimizerPage() {
           placeholder={text.placeholder}
           rows={6}
           className="w-full px-5 py-4 text-sm text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+              e.preventDefault();
+              handleOptimize();
+            }
+          }}
         />
 
         <div className="flex items-center justify-between px-5 py-3 border-t border-slate-100 bg-slate-50/50">

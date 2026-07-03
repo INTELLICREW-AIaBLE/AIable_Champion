@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { 
   Sparkles, Send, Copy, Check, RotateCcw, 
   Zap, Settings2, Info, ChevronDown, FolderPlus,
-  ImagePlus, Loader2, Edit2, Eye
+  ImagePlus, Loader2, Edit2, Eye, Paperclip
 } from 'lucide-react';
 import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
 import Tesseract from 'tesseract.js';
@@ -43,8 +43,8 @@ const t = {
     errConn: 'Không thể kết nối đến server.',
     waiting: 'Chờ thực thi',
     errApi: 'Lỗi kết nối API',
-    scanImg: 'Quét văn bản từ ảnh',
-    scanning: 'Đang quét ảnh...',
+    scanImg: 'Đính kèm File/Ảnh',
+    scanning: 'Đang xử lý...',
     scanErr: 'Không thể nhận diện văn bản. Vui lòng thử lại.',
     examples: [
       'Viết một email chuyên nghiệp từ chối lời mời phỏng vấn.',
@@ -66,8 +66,8 @@ const t = {
     errConn: 'Cannot connect to server.',
     waiting: 'Waiting to execute',
     errApi: 'API Connection Error',
-    scanImg: 'Scan text from image',
-    scanning: 'Scanning image...',
+    scanImg: 'Attach File/Image',
+    scanning: 'Processing...',
     scanErr: 'Could not recognize text. Please try again.',
     examples: [
       'Write a professional email declining an interview invitation.',
@@ -208,10 +208,30 @@ export default function SandboxPage() {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    await processImageFile(file);
+    
+    if (file.type.startsWith('image/')) {
+      await processImageFile(file);
+    } else {
+      setIsScanning(true);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const extractedText = event.target?.result as string;
+        if (extractedText) {
+          setPrompt(prev => prev ? `${prev}\n\n[Nội dung file ${file.name}]:\n${extractedText}` : `[Nội dung file ${file.name}]:\n${extractedText}`);
+          setTimeout(() => textareaRef.current?.focus(), 100);
+        }
+        setIsScanning(false);
+      };
+      reader.onerror = () => {
+        alert(text.scanErr);
+        setIsScanning(false);
+      };
+      reader.readAsText(file);
+    }
+    
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -390,13 +410,13 @@ export default function SandboxPage() {
           </div>
           <div className="relative flex items-center gap-3">
             
-            {/* Nút Upload Ảnh */}
+            {/* Nút Upload File/Ảnh */}
             <input 
               type="file" 
-              accept="image/*" 
+              accept="image/*,.txt,.md,.csv,.json" 
               className="hidden" 
               ref={fileInputRef} 
-              onChange={handleImageUpload} 
+              onChange={handleFileUpload} 
             />
             <button
               onClick={() => fileInputRef.current?.click()}
@@ -404,7 +424,7 @@ export default function SandboxPage() {
               title={text.scanImg}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-violet-600 bg-violet-50 hover:bg-violet-100 disabled:opacity-50 transition"
             >
-              {isScanning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImagePlus className="w-3.5 h-3.5" />}
+              {isScanning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Paperclip className="w-3.5 h-3.5" />}
               <span className="hidden sm:inline">{isScanning ? text.scanning : text.scanImg}</span>
             </button>
             
@@ -448,7 +468,7 @@ export default function SandboxPage() {
             rows={4}
             className="w-full text-sm text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && e.shiftKey) {
+              if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                 e.preventDefault();
                 handleRun();
               }

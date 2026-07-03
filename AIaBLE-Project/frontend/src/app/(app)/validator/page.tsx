@@ -14,7 +14,8 @@ import {
   Target,
   FolderPlus,
   ImagePlus,
-  Loader2
+  Loader2,
+  Paperclip
 } from 'lucide-react';
 import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
 import Tesseract from 'tesseract.js';
@@ -60,8 +61,8 @@ const t = {
     sourceLabel: 'Nguồn: ',
     errConn: 'Không thể kết nối đến server backend.',
     errGen: 'Có lỗi xảy ra khi kiểm định.',
-    scanImg: 'Quét văn bản từ ảnh',
-    scanning: 'Đang quét ảnh...',
+    scanImg: 'Đính kèm File/Ảnh',
+    scanning: 'Đang xử lý...',
     scanErr: 'Không thể nhận diện văn bản. Vui lòng thử lại.'
   },
   en: {
@@ -96,8 +97,8 @@ const t = {
     sourceLabel: 'Source: ',
     errConn: 'Cannot connect to backend server.',
     errGen: 'An error occurred during validation.',
-    scanImg: 'Scan text from image',
-    scanning: 'Scanning image...',
+    scanImg: 'Attach File/Image',
+    scanning: 'Processing...',
     scanErr: 'Could not recognize text. Please try again.'
   }
 };
@@ -154,10 +155,33 @@ export default function ValidatorPage() {
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'output' | 'context') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'output' | 'context') => {
     const file = e.target.files?.[0];
     if (!file) return;
-    await processImageFile(file, target);
+
+    if (file.type.startsWith('image/')) {
+      await processImageFile(file, target);
+    } else {
+      setIsScanning(target);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const extractedText = event.target?.result as string;
+        if (extractedText) {
+          if (target === 'output') {
+            setOutput(prev => prev ? `${prev}\n\n[Nội dung file ${file.name}]:\n${extractedText}` : `[Nội dung file ${file.name}]:\n${extractedText}`);
+          } else {
+            setContext(prev => prev ? `${prev}\n\n[Nội dung file ${file.name}]:\n${extractedText}` : `[Nội dung file ${file.name}]:\n${extractedText}`);
+          }
+        }
+        setIsScanning(null);
+      };
+      reader.onerror = () => {
+        alert(text.scanErr);
+        setIsScanning(null);
+      };
+      reader.readAsText(file);
+    }
+
     if (target === 'output' && fileInputRef.current) fileInputRef.current.value = '';
     if (target === 'context' && contextFileInputRef.current) contextFileInputRef.current.value = '';
   };
@@ -297,10 +321,10 @@ export default function ValidatorPage() {
               <div className="flex items-center gap-3">
                 <input 
                   type="file" 
-                  accept="image/*" 
+                  accept="image/*,.txt,.md,.csv,.json" 
                   className="hidden" 
                   ref={fileInputRef} 
-                  onChange={(e) => handleImageUpload(e, 'output')} 
+                  onChange={(e) => handleFileUpload(e, 'output')} 
                 />
                 <button
                   onClick={() => fileInputRef.current?.click()}
@@ -308,7 +332,7 @@ export default function ValidatorPage() {
                   title={text.scanImg}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-violet-600 bg-violet-50 hover:bg-violet-100 disabled:opacity-50 transition"
                 >
-                  {isScanning === 'output' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImagePlus className="w-3.5 h-3.5" />}
+                  {isScanning === 'output' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Paperclip className="w-3.5 h-3.5" />}
                   <span className="hidden sm:inline">{isScanning === 'output' ? text.scanning : text.scanImg}</span>
                 </button>
                 <span className={`text-xs font-medium ${charCount > 5000 ? 'text-amber-500' : 'text-slate-400'}`}>
@@ -324,6 +348,12 @@ export default function ValidatorPage() {
               rows={8}
               className="w-full px-5 py-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
               onPaste={(e) => handlePaste(e, 'output')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                  e.preventDefault();
+                  handleValidate();
+                }
+              }}
             />
 
             {/* Lớp phủ khi đang quét ảnh (Paste/Upload) */}
@@ -346,10 +376,10 @@ export default function ValidatorPage() {
               <div className="flex items-center gap-3">
                 <input 
                   type="file" 
-                  accept="image/*" 
+                  accept="image/*,.txt,.md,.csv,.json" 
                   className="hidden" 
                   ref={contextFileInputRef} 
-                  onChange={(e) => handleImageUpload(e, 'context')} 
+                  onChange={(e) => handleFileUpload(e, 'context')} 
                 />
                 <button
                   onClick={() => contextFileInputRef.current?.click()}
@@ -357,7 +387,7 @@ export default function ValidatorPage() {
                   title={text.scanImg}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-violet-600 bg-violet-50 hover:bg-violet-100 disabled:opacity-50 transition"
                 >
-                  {isScanning === 'context' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImagePlus className="w-3.5 h-3.5" />}
+                  {isScanning === 'context' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Paperclip className="w-3.5 h-3.5" />}
                   <span className="hidden sm:inline">{isScanning === 'context' ? text.scanning : text.scanImg}</span>
                 </button>
                 <span className={`text-xs font-medium ${context.length >= 5000 ? 'text-red-500 font-bold' : 'text-slate-400'}`}>
@@ -372,6 +402,12 @@ export default function ValidatorPage() {
               rows={3}
               className="w-full px-5 py-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
               onPaste={(e) => handlePaste(e, 'context')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                  e.preventDefault();
+                  handleValidate();
+                }
+              }}
             />
 
             {isScanning === 'context' && (

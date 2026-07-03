@@ -110,6 +110,7 @@ export default function SettingsPage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('app_theme') || 'light';
@@ -149,7 +150,7 @@ export default function SettingsPage() {
   const currentLang = (lang === 'en' ? 'en' : 'vi') as 'en' | 'vi';
   const text = t[currentLang];
 
-  const handleUpdatePassword = () => {
+  const handleUpdatePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
       alert(text.account.errorEmpty);
       return;
@@ -158,12 +159,35 @@ export default function SettingsPage() {
       alert(text.account.errorMismatch);
       return;
     }
-    // TODO: Connect to backend password update endpoint
-    alert(text.account.success);
-    addNotification('Bảo mật', text.account.success);
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
+
+    setIsUpdatingPassword(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        alert(text.account.success);
+        addNotification('Bảo mật', text.account.success);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        alert(data.message || 'Lỗi khi cập nhật mật khẩu');
+        addNotification('Lỗi', data.message || 'Lỗi khi cập nhật mật khẩu', 'error');
+      }
+    } catch (err) {
+      alert('Không thể kết nối đến server');
+    } finally {
+      setIsUpdatingPassword(false);
+    }
   };
 
   const tabs = [
@@ -231,8 +255,8 @@ export default function SettingsPage() {
                     <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{text.account.confirm}</label>
                     <input maxLength={100} type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm" />
                   </div>
-                  <button onClick={handleUpdatePassword} className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition">
-                    {text.account.update}
+                  <button disabled={isUpdatingPassword} onClick={handleUpdatePassword} className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition disabled:opacity-70 disabled:cursor-not-allowed">
+                    {isUpdatingPassword ? 'Đang cập nhật...' : text.account.update}
                   </button>
                 </div>
               </div>

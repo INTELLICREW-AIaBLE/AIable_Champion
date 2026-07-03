@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getProfile, updateProfile, getHistory, addHistory, getSavedRecipes, toggleSavedRecipe } from '../controllers/profile';
+import { getProfile, updateProfile, getHistory, addHistory, getSavedRecipes, toggleSavedRecipe, changePassword } from '../controllers/profile';
 import { requireAuth } from '../middleware/authMiddleware';
 
 const router = Router();
@@ -9,6 +9,7 @@ router.use(requireAuth);
 
 router.get('/', getProfile);
 router.put('/', updateProfile);
+router.put('/password', changePassword);
 
 router.get('/history', getHistory);
 router.post('/history', addHistory);

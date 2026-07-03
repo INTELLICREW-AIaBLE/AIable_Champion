@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   Users, BookOpen, Zap, TrendingUp, RefreshCw,
   Wand2, GitBranch, FlaskConical, Shield,
@@ -194,29 +195,39 @@ export default function AdminDashboardPage() {
         <>
           {/* Overview cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-            <StatCard label="Tổng users" value={stats.overview.totalUsers} icon={Users} color="bg-gradient-to-tr from-violet-600 to-fuchsia-600" gradient="bg-violet-500" />
-            <StatCard label="Tổng recipes" value={stats.overview.totalRecipes} icon={BookOpen} color="bg-gradient-to-tr from-emerald-500 to-teal-400" gradient="bg-emerald-500" />
-            <StatCard label="API requests" value={stats.overview.totalApiCalls} icon={Zap} color="bg-gradient-to-tr from-blue-600 to-cyan-500" gradient="bg-blue-500" />
-            <StatCard label="Đã lưu trữ" value={stats.overview.totalSavedRecipes} icon={TrendingUp} color="bg-gradient-to-tr from-amber-500 to-orange-400" gradient="bg-amber-500" />
+            <Link href="/admin/users">
+              <StatCard label="Tổng users" value={stats.overview.totalUsers} icon={Users} color="bg-gradient-to-tr from-violet-600 to-fuchsia-600" gradient="bg-violet-500" />
+            </Link>
+            <Link href="/admin/recipes">
+              <StatCard label="Tổng recipes" value={stats.overview.totalRecipes} icon={BookOpen} color="bg-gradient-to-tr from-emerald-500 to-teal-400" gradient="bg-emerald-500" />
+            </Link>
+            <Link href="/admin/activities">
+              <StatCard label="API requests" value={stats.overview.totalApiCalls} icon={Zap} color="bg-gradient-to-tr from-blue-600 to-cyan-500" gradient="bg-blue-500" />
+            </Link>
+            <Link href="/admin/activities">
+              <StatCard label="Đã lưu trữ" value={stats.overview.totalSavedRecipes} icon={TrendingUp} color="bg-gradient-to-tr from-amber-500 to-orange-400" gradient="bg-amber-500" />
+            </Link>
           </div>
 
           {/* Feature breakdown */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
-            {[
-              { label: 'Optimizer', icon: Wand2, val: stats.overview.optimizerCount, color: 'text-violet-600 bg-violet-50' },
-              { label: 'Task Matcher', icon: GitBranch, val: stats.overview.taskMatcherCount, color: 'text-blue-600 bg-blue-50' },
-              { label: 'Sandbox', icon: FlaskConical, val: stats.overview.sandboxCount, color: 'text-fuchsia-600 bg-fuchsia-50' },
-              { label: 'Validator', icon: Shield, val: stats.overview.validatorCount, color: 'text-emerald-600 bg-emerald-50' },
-              { label: 'Recipes', icon: BookOpen, val: stats.overview.recipeCount, color: 'text-amber-600 bg-amber-50' },
-            ].map(({ label, icon: Icon, val, color }) => (
-              <div key={label} className="bg-white rounded-3xl border border-slate-100 shadow-sm p-5 text-center hover:shadow-md hover:border-violet-200 transition-all group cursor-default">
-                <div className={cn('w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300', color)}>
-                  <Icon className="w-6 h-6" />
-                </div>
-                <p className="text-2xl font-black text-slate-900">{val}</p>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">{label}</p>
-              </div>
-            ))}
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="grid grid-cols-2 md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+              {[
+                { label: 'Optimizer', icon: Wand2, val: stats.overview.optimizerCount, color: 'text-violet-600 bg-violet-50', link: '/admin/activities' },
+                { label: 'Task Matcher', icon: GitBranch, val: stats.overview.taskMatcherCount, color: 'text-blue-600 bg-blue-50', link: '/admin/activities' },
+                { label: 'Sandbox', icon: FlaskConical, val: stats.overview.sandboxCount, color: 'text-fuchsia-600 bg-fuchsia-50', link: '/admin/activities' },
+                { label: 'Validator', icon: Shield, val: stats.overview.validatorCount, color: 'text-emerald-600 bg-emerald-50', link: '/admin/activities' },
+                { label: 'Recipes', icon: BookOpen, val: stats.overview.recipeCount, color: 'text-amber-600 bg-amber-50', link: '/admin/recipes' },
+              ].map(({ label, icon: Icon, val, color, link }) => (
+                <Link href={link} key={label} className="p-6 flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-slate-50/50 transition-colors">
+                  <div className={cn('w-10 h-10 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300', color)}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <p className="text-2xl font-black text-slate-900 leading-none mb-1">{val}</p>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{label}</p>
+                </Link>
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

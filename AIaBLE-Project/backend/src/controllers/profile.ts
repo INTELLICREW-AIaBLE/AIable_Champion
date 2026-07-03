@@ -188,3 +188,31 @@ export const toggleSavedRecipe = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: 'Lỗi server' });
   }
 };
+
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Thiếu thông tin mật khẩu' });
+    }
+
+    const user = await User.findOne({ id: userId });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
+    }
+
+    if (user.password !== currentPassword) {
+      return res.status(400).json({ success: false, message: 'Mật khẩu hiện tại không đúng' });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ success: true, message: 'Đổi mật khẩu thành công' });
+  } catch (err) {
+    console.error('Lỗi khi đổi mật khẩu:', err);
+    res.status(500).json({ success: false, message: 'Lỗi server khi đổi mật khẩu' });
+  }
+};
