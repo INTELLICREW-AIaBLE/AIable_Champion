@@ -134,7 +134,7 @@ export default function RegisterPage() {
               <label htmlFor="reg-fullname" className="text-sm font-semibold text-slate-700">
                 {text.name}
               </label>
-              <input
+              <input maxLength={100}
                 id="reg-fullname"
                 type="text"
                 required
@@ -148,7 +148,7 @@ export default function RegisterPage() {
               <label htmlFor="reg-email" className="text-sm font-semibold text-slate-700">
                 {text.email}
               </label>
-              <input
+              <input maxLength={100}
                 id="reg-email"
                 type="text"
                 required
@@ -167,7 +167,7 @@ export default function RegisterPage() {
                 {text.pw}
               </label>
               <div className="relative">
-                <input
+                <input maxLength={100}
                   id="reg-password"
                   type={showPw ? 'text' : 'password'}
                   required
@@ -191,7 +191,7 @@ export default function RegisterPage() {
                 {text.confirm}
               </label>
               <div className="relative">
-                <input
+                <input maxLength={100}
                   id="reg-confirm"
                   type={showConfirm ? 'text' : 'password'}
                   required

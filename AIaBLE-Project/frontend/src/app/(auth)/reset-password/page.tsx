@@ -91,7 +91,7 @@ export default function ResetPasswordPage() {
           <div className="space-y-1.5">
             <label className="text-sm font-semibold text-slate-700">Mật khẩu mới</label>
             <div className="relative">
-              <input
+              <input maxLength={100}
                 type={showPw ? 'text' : 'password'}
                 required
                 placeholder="••••••••"
@@ -112,7 +112,7 @@ export default function ResetPasswordPage() {
           <div className="space-y-1.5">
             <label className="text-sm font-semibold text-slate-700">Xác nhận mật khẩu mới</label>
             <div className="relative">
-              <input
+              <input maxLength={100}
                 type={showConfirm ? 'text' : 'password'}
                 required
                 placeholder="••••••••"

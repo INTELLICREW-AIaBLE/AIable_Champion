@@ -37,7 +37,7 @@ function EditableField({
   return (
     <span className="inline-flex items-center gap-1 flex-1">
       {multiline ? (
-        <textarea
+        <textarea maxLength={5000}
           autoFocus
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -46,7 +46,7 @@ function EditableField({
           rows={3}
         />
       ) : (
-        <input
+        <input maxLength={100}
           type={type}
           autoFocus
           value={value}
@@ -92,7 +92,7 @@ function LocationSelector({ value, onSave }: { value: string; onSave: (v: string
             
             <div className="p-4 space-y-4">
               <div className="flex gap-2">
-                <input 
+                <input maxLength={100} 
                   type="text" 
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
@@ -515,7 +515,7 @@ export default function ProfilePage() {
               
               {isAddingSkill ? (
                 <div className="flex items-center gap-1">
-                  <input
+                  <input maxLength={100}
                     type="text"
                     value={newSkill}
                     onChange={(e) => setNewSkill(e.target.value)}

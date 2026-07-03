@@ -320,7 +320,7 @@ export function AppNavbar() {
           <div className="relative" ref={searchRef}>
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
-              <input
+              <input maxLength={100}
                 ref={inputRef}
                 id="navbar-search"
                 type="text"

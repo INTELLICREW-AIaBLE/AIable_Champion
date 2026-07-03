@@ -227,7 +227,7 @@ export default function ProjectsPage() {
         <div className="flex items-center gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
+            <input maxLength={100}
               type="text"
               placeholder={text.searchPlaceholder}
               value={searchQuery}
@@ -501,7 +501,7 @@ function CreateProjectModal({ onClose, onSuccess, text }: { onClose: () => void;
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">{text.nameLabel}</label>
-            <input
+            <input maxLength={100}
               type="text"
               required
               value={formData.title}
@@ -513,7 +513,7 @@ function CreateProjectModal({ onClose, onSuccess, text }: { onClose: () => void;
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">{text.descLabel}</label>
-            <textarea
+            <textarea maxLength={5000}
               required
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -538,7 +538,7 @@ function CreateProjectModal({ onClose, onSuccess, text }: { onClose: () => void;
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">{text.tagsLabel}</label>
-            <input
+            <input maxLength={100}
               type="text"
               value={formData.tags}
               onChange={(e) => setFormData({ ...formData, tags: e.target.value })}

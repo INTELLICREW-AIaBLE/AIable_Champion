@@ -166,7 +166,7 @@ export default function LoginPage() {
             <label htmlFor="login-username" className="text-sm font-semibold text-slate-700">
               {text.userOrEmail}
             </label>
-            <input
+            <input maxLength={100}
               id="login-username"
               type="text"
               required
@@ -188,7 +188,7 @@ export default function LoginPage() {
               </Link>
             </div>
             <div className="relative">
-              <input
+              <input maxLength={100}
                 id="login-password"
                 type={showPw ? 'text' : 'password'}
                 required

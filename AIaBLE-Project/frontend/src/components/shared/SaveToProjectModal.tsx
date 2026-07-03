@@ -265,7 +265,7 @@ export default function SaveToProjectModal({ isOpen, onClose, data }: SaveToProj
                 )
               ) : (
                 <div className="space-y-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
-                  <input
+                  <input maxLength={100}
                     type="text"
                     placeholder="Tên dự án mới..."
                     value={newProjectTitle}
@@ -290,14 +290,14 @@ export default function SaveToProjectModal({ isOpen, onClose, data }: SaveToProj
             <div className="space-y-3">
               <label className="text-sm font-bold text-slate-700">Thông tin lưu trữ (Task)</label>
               <div>
-                <input
+                <input maxLength={100}
                   type="text"
                   placeholder="Tên tác vụ (VD: Generate API docs)"
                   value={taskTitle}
                   onChange={(e) => setTaskTitle(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 mb-2"
                 />
-                <textarea
+                <textarea maxLength={5000}
                   placeholder="Mô tả ngắn gọn (Tùy chọn)"
                   value={taskDescription}
                   onChange={(e) => setTaskDescription(e.target.value)}

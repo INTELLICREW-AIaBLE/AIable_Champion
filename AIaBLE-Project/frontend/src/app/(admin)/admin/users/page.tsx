@@ -104,7 +104,7 @@ export default function AdminUsersPage() {
         
         <div className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-xl border border-slate-200 w-full sm:w-72 focus-within:border-violet-500 focus-within:ring-4 focus-within:ring-violet-50 transition-all shadow-sm">
           <Search className="w-4 h-4 text-slate-400 shrink-0" />
-          <input 
+          <input maxLength={100} 
             type="text" 
             placeholder="Tìm kiếm theo tên hoặc email..." 
             value={search} 

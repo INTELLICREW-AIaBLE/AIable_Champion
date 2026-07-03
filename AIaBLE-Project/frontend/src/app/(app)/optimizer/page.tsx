@@ -543,7 +543,7 @@ export default function OptimizerPage() {
           </div>
         </div>
 
-        <textarea
+        <textarea maxLength={5000}
           ref={textareaRef}
           value={raw}
           onChange={(e) => setRaw(e.target.value)}

@@ -70,7 +70,7 @@ export default function HelpPage() {
           
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <input 
+            <input maxLength={100} 
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

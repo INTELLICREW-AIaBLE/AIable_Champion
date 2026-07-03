@@ -177,7 +177,7 @@ export default function TaskMatcherPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_220px_150px] gap-3">
-        <input
+        <input maxLength={100}
           value={taskDescription}
           onChange={(e) => setTaskDescription(e.target.value)}
           placeholder={text.placeholder}

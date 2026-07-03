@@ -106,7 +106,7 @@ export default function ForgotPasswordPage() {
               <label htmlFor="forgot-email" className="text-sm font-semibold text-slate-700">
                 Email đăng ký
               </label>
-              <input
+              <input maxLength={100}
                 id="forgot-email"
                 type="email"
                 required

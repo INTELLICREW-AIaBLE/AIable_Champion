@@ -298,7 +298,7 @@ export default function RecipeLibraryPage() {
         <div className="flex items-center gap-2 relative">
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-slate-200 shadow-sm text-sm text-slate-700 w-56 focus-within:border-violet-400 focus-within:ring-1 focus-within:ring-violet-200 transition-all">
             <Search className="w-4 h-4 text-slate-400 shrink-0" />
-            <input
+            <input maxLength={100}
               type="text"
               placeholder="Tìm kiếm recipe..."
               className="bg-transparent border-none outline-none w-full placeholder:text-slate-400 text-sm"

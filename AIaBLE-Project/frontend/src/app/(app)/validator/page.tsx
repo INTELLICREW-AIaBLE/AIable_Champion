@@ -315,7 +315,7 @@ export default function ValidatorPage() {
               </div>
             </div>
 
-            <textarea
+            <textarea maxLength={5000}
               value={output}
               onChange={(e) => setOutput(e.target.value)}
               placeholder={text.inputPlaceholder}
@@ -359,12 +359,16 @@ export default function ValidatorPage() {
                   {isScanning === 'context' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImagePlus className="w-3.5 h-3.5" />}
                   <span className="hidden sm:inline">{isScanning === 'context' ? text.scanning : text.scanImg}</span>
                 </button>
+                <span className={`text-xs font-medium ${context.length >= 5000 ? 'text-red-500 font-bold' : 'text-slate-400'}`}>
+                  {context.length}/5000 {text.chars}
+                </span>
               </div>
             </div>
-            <textarea
+            <textarea maxLength={5000}
               value={context}
               onChange={(e) => setContext(e.target.value)}
               placeholder={text.contextPlaceholder}
+              maxLength={5000}
               rows={3}
               className="w-full px-5 py-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
               onPaste={(e) => handlePaste(e, 'context')}

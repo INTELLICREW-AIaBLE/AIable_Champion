@@ -440,11 +440,11 @@ export default function SandboxPage() {
         </div>
         
         <div className="p-4">
-          <textarea
+          <textarea maxLength={5000}
             ref={textareaRef}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            maxLength={4000}
+            maxLength={5000}
             placeholder={text.placeholder}
             rows={4}
             className="w-full text-sm text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
@@ -474,8 +474,8 @@ export default function SandboxPage() {
               <Info className="w-4 h-4" />
               {text.hint}
             </div>
-            <div className={prompt.length >= 4000 ? "text-red-500 font-bold" : "text-slate-400 font-medium"}>
-              {prompt.length} / 4000
+            <div className={prompt.length >= 5000 ? "text-red-500 font-bold" : "text-slate-400 font-medium"}>
+              {prompt.length} / 5000
             </div>
           </div>
           {isRunning ? (
@@ -567,7 +567,7 @@ export default function SandboxPage() {
 
               {res.status === 'success' && (
                 editModes[res.model] ? (
-                  <textarea
+                  <textarea maxLength={5000}
                     value={res.content}
                     onChange={(e) => handleContentChange(res.model, e.target.value)}
                     className="w-full min-h-[250px] p-2 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono text-sm leading-relaxed focus:ring-1 focus:ring-violet-400 focus:outline-none resize-y animate-in fade-in duration-300"

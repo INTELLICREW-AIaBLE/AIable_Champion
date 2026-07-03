@@ -68,7 +68,7 @@ const t = {
   },
   en: {
     welcome: 'Welcome',
-    welcomeSuffix: ' san!',
+    welcomeSuffix: '!',
     welcomeDefault: 'Welcome to AIaBLE!',
     desc: 'Your AI-powered productivity platform. Optimizing prompts and matching tasks.',
     quickAccess: 'QUICK ACCESS',

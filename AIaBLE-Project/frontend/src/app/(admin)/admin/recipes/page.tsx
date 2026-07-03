@@ -40,7 +40,7 @@ function RecipeModal({ recipe, onClose, onSave }: { recipe: any; onClose: () => 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5 block">ID (Unique)</label>
-              <input value={form.id} onChange={e => setForm(f => ({ ...f, id: e.target.value }))}
+              <input maxLength={100} value={form.id} onChange={e => setForm(f => ({ ...f, id: e.target.value }))}
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-4 focus:ring-violet-50 focus:border-violet-500 transition font-mono" placeholder="vd: coding-001" />
             </div>
             <div>
@@ -53,7 +53,7 @@ function RecipeModal({ recipe, onClose, onSave }: { recipe: any; onClose: () => 
           </div>
           <div>
             <label className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5 block">Tiêu đề (Title) *</label>
-            <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+            <input maxLength={100} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-4 focus:ring-violet-50 focus:border-violet-500 transition font-semibold text-slate-800" placeholder="Nhập tiêu đề prompt..." />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -66,18 +66,18 @@ function RecipeModal({ recipe, onClose, onSave }: { recipe: any; onClose: () => 
             </div>
             <div>
               <label className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5 block">Tags (cách nhau dấu phẩy)</label>
-              <input value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))}
+              <input maxLength={100} value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))}
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-4 focus:ring-violet-50 focus:border-violet-500 transition" placeholder="react, nextjs, typescript" />
             </div>
           </div>
           <div>
             <label className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5 block">Mô tả ngắn (Description) *</label>
-            <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+            <textarea maxLength={5000} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
               rows={2} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-4 focus:ring-violet-50 focus:border-violet-500 transition resize-none text-slate-700" placeholder="Mô tả công dụng của prompt này..." />
           </div>
           <div>
             <label className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5 block">Nội dung Prompt *</label>
-            <textarea value={form.prompt} onChange={e => setForm(f => ({ ...f, prompt: e.target.value }))}
+            <textarea maxLength={5000} value={form.prompt} onChange={e => setForm(f => ({ ...f, prompt: e.target.value }))}
               rows={6} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-4 focus:ring-violet-50 focus:border-violet-500 transition resize-none font-mono text-slate-800 leading-relaxed bg-slate-50" placeholder="Viết nội dung prompt ở đây. Dùng [Biến] nếu cần..." />
           </div>
         </div>
@@ -178,7 +178,7 @@ export default function AdminRecipesPage() {
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-slate-200 focus-within:border-violet-500 focus-within:ring-4 focus-within:ring-violet-50 transition-all shadow-sm">
             <Search className="w-4 h-4 text-slate-400 shrink-0" />
-            <input 
+            <input maxLength={100} 
               type="text" 
               placeholder="Tìm tên, ID..." 
               value={search} 
