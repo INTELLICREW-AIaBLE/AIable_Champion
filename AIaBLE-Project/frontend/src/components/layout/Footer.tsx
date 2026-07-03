@@ -111,7 +111,7 @@ export function Footer() {
           
           {/* Brand & Introduction Column */}
           <div className="lg:col-span-2 space-y-4 pr-0 lg:pr-8">
-            <Link href="/" className="flex items-center group">
+            <Link href="/" className="flex items-center group logo-container">
               <Image 
                 src="/logo.png" 
                 alt="AIaBLE Logo" 

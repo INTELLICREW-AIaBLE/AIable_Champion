@@ -85,9 +85,14 @@ html.dark-mode-active .ignore-dark-mode video {
   filter: none !important;
 }
 
-/* Logo: nhận 1 lần invert từ trang → nền trắng thành tối, purple text giữ được tông màu */
+/* Logo container: pre-inversion bg = hsl(240,15%,84%) → sau page filter = dark navy khớp với header */
+html.dark-mode-active .logo-container {
+  background-color: hsl(240, 15%, 84%);
+}
+/* Logo img: dùng darken blend → white pixels của logo nhận màu container → sau filter = dark navy ✓ */
 html.dark-mode-active .logo-img {
   filter: none !important;
+  mix-blend-mode: darken;
 }
 
 /* Custom Overrides for precise inverted colors */

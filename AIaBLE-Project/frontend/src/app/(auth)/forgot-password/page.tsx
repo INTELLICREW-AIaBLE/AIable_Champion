@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
         </Link>
 
         {/* Logo */}
-        <div className="flex items-center justify-center mb-6 mt-2">
+        <div className="flex items-center justify-center mb-6 mt-2 logo-container">
           <Image
             src="/logo.png"
             alt="AIaBLE Logo"

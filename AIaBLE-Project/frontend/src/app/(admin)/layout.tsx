@@ -33,7 +33,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       {/* ── Admin Sidebar ── */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 sticky top-0 h-screen shadow-sm">
         <div className="h-16 flex items-center px-6 border-b border-slate-100">
-          <Link href="/admin/dashboard" className="flex items-center gap-3">
+          <Link href="/admin/dashboard" className="flex items-center gap-3 logo-container">
             <Image 
               src="/logo.png" 
               alt="AIaBLE Logo" 

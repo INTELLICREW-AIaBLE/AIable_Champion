@@ -293,7 +293,7 @@ export function AppNavbar() {
       <div className="flex h-14 items-center px-4 gap-2">
 
         {/* Logo */}
-        <Link href="/home" className="flex items-center shrink-0 md:w-52 group">
+        <Link href="/home" className="flex items-center shrink-0 md:w-52 group logo-container">
           <Image 
             src="/logo.png" 
             alt="AIaBLE Logo" 
