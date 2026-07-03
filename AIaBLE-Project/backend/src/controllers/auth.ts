@@ -165,7 +165,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: 'Vui lòng cung cấp email.' });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: new RegExp('^' + email.trim() + '$', 'i') });
     
     // Luôn trả về success để tránh dò rỉ email (security best practice)
     if (!user) {
@@ -246,7 +246,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     }
 
     // Cast any to access generic fields
-    const user = await User.findOne({ email, resetToken: token } as any);
+    const user = await User.findOne({ email: new RegExp('^' + email.trim() + '$', 'i'), resetToken: token } as any);
 
     if (!user) {
       return res.status(400).json({ success: false, message: 'Token không hợp lệ hoặc sai email.' });
