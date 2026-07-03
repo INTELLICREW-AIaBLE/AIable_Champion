@@ -86,28 +86,32 @@ ${text.trim()}
       .join('\n');
 
     const analyzePrompt = `
-You are a fact-checker. Analyze the following claim and determine its accuracy based on the search results provided (if any).
+You are an expert Fact-Checker and RAG System Validator. Analyze the following claim and determine its accuracy based strictly on the search results provided (if any).
 
 Claim: "${claim}"
 
 Search results:
-${snippets || 'No search results available. Use your own knowledge.'}
+${snippets || 'No search results available.'}
 
-Return ONLY a valid JSON object (no markdown):
+Return ONLY a valid JSON object (no markdown, no extra text):
 {
   "status": "verified" | "unverified" | "disputed",
   "explanation": "1-2 sentence explanation in Vietnamese",
   "confidence": number between 0 and 100
 }
 
-Rules:
-- "verified": claim is confirmed by search results or well-established knowledge
-- "disputed": claim contradicts search results or is commonly known to be false
-- "unverified": not enough evidence to confirm or deny
+Rules & Constraints:
+1. Trạng thái (Status mapping): 
+   - "verified" (Hợp lệ): claim is confirmed by reliable search results.
+   - "disputed" (Sai lệch): claim contradicts search results or is proven false.
+   - "unverified" (Không xác định): not enough evidence.
+2. Ưu tiên các nguồn tin có domain chính thống, tránh các trang blog cá nhân hoặc diễn đàn. 
+3. Nếu không tìm thấy nguồn tin cậy hoặc search results rỗng, bạn PHẢI ghi rõ "Không đủ bằng chứng" trong phần explanation thay vì tự suy diễn.
+4. Trong explanation, hãy trích dẫn ngắn gọn nguồn hỗ trợ nếu có.
 `;
 
     let status: AnalyzedClaim['status'] = 'unverified';
-    let explanation = 'Không đủ dữ liệu để xác minh.';
+    let explanation = 'Không đủ bằng chứng.';
     let confidence = 40;
 
     try {
