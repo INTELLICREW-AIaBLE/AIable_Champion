@@ -172,7 +172,7 @@ export default function AdminDashboardPage() {
                 {stats.charts.byModel.slice(0, 5).map((m: any, idx: number) => (
                   <div key={m.name} className="flex items-center gap-4 group">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-violet-500 to-fuchsia-500 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-105 transition-transform">
-                      <span className="font-black text-lg">#{idx + 1}</span>
+                      <span className="font-black text-lg">{idx + 1}</span>
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-black text-slate-800">{m.name || 'Mặc định'}</p>

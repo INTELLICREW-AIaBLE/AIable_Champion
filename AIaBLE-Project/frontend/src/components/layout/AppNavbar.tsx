@@ -174,12 +174,7 @@ export function AppNavbar() {
   const text = t[currentLang];
   let menuItems = getMenuItems(text);
 
-  if (userProfile?.role === 'admin') {
-    menuItems = [
-      { icon: ShieldAlert, label: text.adminPanel, href: '/admin', dividerAfter: true },
-      ...menuItems
-    ];
-  }
+  // Removed admin panel link from dropdown to avoid duplication
 
   // Search
   const [query, setQuery] = useState('');
