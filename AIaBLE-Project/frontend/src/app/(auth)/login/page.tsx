@@ -50,7 +50,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && localStorage.getItem('token')) {
-      router.push('/home');
+      const role = localStorage.getItem('role');
+      if (role === 'admin') router.push('/admin/dashboard');
+      else router.push('/home');
     }
     setLang(localStorage.getItem('app_lang') || 'vi');
     const handleLangChange = () => setLang(localStorage.getItem('app_lang') || 'vi');
@@ -80,8 +82,13 @@ export default function LoginPage() {
         }
         if (data.token) {
           localStorage.setItem('token', data.token);
+          if (data.data?.role) localStorage.setItem('role', data.data.role);
         }
-        router.push('/home');
+        if (data.data?.role === 'admin') {
+          router.push('/admin/dashboard');
+        } else {
+          router.push('/home');
+        }
       } catch (err) {
         setError('Không thể kết nối server.');
       } finally {
@@ -116,10 +123,15 @@ export default function LoginPage() {
       // Lưu token vào localStorage (nếu cần dùng sau này)
       if (data.token) {
         localStorage.setItem('token', data.token);
+        if (data.data?.role) localStorage.setItem('role', data.data.role);
       }
 
       // Redirect to home after successful login
-      router.push('/home');
+      if (data.data?.role === 'admin') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/home');
+      }
     } catch (err) {
       setError('Không thể kết nối đến server.');
       setLoading(false);

@@ -82,7 +82,7 @@ const getNavGroups = (text: any) => [
 const getAdminNavGroup = (text: any) => ({
   label: 'Admin',
   items: [
-    { href: '/admin', label: text.items.admin, icon: ShieldAlert },
+    { href: '/admin/dashboard', label: text.items.admin, icon: ShieldAlert },
   ],
 });
 

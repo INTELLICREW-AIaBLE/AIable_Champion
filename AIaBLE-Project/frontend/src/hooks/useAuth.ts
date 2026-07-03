@@ -113,6 +113,7 @@ export function useAuth() {
 
     const logout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('role');
         localStorage.removeItem(PROFILE_CACHE_KEY);
         setUserProfile({
             name: 'User',

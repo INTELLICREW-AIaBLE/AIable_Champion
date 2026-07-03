@@ -78,7 +78,7 @@ export const login = async (req: Request, res: Response) => {
       success: true,
       message: 'Đăng nhập thành công!',
       token: 'mock-jwt-token-' + user.id,
-      data: { id: user.id, email: user.email, fullName: user.fullName }
+      data: { id: user.id, email: user.email, fullName: user.fullName, role: user.role }
     });
   } catch (error: any) {
     res.status(500).json({ success: false, message: 'Lỗi server khi đăng nhập.' });
@@ -124,7 +124,7 @@ export const googleLogin = async (req: Request, res: Response) => {
       success: true,
       message: 'Đăng nhập bằng Google thành công!',
       token: 'mock-jwt-token-' + user.id,
-      data: { id: user.id, email: user.email, fullName: user.fullName }
+      data: { id: user.id, email: user.email, fullName: user.fullName, role: user.role }
     });
   } catch (error: any) {
     console.error('[Google Login Error]:', error);
