@@ -87,7 +87,7 @@ html.dark-mode-active .ignore-dark-mode video {
 
 /* Tinh chỉnh ảnh chân dung các thành viên ở chế độ tối để có màu sắc tươi sáng, da người hồng hào tự nhiên */
 html.dark-mode-active .founder-avatar {
-  filter: invert(1) hue-rotate(180deg) saturate(1.25) contrast(0.95) brightness(1.02) !important;
+  filter: invert(1) hue-rotate(178deg) saturate(1.6) contrast(1.1) brightness(1.05) !important;
 }
 
 /* Logo container: pre-inversion bg = hsl(240,15%,84%) → sau page filter = dark navy khớp với header */
