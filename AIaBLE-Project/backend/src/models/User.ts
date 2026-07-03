@@ -18,8 +18,6 @@ export interface IUser extends Document {
   resetTokenExpiry?: number;
   savedRecipes?: any[];
   history?: any[];
-  resetToken?: string;
-  resetTokenExpiry?: number;
 }
 
 const userSchema = new Schema<IUser>({
@@ -39,9 +37,7 @@ const userSchema = new Schema<IUser>({
   resetToken: { type: String },
   resetTokenExpiry: { type: Number },
   savedRecipes: { type: [Schema.Types.Mixed], default: [] },
-  history: { type: [Schema.Types.Mixed], default: [] },
-  resetToken: { type: String },
-  resetTokenExpiry: { type: Number }
+  history: { type: [Schema.Types.Mixed], default: [] }
 }, {
   timestamps: true // Tự động tạo createdAt, updatedAt
 });
