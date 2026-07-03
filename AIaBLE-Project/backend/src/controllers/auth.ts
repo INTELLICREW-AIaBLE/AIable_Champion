@@ -180,14 +180,18 @@ export const forgotPassword = async (req: Request, res: Response) => {
     // Using any cast to bypass mongoose strict typing temporarily for reset logic
     await User.updateOne({ _id: user._id }, { $set: { resetToken, resetTokenExpiry } } as any);
 
-    // Prepare Nodemailer transport
+    // Prepare Nodemailer transport - port 587 STARTTLS (compatible with Render)
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
-      port: 465,
-      secure: true, // true for port 465, false for other ports
+      port: 587,
+      secure: false, // STARTTLS - không dùng SSL ngay từ đầu, Render không block port 587
+      requireTLS: true,
       auth: {
         user: process.env.SMTP_EMAIL,
-        pass: process.env.SMTP_PASSWORD // App Password
+        pass: process.env.SMTP_PASSWORD // App Password (16 ký tự từ Google Account)
+      },
+      tls: {
+        rejectUnauthorized: false // Cho phép self-signed certs trên cloud
       }
     });
 
