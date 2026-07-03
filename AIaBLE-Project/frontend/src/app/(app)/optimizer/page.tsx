@@ -548,7 +548,6 @@ export default function OptimizerPage() {
           value={raw}
           onChange={(e) => setRaw(e.target.value)}
           placeholder={text.placeholder}
-          maxLength={2000}
           rows={6}
           className="w-full px-5 py-4 text-sm text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
         />
