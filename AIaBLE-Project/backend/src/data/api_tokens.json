@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Gemini",
+    "usedTokens": 0,
+    "limit": 1000000,
+    "warningThreshold": 80
+  },
+  {
+    "name": "Groq",
+    "usedTokens": 0,
+    "limit": 500000,
+    "warningThreshold": 80
+  },
+  {
+    "name": "OpenRouter",
+    "usedTokens": 0,
+    "limit": 200000,
+    "warningThreshold": 80
+  }
+]
