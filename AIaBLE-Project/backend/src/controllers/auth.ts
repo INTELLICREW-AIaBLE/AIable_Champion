@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import crypto from 'crypto';
 import User from '../models/User';
 
@@ -180,62 +180,54 @@ export const forgotPassword = async (req: Request, res: Response) => {
     // Using any cast to bypass mongoose strict typing temporarily for reset logic
     await User.updateOne({ _id: user._id }, { $set: { resetToken, resetTokenExpiry } } as any);
 
-    // Prepare Nodemailer transport - port 587 STARTTLS (compatible with Render)
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false, // STARTTLS - không dùng SSL ngay từ đầu, Render không block port 587
-      requireTLS: true,
-      auth: {
-        user: process.env.SMTP_EMAIL,
-        pass: process.env.SMTP_PASSWORD // App Password (16 ký tự từ Google Account)
-      },
-      tls: {
-        rejectUnauthorized: false // Cho phép self-signed certs trên cloud
-      }
-    });
+    // Resend API - gửi email qua HTTPS (không bị Render block như SMTP)
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
-    const clientUrl = process.env.CLIENT_URL || req.headers.origin || 'http://localhost:3000';
+    const clientUrl = process.env.CLIENT_URL || (req.headers.origin as string) || 'http://localhost:3000';
     const resetLink = `${clientUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
-    const mailOptions = {
-      from: `"AIaBLE Support" <${process.env.SMTP_EMAIL}>`,
-      to: email,
-      subject: 'Khôi phục mật khẩu tài khoản AIaBLE',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #8B5CF6;">AIaBLE - Khôi phục mật khẩu</h2>
-          <p>Xin chào ${user.fullName},</p>
-          <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản AIaBLE của mình.</p>
-          <p>Vui lòng click vào nút bên dưới để tiến hành đặt lại mật khẩu. Link này sẽ hết hạn sau 1 giờ.</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${resetLink}" style="background-color: #8B5CF6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-              Đặt Lại Mật Khẩu
-            </a>
-          </div>
-          <p>If you did not request a password reset, please ignore this email.</p>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-          <p style="color: #888; font-size: 12px;">Đội ngũ AIaBLE INTELLICREW</p>
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #8B5CF6;">AIaBLE - Khôi phục mật khẩu</h2>
+        <p>Xin chào ${user.fullName},</p>
+        <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản AIaBLE của mình.</p>
+        <p>Vui lòng click vào nút bên dưới để tiến hành đặt lại mật khẩu. Link này sẽ hết hạn sau 1 giờ.</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${resetLink}" style="background-color: #8B5CF6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+            Đặt Lại Mật Khẩu
+          </a>
         </div>
-      `
-    };
+        <p>Nếu bạn không yêu cầu điều này, vui lòng bỏ qua email này.</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+        <p style="color: #888; font-size: 12px;">Đội ngũ AIaBLE INTELLICREW</p>
+      </div>
+    `;
 
-    if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
+    if (process.env.RESEND_API_KEY) {
       try {
-        await transporter.sendMail(mailOptions);
-        console.log(`[Email Sent] Đã gửi link reset password tới ${email}`);
+        const { error: sendError } = await resend.emails.send({
+          from: 'AIaBLE Support <onboarding@resend.dev>',
+          to: email,
+          subject: 'Khôi phục mật khẩu tài khoản AIaBLE',
+          html: emailHtml,
+        });
+        if (sendError) {
+          console.error('[Resend Error]', sendError);
+          return res.status(500).json({
+            success: false,
+            message: `Không thể gửi email: ${sendError.message}`
+          });
+        }
+        console.log(`[Email Sent via Resend] Đã gửi link reset password tới ${email}`);
       } catch (mailErr: any) {
-        // Log chi tiết lỗi SMTP để debug trên Render
-        console.error('[SMTP Error] Không thể gửi email:', mailErr?.message || mailErr);
-        console.error('[SMTP Error] Code:', mailErr?.code, '| Response:', mailErr?.response);
-        // Token vẫn đã được lưu vào DB - trả về lỗi cụ thể thay vì 500 generic
+        console.error('[Resend Exception]', mailErr?.message || mailErr);
         return res.status(500).json({
           success: false,
-          message: `Không thể gửi email. Vui lòng kiểm tra cấu hình SMTP. Lỗi: ${mailErr?.code || mailErr?.message || 'Unknown SMTP error'}`
+          message: `Không thể gửi email: ${mailErr?.message || 'Unknown error'}`
         });
       }
     } else {
-      console.log(`[Mock Email] SMTP chưa được cấu hình. Link reset: ${resetLink}`);
+      console.log(`[Mock Email] RESEND_API_KEY chưa được cấu hình. Link reset: ${resetLink}`);
     }
 
     res.json({ success: true, message: 'Hướng dẫn khôi phục mật khẩu đã được gửi đến email của bạn.' });
