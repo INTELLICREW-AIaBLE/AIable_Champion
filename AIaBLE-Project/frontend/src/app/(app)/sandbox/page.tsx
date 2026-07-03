@@ -444,6 +444,7 @@ export default function SandboxPage() {
             ref={textareaRef}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
+            maxLength={4000}
             placeholder={text.placeholder}
             rows={4}
             className="w-full text-sm text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
@@ -468,9 +469,14 @@ export default function SandboxPage() {
         )}
 
         <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-t border-slate-100 relative z-20">
-          <div className="flex items-center gap-2 text-xs text-slate-500">
-            <Info className="w-4 h-4" />
-            {text.hint}
+          <div className="flex items-center gap-4 text-xs text-slate-500">
+            <div className="flex items-center gap-1.5">
+              <Info className="w-4 h-4" />
+              {text.hint}
+            </div>
+            <div className={prompt.length >= 4000 ? "text-red-500 font-bold" : "text-slate-400 font-medium"}>
+              {prompt.length} / 4000
+            </div>
           </div>
           {isRunning ? (
             <button
