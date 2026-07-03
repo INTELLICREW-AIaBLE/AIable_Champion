@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { Resend } from 'resend';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import User from '../models/User';
 
 // Helper to verify Turnstile token
@@ -38,18 +40,21 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: 'Vui lòng điền đầy đủ thông tin.' });
     }
 
-    // Check if user exists
-    const existingUser = await User.findOne({ email });
+    // Check if user exists (case-insensitive)
+    const existingUser = await User.findOne({ email: new RegExp('^' + email.trim() + '$', 'i') });
     if (existingUser) {
       return res.status(400).json({ success: false, message: 'Email này đã được sử dụng!' });
     }
 
-    // Create new user (Storing password as plain text just for mock purposes)
+    // Mã hóa mật khẩu bằng bcryptjs trước khi lưu vào DB
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create new user with hashed password
     const newUser = await User.create({
       id: Date.now().toString(),
       fullName,
       email,
-      password,
+      password: hashedPassword,
       username: email.split('@')[0]
     });
 
@@ -67,9 +72,16 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: 'Vui lòng nhập email và mật khẩu.' });
     }
 
-    const user = await User.findOne({ email, password });
+    // Tìm kiếm user không phân biệt chữ hoa chữ thường
+    const user = await User.findOne({ email: new RegExp('^' + email.trim() + '$', 'i') });
 
-    if (!user) {
+    if (!user || !user.password) {
+      return res.status(401).json({ success: false, message: 'Email hoặc mật khẩu không đúng.' });
+    }
+
+    // So sánh mật khẩu đã được mã hóa bằng bcryptjs
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
       return res.status(401).json({ success: false, message: 'Email hoặc mật khẩu không đúng.' });
     }
 
@@ -77,11 +89,17 @@ export const login = async (req: Request, res: Response) => {
       return res.status(403).json({ success: false, message: 'Tài khoản của bạn đã bị khóa.' });
     }
 
-    // Return fake token
+    // Ký token JWT thực tế
+    const jwtToken = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET || 'hoangbeo172006_secret_jwt_key',
+      { expiresIn: '7d' }
+    );
+
     res.json({
       success: true,
       message: 'Đăng nhập thành công!',
-      token: 'mock-jwt-token-' + user.id,
+      token: jwtToken,
       data: { id: user.id, email: user.email, fullName: user.fullName, role: user.role }
     });
   } catch (error: any) {
@@ -128,10 +146,17 @@ export const googleLogin = async (req: Request, res: Response) => {
       return res.status(403).json({ success: false, message: 'Tài khoản của bạn đã bị khóa.' });
     }
 
+    // Ký token JWT thực tế cho Google Login
+    const jwtToken = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET || 'hoangbeo172006_secret_jwt_key',
+      { expiresIn: '7d' }
+    );
+
     res.json({
       success: true,
       message: 'Đăng nhập bằng Google thành công!',
-      token: 'mock-jwt-token-' + user.id,
+      token: jwtToken,
       data: { id: user.id, email: user.email, fullName: user.fullName, role: user.role }
     });
   } catch (error: any) {
@@ -257,10 +282,12 @@ export const resetPassword = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: 'Token đã hết hạn. Vui lòng yêu cầu lại.' });
     }
 
+    // Băm mật khẩu mới bằng bcryptjs trước khi lưu vào DB
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
     // Update password and remove reset token
-    user.password = newPassword;
     await User.updateOne({ _id: user._id }, { 
-      $set: { password: newPassword },
+      $set: { password: hashedPassword },
       $unset: { resetToken: 1, resetTokenExpiry: 1 } 
     } as any);
 
