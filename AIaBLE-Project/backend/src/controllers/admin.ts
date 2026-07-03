@@ -87,7 +87,7 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     const totalSavedRecipes = users.reduce((acc, u: any) => acc + (u.savedRecipes?.length || 0), 0);
 
     // Check for API token warnings
-    const apiTokens = readTokenInfo();
+    const apiTokens = await readTokenInfo();
     const tokenWarnings: any[] = [];
     apiTokens.forEach(t => {
       const usagePercent = (t.usedTokens / t.limit) * 100;
@@ -341,7 +341,7 @@ import { readTokenInfo, writeTokenInfo } from '../services/tokenTracker';
 
 export const getApiTokens = async (req: Request, res: Response) => {
   try {
-    const tokens = readTokenInfo();
+    const tokens = await readTokenInfo();
     res.json({ success: true, data: tokens });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi server khi lấy thông tin API tokens' });
@@ -354,14 +354,14 @@ export const updateApiTokenLimit = async (req: Request, res: Response) => {
     if (!name || limit === undefined || warningThreshold === undefined) {
       return res.status(400).json({ success: false, message: 'Thiếu thông tin name, limit hoặc warningThreshold' });
     }
-    const tokens = readTokenInfo();
+    const tokens = await readTokenInfo();
     const tokenObj = tokens.find(t => t.name.toLowerCase() === name.toLowerCase());
     if (!tokenObj) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy API này' });
     }
     tokenObj.limit = Number(limit);
     tokenObj.warningThreshold = Number(warningThreshold);
-    writeTokenInfo(tokens);
+    await writeTokenInfo(tokens);
     res.json({ success: true, message: 'Cập nhật hạn mức thành công', data: tokenObj });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi server khi cập nhật hạn mức API' });
@@ -374,14 +374,17 @@ export const resetApiTokenUsage = async (req: Request, res: Response) => {
     if (!name) {
       return res.status(400).json({ success: false, message: 'Thiếu thông tin name' });
     }
-    const tokens = readTokenInfo();
+    const tokens = await readTokenInfo();
     const tokenObj = tokens.find(t => t.name.toLowerCase() === name.toLowerCase());
     if (!tokenObj) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy API này' });
     }
     tokenObj.usedTokens = 0;
-    delete tokenObj.lastWarningSent; // Cho phép gửi lại cảnh báo nếu chạm ngưỡng sau đó
-    writeTokenInfo(tokens);
+    // Cho phép gửi lại cảnh báo nếu chạm ngưỡng sau đó
+    if (tokenObj.lastWarningSent) {
+      tokenObj.lastWarningSent = undefined;
+    }
+    await writeTokenInfo(tokens);
     res.json({ success: true, message: 'Reset token đã dùng thành công', data: tokenObj });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi server khi reset token đã dùng' });
