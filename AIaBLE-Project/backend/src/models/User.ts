@@ -14,10 +14,10 @@ export interface IUser extends Document {
   birthday?: string;
   role?: string;
   isLocked?: boolean;
-  savedRecipes?: any[];
-  history?: any[];
   resetToken?: string;
   resetTokenExpiry?: number;
+  savedRecipes?: any[];
+  history?: any[];
 }
 
 const userSchema = new Schema<IUser>({
@@ -34,10 +34,10 @@ const userSchema = new Schema<IUser>({
   birthday: { type: String, default: '' },
   role: { type: String, default: 'user' },
   isLocked: { type: Boolean, default: false },
-  savedRecipes: { type: [Schema.Types.Mixed], default: [] },
-  history: { type: [Schema.Types.Mixed], default: [] },
   resetToken: { type: String },
-  resetTokenExpiry: { type: Number }
+  resetTokenExpiry: { type: Number },
+  savedRecipes: { type: [Schema.Types.Mixed], default: [] },
+  history: { type: [Schema.Types.Mixed], default: [] }
 }, {
   timestamps: true // Tự động tạo createdAt, updatedAt
 });

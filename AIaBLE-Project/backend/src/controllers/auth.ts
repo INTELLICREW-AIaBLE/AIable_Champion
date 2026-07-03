@@ -182,14 +182,17 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     // Prepare Nodemailer transport
     const transporter = nodemailer.createTransport({
-      service: 'gmail', // or use host/port if not gmail
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true, // true for port 465, false for other ports
       auth: {
         user: process.env.SMTP_EMAIL,
         pass: process.env.SMTP_PASSWORD // App Password
       }
     });
 
-    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+    const clientUrl = process.env.CLIENT_URL || req.headers.origin || 'http://localhost:3000';
+    const resetLink = `${clientUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
     const mailOptions = {
       from: `"AIaBLE Support" <${process.env.SMTP_EMAIL}>`,
@@ -206,7 +209,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
               Đặt Lại Mật Khẩu
             </a>
           </div>
-          <p>Nếu bạn không yêu cầu điều này, vui lòng bỏ qua email.</p>
+          <p>If you did not request a password reset, please ignore this email.</p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
           <p style="color: #888; font-size: 12px;">Đội ngũ AIaBLE INTELLICREW</p>
         </div>
@@ -214,16 +217,27 @@ export const forgotPassword = async (req: Request, res: Response) => {
     };
 
     if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
-      await transporter.sendMail(mailOptions);
-      console.log(`[Email Sent] Đã gửi link reset password tới ${email}`);
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log(`[Email Sent] Đã gửi link reset password tới ${email}`);
+      } catch (mailErr: any) {
+        // Log chi tiết lỗi SMTP để debug trên Render
+        console.error('[SMTP Error] Không thể gửi email:', mailErr?.message || mailErr);
+        console.error('[SMTP Error] Code:', mailErr?.code, '| Response:', mailErr?.response);
+        // Token vẫn đã được lưu vào DB - trả về lỗi cụ thể thay vì 500 generic
+        return res.status(500).json({
+          success: false,
+          message: `Không thể gửi email. Vui lòng kiểm tra cấu hình SMTP. Lỗi: ${mailErr?.code || mailErr?.message || 'Unknown SMTP error'}`
+        });
+      }
     } else {
-      console.log(`[Mock Email] SMTP chưa được cấu hình. Gửi link reset password tới ${email}: ${resetLink}`);
+      console.log(`[Mock Email] SMTP chưa được cấu hình. Link reset: ${resetLink}`);
     }
 
     res.json({ success: true, message: 'Hướng dẫn khôi phục mật khẩu đã được gửi đến email của bạn.' });
   } catch (error: any) {
-    console.error('[Forgot Password Error]', error);
-    res.status(500).json({ success: false, message: 'Lỗi server khi xử lý yêu cầu quên mật khẩu.' });
+    console.error('[Forgot Password Error]', error?.message || error);
+    res.status(500).json({ success: false, message: `Lỗi server: ${error?.message || 'Unknown error'}` });
   }
 };
 
