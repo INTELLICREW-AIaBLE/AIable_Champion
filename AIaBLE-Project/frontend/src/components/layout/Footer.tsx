@@ -14,7 +14,8 @@ import {
   CheckCircle2,
   Bookmark,
   MapPin,
-  Phone
+  Phone,
+  Mail
 } from 'lucide-react';
 
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -247,6 +248,15 @@ export function Footer() {
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wide">{text.phone}</p>
                   <a href="tel:0981583316" className="text-sm font-black text-slate-800 dark:text-slate-200 hover:text-violet-600 transition">
                     0981583316
+                  </a>
+                </div>
+              </div>
+              <div className="flex gap-2 items-center pt-1.5 border-t border-slate-100 dark:border-slate-800">
+                <Mail className="w-4 h-4 text-violet-600 shrink-0" />
+                <div>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wide">Email Support</p>
+                  <a href="mailto:aiable.support.su26@gmail.com" className="text-sm font-black text-slate-800 dark:text-slate-200 hover:text-violet-600 transition">
+                    aiable.support.su26@gmail.com
                   </a>
                 </div>
               </div>
