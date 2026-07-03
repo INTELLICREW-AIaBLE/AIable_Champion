@@ -1,6 +1,6 @@
 [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing") | Out-Null
 
-$srcPath = "d:\CodingInspiration2026\AIaBLE-Project\frontend\src\app\icon.png"
+$srcPath = "C:\Users\quoca\.gemini\antigravity-ide\brain\10031b58-7ec9-4c7d-a320-1ce479ded4b1\aiable_icon_favicon_1783053676067.png"
 $destPath1 = "d:\CodingInspiration2026\AIaBLE-Project\frontend\src\app\icon.png"
 $destPath2 = "d:\CodingInspiration2026\AIaBLE-Project\frontend\public\favicon.png"
 $destPath3 = "d:\CodingInspiration2026\AIaBLE-Project\frontend\public\favicon.ico"
