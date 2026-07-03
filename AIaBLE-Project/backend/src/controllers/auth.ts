@@ -217,16 +217,27 @@ export const forgotPassword = async (req: Request, res: Response) => {
     };
 
     if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
-      await transporter.sendMail(mailOptions);
-      console.log(`[Email Sent] Đã gửi link reset password tới ${email}`);
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log(`[Email Sent] Đã gửi link reset password tới ${email}`);
+      } catch (mailErr: any) {
+        // Log chi tiết lỗi SMTP để debug trên Render
+        console.error('[SMTP Error] Không thể gửi email:', mailErr?.message || mailErr);
+        console.error('[SMTP Error] Code:', mailErr?.code, '| Response:', mailErr?.response);
+        // Token vẫn đã được lưu vào DB - trả về lỗi cụ thể thay vì 500 generic
+        return res.status(500).json({
+          success: false,
+          message: `Không thể gửi email. Vui lòng kiểm tra cấu hình SMTP. Lỗi: ${mailErr?.code || mailErr?.message || 'Unknown SMTP error'}`
+        });
+      }
     } else {
-      console.log(`[Mock Email] SMTP chưa được cấu hình. Gửi link reset password tới ${email}: ${resetLink}`);
+      console.log(`[Mock Email] SMTP chưa được cấu hình. Link reset: ${resetLink}`);
     }
 
     res.json({ success: true, message: 'Hướng dẫn khôi phục mật khẩu đã được gửi đến email của bạn.' });
   } catch (error: any) {
-    console.error('[Forgot Password Error]', error);
-    res.status(500).json({ success: false, message: 'Lỗi server khi xử lý yêu cầu quên mật khẩu.' });
+    console.error('[Forgot Password Error]', error?.message || error);
+    res.status(500).json({ success: false, message: `Lỗi server: ${error?.message || 'Unknown error'}` });
   }
 };
 
