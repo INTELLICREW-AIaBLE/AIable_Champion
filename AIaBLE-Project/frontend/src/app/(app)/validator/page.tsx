@@ -120,15 +120,13 @@ export default function ValidatorPage() {
   const text = t[lang as 'en' | 'vi'] || t.vi;
 
   const [output, setOutput] = useState('');
-  const [context, setContext] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ValidationResult | null>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const [isScanning, setIsScanning] = useState<'output' | 'context' | null>(null);
+  const [isScanning, setIsScanning] = useState<'output' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const contextFileInputRef = useRef<HTMLInputElement>(null);
 
-  const processImageFile = async (file: File, target: 'output' | 'context') => {
+  const processImageFile = async (file: File, target: 'output') => {
     try {
       setIsScanning(target);
       const ocrLang = lang === 'vi' ? 'vie+eng' : 'eng';
@@ -141,8 +139,6 @@ export default function ValidatorPage() {
       if (extractedText) {
         if (target === 'output') {
           setOutput(prev => prev ? `${prev}\n\n${extractedText}` : extractedText);
-        } else {
-          setContext(prev => prev ? `${prev}\n\n${extractedText}` : extractedText);
         }
       } else {
         alert(text.scanErr);
@@ -155,7 +151,7 @@ export default function ValidatorPage() {
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'output' | 'context') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'output') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -169,8 +165,6 @@ export default function ValidatorPage() {
         if (extractedText) {
           if (target === 'output') {
             setOutput(prev => prev ? `${prev}\n\n[Nội dung file ${file.name}]:\n${extractedText}` : `[Nội dung file ${file.name}]:\n${extractedText}`);
-          } else {
-            setContext(prev => prev ? `${prev}\n\n[Nội dung file ${file.name}]:\n${extractedText}` : `[Nội dung file ${file.name}]:\n${extractedText}`);
           }
         }
         setIsScanning(null);
@@ -183,10 +177,9 @@ export default function ValidatorPage() {
     }
 
     if (target === 'output' && fileInputRef.current) fileInputRef.current.value = '';
-    if (target === 'context' && contextFileInputRef.current) contextFileInputRef.current.value = '';
   };
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>, target: 'output' | 'context') => {
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>, target: 'output') => {
     const items = e.clipboardData.items;
     for (let i = 0; i < items.length; i++) {
       if (items[i].type.indexOf('image') !== -1) {
@@ -201,7 +194,7 @@ export default function ValidatorPage() {
   };
 
   const charCount = output.length;
-  const combinedText = `${context.trim()}\n\n${output.trim()}`.trim();
+  const combinedText = output.trim();
   const canValidate = combinedText.length >= 20 && !loading;
 
   const handleValidate = async () => {
@@ -279,7 +272,6 @@ export default function ValidatorPage() {
 
   const handleReset = () => {
     setOutput('');
-    setContext('');
     setResult(null);
   };
 
@@ -367,58 +359,7 @@ export default function ValidatorPage() {
             )}
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden relative">
-            <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50/50">
-              <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                <Target className="w-4 h-4 text-slate-400" />
-                {text.contextLabel}
-              </span>
-              <div className="flex items-center gap-3">
-                <input 
-                  type="file" 
-                  accept="image/*,.txt,.md,.csv,.json" 
-                  className="hidden" 
-                  ref={contextFileInputRef} 
-                  onChange={(e) => handleFileUpload(e, 'context')} 
-                />
-                <button
-                  onClick={() => contextFileInputRef.current?.click()}
-                  disabled={isScanning !== null}
-                  title={text.scanImg}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-violet-600 bg-violet-50 hover:bg-violet-100 disabled:opacity-50 transition"
-                >
-                  {isScanning === 'context' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Paperclip className="w-3.5 h-3.5" />}
-                  <span className="hidden sm:inline">{isScanning === 'context' ? text.scanning : text.scanImg}</span>
-                </button>
-                <span className={`text-xs font-medium ${context.length >= 5000 ? 'text-red-500 font-bold' : 'text-slate-400'}`}>
-                  {context.length}/5000 {text.chars}
-                </span>
-              </div>
-            </div>
-            <textarea maxLength={5000}
-              value={context}
-              onChange={(e) => setContext(e.target.value)}
-              placeholder={text.contextPlaceholder}
-              rows={3}
-              className="w-full px-5 py-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
-              onPaste={(e) => handlePaste(e, 'context')}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                  e.preventDefault();
-                  handleValidate();
-                }
-              }}
-            />
 
-            {isScanning === 'context' && (
-              <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10">
-                <div className="flex flex-col items-center gap-2 text-violet-600 bg-white px-4 py-3 rounded-xl shadow-lg border border-violet-100 animate-in zoom-in duration-200">
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                  <span className="text-sm font-bold">{text.scanning}</span>
-                </div>
-              </div>
-            )}
-          </div>
 
           <div className="flex items-center justify-between">
              <div className="flex items-center gap-1.5 text-xs text-slate-400">
