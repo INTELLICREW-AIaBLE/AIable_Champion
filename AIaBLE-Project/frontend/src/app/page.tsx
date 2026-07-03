@@ -558,7 +558,7 @@ export default function LandingPage() {
                       alt={founder.name} 
                       fill 
                       sizes="(max-w-7xl) 25vw, 100vw"
-                      className="object-cover object-center group-hover:scale-105 transition-transform duration-700" 
+                      className="object-cover object-center group-hover:scale-105 transition-transform duration-700 founder-avatar" 
                     />
                   ) : (
                     <span className="text-3xl font-black bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent select-none">

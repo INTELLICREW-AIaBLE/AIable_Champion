@@ -49,7 +49,7 @@ const customMarked = new Marked({
             throwOnError: false,
             trust: true 
           });
-          return `<div class="math-block-container my-4 overflow-x-auto text-center w-full select-all ignore-dark-mode">${html}</div>`;
+          return `<div class="math-block-container my-4 overflow-x-auto text-center w-full select-all">${html}</div>`;
         } catch (e) {
           return `<pre class="katex-error p-2 bg-red-50 text-red-600 rounded text-xs overflow-x-auto">${token.raw}</pre>`;
         }
@@ -82,7 +82,7 @@ const customMarked = new Marked({
             throwOnError: false,
             trust: true
           });
-          return `<span class="math-inline-container inline-block px-1 select-all ignore-dark-mode">${html}</span>`;
+          return `<span class="math-inline-container inline-block px-1 select-all">${html}</span>`;
         } catch (e) {
           return `<code class="katex-error px-1 bg-red-50 text-red-600 rounded text-xs">${token.raw}</code>`;
         }

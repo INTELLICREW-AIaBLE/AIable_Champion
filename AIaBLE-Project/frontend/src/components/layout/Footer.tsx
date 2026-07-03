@@ -255,7 +255,7 @@ export function Footer() {
                 <Mail className="w-4 h-4 text-violet-600 shrink-0" />
                 <div>
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wide">Email Support</p>
-                  <a href="mailto:aiable.support.su26@gmail.com" className="text-sm font-black text-slate-800 dark:text-slate-200 hover:text-violet-600 transition">
+                  <a href="mailto:aiable.support.su26@gmail.com" className="text-sm font-black text-slate-800 dark:text-slate-200 hover:text-violet-600 transition break-all">
                     aiable.support.su26@gmail.com
                   </a>
                 </div>

@@ -154,7 +154,7 @@ export default function HelpPage() {
               <div>
                 <p className="font-bold text-sm text-slate-900 mb-1">Email Hỗ Trợ</p>
                 <p className="text-xs text-slate-500 mb-2">Phản hồi trong vòng 24h làm việc.</p>
-                <a href="mailto:aiable.support.su26@gmail.com" className="text-sm font-semibold text-violet-600 hover:underline">aiable.support.su26@gmail.com</a>
+                <a href="mailto:aiable.support.su26@gmail.com" className="text-sm font-semibold text-violet-600 hover:underline break-all">aiable.support.su26@gmail.com</a>
               </div>
             </div>
           </div>
