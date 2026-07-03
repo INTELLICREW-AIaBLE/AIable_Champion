@@ -14,6 +14,8 @@ export interface IUser extends Document {
   birthday?: string;
   role?: string;
   isLocked?: boolean;
+  resetToken?: string;
+  resetTokenExpiry?: number;
   savedRecipes?: any[];
   history?: any[];
   resetToken?: string;
@@ -34,6 +36,8 @@ const userSchema = new Schema<IUser>({
   birthday: { type: String, default: '' },
   role: { type: String, default: 'user' },
   isLocked: { type: Boolean, default: false },
+  resetToken: { type: String },
+  resetTokenExpiry: { type: Number },
   savedRecipes: { type: [Schema.Types.Mixed], default: [] },
   history: { type: [Schema.Types.Mixed], default: [] },
   resetToken: { type: String },

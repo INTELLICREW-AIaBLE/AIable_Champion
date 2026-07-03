@@ -182,14 +182,17 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     // Prepare Nodemailer transport
     const transporter = nodemailer.createTransport({
-      service: 'gmail', // or use host/port if not gmail
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true, // true for port 465, false for other ports
       auth: {
         user: process.env.SMTP_EMAIL,
         pass: process.env.SMTP_PASSWORD // App Password
       }
     });
 
-    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+    const clientUrl = process.env.CLIENT_URL || req.headers.origin || 'http://localhost:3000';
+    const resetLink = `${clientUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
     const mailOptions = {
       from: `"AIaBLE Support" <${process.env.SMTP_EMAIL}>`,
@@ -206,7 +209,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
               Đặt Lại Mật Khẩu
             </a>
           </div>
-          <p>Nếu bạn không yêu cầu điều này, vui lòng bỏ qua email.</p>
+          <p>If you did not request a password reset, please ignore this email.</p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
           <p style="color: #888; font-size: 12px;">Đội ngũ AIaBLE INTELLICREW</p>
         </div>
