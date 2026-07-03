@@ -72,12 +72,15 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-100 px-8 py-10">
         
-        <div className="flex items-center justify-center gap-2.5 mb-6">
-          <Image src="/logo.png" alt="AIaBLE Logo" width={44} height={44} priority className="rounded-xl" />
-          <div className="font-bold text-2xl">
-            <span className="text-black">Ala</span>
-            <span className="text-purple-600">BLE</span>
-          </div>
+        <div className="flex items-center justify-center mb-6 ignore-dark-mode">
+          <Image 
+            src="/logo.png" 
+            alt="AIaBLE Logo" 
+            width={160} 
+            height={36} 
+            priority 
+            className="h-9 w-auto object-contain" 
+          />
         </div>
 
         <h1 className="text-2xl font-black text-slate-900 text-center mb-7">

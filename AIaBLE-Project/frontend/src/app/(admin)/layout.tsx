@@ -8,12 +8,15 @@ import {
   Users, 
   BookOpen, 
   Activity, 
-  LogOut,
   ArrowLeft
 } from 'lucide-react';
 import Image from 'next/image';
+import { Inter, Be_Vietnam_Pro } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import '@/app/globals.css';
+
+const inter = Inter({ subsets: ['latin', 'vietnamese'], variable: '--font-sans' });
+const beVietnamPro = Be_Vietnam_Pro({ subsets: ['latin', 'vietnamese'], weight: ['400', '500', '600', '700', '800'], variable: '--font-heading' });
 
 const ADMIN_NAV = [
   { href: '/admin/dashboard', label: 'Tổng quan', icon: LayoutDashboard },
@@ -26,11 +29,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-50 via-slate-50 to-slate-100 flex font-sans">
+    <div className={cn('min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-50 via-slate-50 to-slate-100 flex', inter.variable, beVietnamPro.variable, 'font-sans')}>
       {/* ── Admin Sidebar ── */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 sticky top-0 h-screen shadow-sm">
         <div className="h-16 flex items-center px-6 border-b border-slate-100">
-          <Link href="/admin/dashboard" className="flex items-center gap-3">
+          <Link href="/admin/dashboard" className="flex items-center gap-3 ignore-dark-mode">
             <Image 
               src="/logo.png" 
               alt="AIaBLE Logo" 

@@ -63,19 +63,15 @@ export default function ForgotPasswordPage() {
         </Link>
 
         {/* Logo */}
-        <div className="flex items-center justify-center gap-2.5 mb-6 mt-2">
+        <div className="flex items-center justify-center mb-6 mt-2 ignore-dark-mode">
           <Image
             src="/logo.png"
             alt="AIaBLE Logo"
-            width={44}
-            height={44}
+            width={160}
+            height={36}
             priority
-            className="rounded-xl"
+            className="h-9 w-auto object-contain"
           />
-          <div className="font-bold text-2xl">
-            <span className="text-black">Ala</span>
-            <span className="text-purple-600">BLE</span>
-          </div>
         </div>
 
         {/* Title */}
