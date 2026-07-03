@@ -111,12 +111,14 @@ export function Footer() {
           
           {/* Brand & Introduction Column */}
           <div className="lg:col-span-2 space-y-4 pr-0 lg:pr-8">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <Image src="/logo.png" alt="AIaBLE Logo" width={32} height={32} className="rounded-lg bg-white/10 p-0.5" />
-              <div className="font-bold text-xl tracking-tight">
-                <span className="text-slate-900 dark:text-white">Ala</span>
-                <span className="text-violet-600 dark:text-violet-400 font-black">BLE</span>
-              </div>
+            <Link href="/" className="flex items-center group">
+              <Image 
+                src="/logo.png" 
+                alt="AIaBLE Logo" 
+                width={130} 
+                height={30} 
+                className="h-7.5 w-auto object-contain dark:brightness-110" 
+              />
             </Link>
             <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
               {text.desc}

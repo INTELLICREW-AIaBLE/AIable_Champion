@@ -76,12 +76,15 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
       <div className="flex h-14 items-center px-4 gap-2">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 shrink-0 w-52 group">
-          <Image src="/logo.png" alt="AIaBLE Logo" width={36} height={36} priority className="rounded-lg" />
-          <div className="font-bold text-xl">
-            <span className="text-black">Ala</span>
-            <span className="text-purple-600">BLE</span>
-          </div>
+        <Link href="/" className="flex items-center shrink-0 w-52 group">
+          <Image 
+            src="/logo.png" 
+            alt="AIaBLE Logo" 
+            width={140} 
+            height={32} 
+            priority 
+            className="h-8 w-auto object-contain" 
+          />
         </Link>
 
         {/* Neural Network decoration (center) */}
