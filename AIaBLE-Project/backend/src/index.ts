@@ -47,8 +47,8 @@ app.use(mongoSanitize()); // Ngăn chặn NoSQL Injection (Hack dữ liệu Mong
 const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:3000'].filter(Boolean) as string[];
 app.use(cors({
   origin: (origin, callback) => {
-    // Cho phép truy cập nếu chưa cấu hình CLIENT_URL trên Render, hoặc origin thuộc allowedOrigins
-    if (!origin || !process.env.CLIENT_URL || allowedOrigins.indexOf(origin) !== -1) {
+    // Chỉ cho phép kết nối từ domain được khai báo trong allowedOrigins (như CLIENT_URL) hoặc localhost
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error('Blocked by CORS policy'));
