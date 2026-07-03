@@ -45,10 +45,18 @@ const t = {
     promptSample: 'Prompt mẫu',
     promptDefault: `Bạn là trợ lý học thuật.\n\nNhiệm vụ:\n{stepName}\n\nNgữ cảnh:\nTôi đang làm bài tập lớn...\n\nYêu cầu:\n- Trình bày rõ ràng\n- Có cấu trúc từng phần\n- Gợi ý ví dụ thực tế\n- Không làm thay hoàn toàn, chỉ hỗ trợ định hướng`,
     subjects: {
-      'software engineering': 'Kỹ thuật phần mềm',
-      'marketing': 'Marketing',
-      'business administration': 'Quản trị kinh doanh',
-      'data science': 'Khoa học dữ liệu'
+      'it_cs': 'Công nghệ thông tin & Khoa học máy tính',
+      'econ_biz': 'Kinh tế & Quản trị',
+      'lang_culture': 'Ngôn ngữ & Văn hóa học',
+      'data_analytics': 'Khoa học dữ liệu & Phân tích',
+      'engineering_tech': 'Kỹ thuật & Công nghệ',
+      'mechanical': 'Kỹ thuật Cơ khí',
+      'mechatronics_automation': 'Cơ điện tử & Tự động hóa',
+      'health_sciences': 'Khoa học sức khỏe',
+      'law_politics': 'Luật & Chính trị',
+      'social_humanities': 'Khoa học xã hội & Nhân văn',
+      'agri_environment': 'Nông Lâm Ngư nghiệp & Môi trường',
+      'art_design': 'Nghệ thuật & Thiết kế'
     }
   },
   en: {
@@ -65,10 +73,18 @@ const t = {
     promptSample: 'Sample Prompt',
     promptDefault: `You are an academic assistant.\n\nTask:\n{stepName}\n\nContext:\nI'm working on an assignment...\n\nRequirements:\n- Present clearly\n- Structured sections\n- Provide real-world examples\n- Do not do it all for me, only assist with directions`,
     subjects: {
-      'software engineering': 'Software Engineering',
-      'marketing': 'Marketing',
-      'business administration': 'Business Administration',
-      'data science': 'Data Science'
+      'it_cs': 'Information Technology & Computer Science',
+      'econ_biz': 'Economics & Management',
+      'lang_culture': 'Linguistics & Cultural Studies',
+      'data_analytics': 'Data Science & Analytics',
+      'engineering_tech': 'Engineering & Technology',
+      'mechanical': 'Mechanical Engineering',
+      'mechatronics_automation': 'Mechatronics & Automation',
+      'health_sciences': 'Health Sciences',
+      'law_politics': 'Law & Politics',
+      'social_humanities': 'Social Sciences & Humanities',
+      'agri_environment': 'Agriculture & Environmental Resources',
+      'art_design': 'Art & Design'
     }
   }
 };
@@ -95,7 +111,7 @@ export default function TaskMatcherPage() {
   // Update placeholder dynamically when language changes
   // useEffect removed because we no longer set the input value to the placeholder
 
-  const [subject, setSubject] = useState('software engineering');
+  const [subject, setSubject] = useState('it_cs');
   const [steps, setSteps] = useState<TimelineStep[]>(MOCK_STEPS);
   const [loading, setLoading] = useState(false);
   const [source, setSource] = useState('');
@@ -108,7 +124,7 @@ export default function TaskMatcherPage() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/task-matcher`);
         const json = await res.json();
         setSteps(Array.isArray(json.data) ? json.data : MOCK_STEPS);
-        setActiveTask({ subject: 'software engineering', desc: text.placeholder });
+        setActiveTask({ subject: 'it_cs', desc: text.placeholder });
       } catch (error) {
         console.error('Failed to fetch task workflow:', error);
         setSteps(MOCK_STEPS);
@@ -176,7 +192,7 @@ export default function TaskMatcherPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_220px_150px] gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_320px_150px] gap-3">
         <input maxLength={100}
           value={taskDescription}
           onChange={(e) => setTaskDescription(e.target.value)}
@@ -187,7 +203,7 @@ export default function TaskMatcherPage() {
         <select
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
-          className="px-4 py-2.5 rounded-xl bg-white border border-slate-100 shadow-sm text-sm font-medium text-slate-600 focus:outline-none"
+          className="px-4 py-2.5 rounded-xl bg-white border border-slate-100 shadow-sm text-sm font-medium text-slate-600 focus:outline-none text-ellipsis overflow-hidden whitespace-nowrap"
         >
           {Object.entries(text.subjects).map(([key, label]) => (
             <option key={key} value={key}>

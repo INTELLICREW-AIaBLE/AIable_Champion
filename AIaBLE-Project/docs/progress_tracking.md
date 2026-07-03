@@ -21,6 +21,17 @@ Dự án được cấu trúc dạng Monorepo (Next.js Frontend + Express/TypeSc
 
 *Cập nhật gần nhất: 03/07/2026*
 
+- **Cải tiến UX/UI & Nâng cấp AI Logic cốt lõi (03/07/2026 - Phiên hiện tại):**
+  - **Output Validator (Xác thực thông tin):**
+    - Cải tiến giao diện: Lược bỏ ô nhập liệu "Context / Original Prompt" thừa thãi, tối ưu hoá UI thành 1 ô nhập liệu duy nhất giúp thao tác Paste nhanh và trực quan hơn.
+    - Nâng cấp AI Logic: Đổi mới tư duy Prompt cho AI. Với kết quả `disputed` (Sai lệch), AI bắt buộc phải cung cấp thông tin ĐÚNG từ nguồn tham khảo để người dùng sửa. Với kết quả `unverified` (Không xác định/Không có kết quả search), AI được phép sử dụng kiến thức nền tảng để gợi ý câu trả lời đúng, nhưng BẮT BUỘC phải đính kèm cảnh báo *"Cần đối chiếu thêm"*.
+    - **Wikipedia Fallback:** Bổ sung cơ chế dự phòng tự động sang **Wikipedia API** (miễn phí, không giới hạn) trong trường hợp Google Custom Search API bị lỗi (Quota/Chưa cấp quyền truy cập JSON API). Đảm bảo tính năng Fact-check luôn xuất ra được các Link URL chuẩn xác để người dùng click kiểm chứng.
+  - **Task Matcher (Phân rã bài tập):**
+    - Đa dạng hoá nhóm ngành: Thay thế 4 ngành học cơ bản thành danh sách 12 nhóm ngành đào tạo Đại học mở rộng (Bao gồm Công nghệ, Kinh tế, Ngôn ngữ, Dữ liệu, Sức khoẻ, Cơ khí, Cơ điện tử, Luật, Nông nghiệp, Nghệ thuật...). Đồng bộ hoá 100% tiếng Anh/Việt.
+    - Tối ưu hoá UI: Nới rộng kích thước khung dropdown CSS Grid (từ `220px` lên `320px`) nhằm khắc phục triệt để lỗi cắt chữ/ẩn chữ (truncate) đối với các tên nhóm ngành quá dài (ví dụ: *Information Technology & Computer Science*).
+  - **Footer:** Tích hợp thêm kênh Hỗ trợ qua Email (`aiable.support.su26@gmail.com`) vào mục Thông tin liên hệ ở Footer, sao chép nguyên bản phong cách thiết kế hiện đại của UI cũ.
+
+
 - **Xây dựng Hệ thống Quản trị (Admin Dashboard & Infrastructure) (03/07/2026):**
   - **Tách biệt Layout:** Tạo Route Group `(admin)` độc lập với layout riêng (giao diện sáng chuẩn) để tránh xung đột với công cụ Dark Mode của trình duyệt, thay thế hoàn toàn thư mục `(app)/admin` cũ rườm rà.
   - **Phân quyền Đăng nhập:** Cập nhật API Đăng nhập trả về trường `role` và lưu vào localStorage. Tự động điều hướng Admin vào `/admin/dashboard` và User vào `/home`. Xử lý xóa quyền (role) khi Logout để bảo mật phiên.
