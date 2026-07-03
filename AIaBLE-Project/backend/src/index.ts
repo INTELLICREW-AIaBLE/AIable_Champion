@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
 import { errorHandler } from './middleware/errorHandler';
 import { callGemini } from './services/gemini';
 import recipeRoutes from './routes/recipeRoutes';
@@ -40,13 +42,24 @@ app.use(compression({
 }));
 
 // Middlewares
+app.use(helmet()); // Bảo vệ HTTP headers
+app.use(mongoSanitize()); // Ngăn chặn NoSQL Injection (Hack dữ liệu MongoDB)
 app.use(cors({
   origin: '*', // For development, allow all. Change to specific frontend domain in production
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '2mb' })); // Giảm từ 50mb xuống 2mb để chống Payload DoS
+app.use(express.urlencoded({ limit: '2mb', extended: true }));
+
+// Global Rate Limiter: Bảo vệ toàn bộ web khỏi DDoS (Đấm sập web)
+import rateLimit from 'express-rate-limit';
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 phút
+  max: 500, // Tối đa 500 requests / 15 phút cho mỗi IP
+  message: { success: false, message: 'Too many requests from this IP, please try again after 15 minutes' }
+});
+app.use('/api', globalLimiter);
 
 // Recipe Library routes
 app.use('/api/recipes', recipeRoutes);
