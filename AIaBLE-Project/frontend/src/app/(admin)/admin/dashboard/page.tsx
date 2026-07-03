@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Users, BookOpen, Zap, TrendingUp, RefreshCw, 
+  Users, BookOpen, Zap, TrendingUp, RefreshCw,
   Wand2, GitBranch, FlaskConical, Shield,
   Server, Clock, Cpu, Database, Wifi, AlertTriangle, Edit2, RotateCcw
 } from 'lucide-react';
@@ -37,7 +37,7 @@ function StatCard({ label, value, icon: Icon, color, gradient }: { label: string
     <div className="relative overflow-hidden bg-white rounded-3xl border border-slate-100 shadow-sm p-6 group hover:shadow-md transition-all hover:-translate-y-1">
       {/* Background glowing orb */}
       <div className={cn("absolute -right-8 -top-8 w-32 h-32 rounded-full opacity-10 blur-2xl group-hover:opacity-20 transition-opacity", gradient)} />
-      
+
       <div className="flex items-center gap-5 relative z-10">
         <div className={cn('w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm', color)}>
           <Icon className="w-6 h-6 text-white" />
@@ -56,7 +56,7 @@ export default function AdminDashboardPage() {
   const [health, setHealth] = useState<any>(null);
   const [tokens, setTokens] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [editingToken, setEditingToken] = useState<string | null>(null);
   const [editLimit, setEditLimit] = useState<number>(0);
   const [editThreshold, setEditThreshold] = useState<number>(0);
@@ -69,7 +69,7 @@ export default function AdminDashboardPage() {
         fetch(`${API}/api/admin/health`, { headers: authHeaders() }),
         fetch(`${API}/api/admin/tokens`, { headers: authHeaders() })
       ]);
-      
+
       const statsJson = await statsRes.json();
       const healthJson = await healthRes.json();
       const tokensJson = await tokensRes.json();
@@ -312,7 +312,7 @@ export default function AdminDashboardPage() {
               const usagePercent = t.limit > 0 ? (t.usedTokens / t.limit) * 100 : 0;
               const isEditing = editingToken === t.name;
               const isDanger = usagePercent >= t.warningThreshold;
-              
+
               return (
                 <div key={t.name} className={cn(
                   "bg-white rounded-3xl border shadow-sm p-6 relative overflow-hidden transition-all hover:shadow-md",
@@ -322,7 +322,7 @@ export default function AdminDashboardPage() {
                   {isDanger && (
                     <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-amber-500 to-rose-500" />
                   )}
-                  
+
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className={cn(
@@ -500,37 +500,37 @@ export default function AdminDashboardPage() {
 
             {/* API Configs */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
-               <div className="flex items-center gap-3 mb-6">
-                 <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                   <Wifi className="w-5 h-5 text-emerald-600" />
-                 </div>
-                 <p className="text-sm font-black text-slate-800 uppercase tracking-wider">API Keys & Services</p>
-               </div>
-               <div className="space-y-3.5">
-                 {[
-                   { label: 'Gemini API Key', val: health.env.geminiKey, type: 'llm' },
-                   { label: 'Groq API Key', val: health.env.groqKey, type: 'llm' },
-                   { label: 'OpenRouter Key', val: health.env.openRouterKey, type: 'llm' },
-                   { label: 'Google Search API', val: health.env.googleSearch ? 'Configured' : null, type: 'service' },
-                   { label: 'SMTP Mailer', val: health.env.smtp ? 'Configured' : null, type: 'service' },
-                 ].map(({ label, val, type }) => (
-                   <div key={label} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm p-3 rounded-xl border border-slate-50 bg-slate-50/50 hover:bg-slate-50 transition-colors">
-                     <span className="text-slate-700 font-bold flex items-center gap-2">
-                       {label}
-                       {type === 'llm' && <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-violet-100 text-violet-700 uppercase">LLM</span>}
-                     </span>
-                     {val ? (
-                       <span className="font-mono text-xs font-bold text-slate-600 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
-                         {val}
-                       </span>
-                     ) : (
-                       <span className="text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider bg-red-50 text-red-600 border border-red-100">
-                         Missing
-                       </span>
-                     )}
-                   </div>
-                 ))}
-               </div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                  <Wifi className="w-5 h-5 text-emerald-600" />
+                </div>
+                <p className="text-sm font-black text-slate-800 uppercase tracking-wider">API Keys & Services</p>
+              </div>
+              <div className="space-y-3.5">
+                {[
+                  { label: 'Gemini API Key', val: health.env.geminiKey, type: 'llm' },
+                  { label: 'Groq API Key', val: health.env.groqKey, type: 'llm' },
+                  { label: 'OpenRouter Key', val: health.env.openRouterKey, type: 'llm' },
+                  { label: 'Google Search API', val: health.env.googleSearch ? 'Configured' : null, type: 'service' },
+                  { label: 'SMTP Mailer', val: health.env.smtp ? 'Configured' : null, type: 'service' },
+                ].map(({ label, val, type }) => (
+                  <div key={label} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm p-3 rounded-xl border border-slate-50 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                    <span className="text-slate-700 font-bold flex items-center gap-2">
+                      {label}
+                      {type === 'llm' && <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-violet-100 text-violet-700 uppercase">LLM</span>}
+                    </span>
+                    {val ? (
+                      <span className="font-mono text-xs font-bold text-slate-600 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                        {val}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider bg-red-50 text-red-600 border border-red-100">
+                        Missing
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
