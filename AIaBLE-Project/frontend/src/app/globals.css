@@ -85,10 +85,9 @@ html.dark-mode-active .ignore-dark-mode video {
   filter: none !important;
 }
 
-/* Logo: adapt to dark mode naturally — nền trắng → tối, màu purple giữ được tông */
-/* Chỉ apply hue-rotate(180deg) để counter hue-rotate của trang, giữ màu gốc sau invert */
+/* Logo: nhận 1 lần invert từ trang → nền trắng thành tối, purple text giữ được tông màu */
 html.dark-mode-active .logo-img {
-  filter: hue-rotate(180deg) !important;
+  filter: none !important;
 }
 
 /* Custom Overrides for precise inverted colors */
