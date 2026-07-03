@@ -6,26 +6,52 @@ dotenv.config();
 
 // ─── Google Custom Search helper ─────────────────────────────────────────────
 
+const searchWikipedia = async (query: string): Promise<SourceLink[]> => {
+  try {
+    const url = `https://vi.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&srlimit=3`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.query || !data.query.search) return [];
+    
+    return data.query.search.map((item: any) => ({
+      title: item.title,
+      url: `https://vi.wikipedia.org/wiki/${encodeURIComponent(item.title.replace(/ /g, '_'))}`,
+      snippet: item.snippet.replace(/<\/?[^>]+(>|$)/g, "") // remove HTML tags
+    }));
+  } catch (err) {
+    console.error('Wiki search error:', err);
+    return [];
+  }
+};
+
 const searchWeb = async (query: string): Promise<SourceLink[]> => {
   const apiKey = process.env.GOOGLE_SEARCH_API_KEY;
   const cx = process.env.GOOGLE_SEARCH_CX;
 
-  if (!apiKey || !cx) return [];
+  // Nếu không cấu hình Google Search, tự động dùng Wikipedia
+  if (!apiKey || !cx) {
+    return searchWikipedia(query);
+  }
 
   try {
     const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query)}&num=3`;
     const res = await fetch(url);
     const data = await res.json();
 
-    if (!data.items) return [];
+    // Nếu Google API báo lỗi (VD: chưa bật Custom Search JSON API), fallback sang Wikipedia
+    if (!data.items) {
+      console.warn('Google Search API returned no items or error, falling back to Wikipedia...');
+      return searchWikipedia(query);
+    }
 
     return (data.items as any[]).map((item) => ({
       title: item.title || '',
       url: item.link || '',
       snippet: item.snippet || '',
     }));
-  } catch {
-    return [];
+  } catch (error) {
+    console.warn('Google Search API throw exception, falling back to Wikipedia...');
+    return searchWikipedia(query);
   }
 };
 
