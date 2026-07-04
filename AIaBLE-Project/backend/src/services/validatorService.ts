@@ -241,7 +241,8 @@ Return ONLY a JSON object:
           reasonText: parsed.reasonText || 'Đoạn văn này chứa khẳng định cần kiểm chứng thêm nguồn gốc.',
           guidingQuestions: parsed.guidingQuestions || ['Bạn có thể tìm nguồn độc lập nào xác thực điều này?'],
           suggestedSearchTerms: parsed.suggestedSearchTerms || [claim]
-        }
+        },
+        sources: searchResults.map((s: any) => ({ title: s.title, url: s.url, snippet: s.snippet }))
       };
     } catch (error) {
       console.error(`[Eval Claim Error for: ${claim}]:`, error);

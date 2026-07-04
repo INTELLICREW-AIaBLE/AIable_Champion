@@ -45,6 +45,11 @@ interface Claim {
     resolvedAt?: string;
     userNote?: string;
   };
+  sources?: {
+    title: string;
+    url: string;
+    snippet?: string;
+  }[];
 }
 
 interface Essay {
@@ -193,7 +198,7 @@ export default function ValidatorPage() {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/validator/history`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/validator/history`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -289,7 +294,7 @@ export default function ValidatorPage() {
 
     try {
       const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') || 'default-user' : 'default-user';
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/validator/analyze`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/validator/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -311,7 +316,7 @@ export default function ValidatorPage() {
         // Save activity log
         const token = localStorage.getItem('token');
         if (token) {
-          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/profile/history`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/history`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -351,7 +356,7 @@ export default function ValidatorPage() {
     setResolving(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/validator/claims/${selectedClaim._id}/resolve`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/validator/claims/${selectedClaim._id}/resolve`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -413,14 +418,26 @@ export default function ValidatorPage() {
           continue;
         }
 
-        const idx = part.text.indexOf(claim.text);
-        if (idx !== -1) {
+        // Create a fuzzy regex that treats any whitespace/newline sequence as \s+
+        const escapedClaimText = claim.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const fuzzyRegexStr = escapedClaimText.replace(/(\\s\+|\\ | )/g, '\\s+');
+        let match;
+        try {
+          const fuzzyRegex = new RegExp(fuzzyRegexStr, 'i');
+          match = part.text.match(fuzzyRegex);
+        } catch (e) {
+          match = null;
+        }
+
+        if (match && match.index !== undefined) {
+          const idx = match.index;
+          const matchLength = match[0].length;
           const before = part.text.substring(0, idx);
-          const match = claim.text;
-          const after = part.text.substring(idx + claim.text.length);
+          const matchedText = part.text.substring(idx, idx + matchLength);
+          const after = part.text.substring(idx + matchLength);
 
           if (before) newParts.push({ text: before });
-          newParts.push({ text: match, claim });
+          newParts.push({ text: matchedText, claim });
           if (after) newParts.push({ text: after });
         } else {
           newParts.push(part);
@@ -811,6 +828,28 @@ export default function ValidatorPage() {
                       ))}
                     </div>
                   </div>
+
+                  {/* Sources List (Only shown if Low Risk / Verified correct) */}
+                  {selectedClaim.riskLevel === 'low' && selectedClaim.sources && selectedClaim.sources.length > 0 && (
+                    <div className="mt-4 border-t border-slate-100 pt-3">
+                      <p className="text-[10px] font-bold text-emerald-600 uppercase mb-2 flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Nguồn đối chiếu đáng tin cậy
+                      </p>
+                      <ul className="space-y-1.5">
+                        {selectedClaim.sources.map((src: any, idx: number) => (
+                          <li key={idx} className="flex gap-2 items-start bg-emerald-50/50 p-2 rounded-lg border border-emerald-100">
+                            <ExternalLink className="w-3 h-3 text-emerald-500 mt-0.5 shrink-0" />
+                            <div className="min-w-0">
+                              <a href={src.url} target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold text-emerald-700 hover:underline truncate block">
+                                {src.title || src.url}
+                              </a>
+                              {src.snippet && <p className="text-[10px] text-emerald-600/80 mt-0.5 line-clamp-2 leading-relaxed">{src.snippet}</p>}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   {/* Resolve / Verify Form Section */}
                   <div className="border-t border-slate-100 pt-4 mt-2">

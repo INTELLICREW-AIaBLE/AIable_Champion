@@ -44,6 +44,7 @@ export const handleValidate = async (req: Request, res: Response) => {
         riskLevel: c.riskLevel,
         signals: c.signals,
         card: c.card,
+        sources: c.sources || [],
         resolution: {
           resolved: false,
           userNote: ''
@@ -89,6 +90,7 @@ export const handleValidate = async (req: Request, res: Response) => {
           riskLevel: c.riskLevel,
           signals: c.signals,
           card: c.card,
+          sources: c.sources || [],
           resolution: {
             resolved: false,
             userNote: ''
