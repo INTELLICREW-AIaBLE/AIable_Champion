@@ -397,6 +397,44 @@ export default function ValidatorPage() {
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
+  // Helper to find closest case/punctuation insensitive word matching for highlight stability
+  const findSubsegment = (original: string, query: string): { start: number; length: number } | null => {
+    // Alphanumeric word matcher supporting Vietnamese Unicode
+    const wordRegex = /[a-z0-9àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]+/gi;
+
+    const queryWords = query.toLowerCase().match(wordRegex) || [];
+    if (queryWords.length === 0) return null;
+
+    const origWords: { word: string; start: number; end: number }[] = [];
+    let match;
+    while ((match = wordRegex.exec(original)) !== null) {
+      origWords.push({
+        word: match[0].toLowerCase(),
+        start: match.index,
+        end: match.index + match[0].length
+      });
+    }
+
+    if (origWords.length === 0) return null;
+
+    for (let i = 0; i <= origWords.length - queryWords.length; i++) {
+      let matches = true;
+      for (let j = 0; j < queryWords.length; j++) {
+        if (origWords[i + j].word !== queryWords[j]) {
+          matches = false;
+          break;
+        }
+      }
+      if (matches) {
+        const start = origWords[i].start;
+        const end = origWords[i + queryWords.length - 1].end;
+        return { start, length: end - start };
+      }
+    }
+
+    return null;
+  };
+
   // Helper to render highlights dynamically inside raw text
   const renderHighlightedText = (rawText: string) => {
     if (!claims || claims.length === 0) return <p className="whitespace-pre-wrap">{rawText}</p>;
@@ -414,11 +452,23 @@ export default function ValidatorPage() {
           continue;
         }
 
-        const idx = part.text.indexOf(claim.text);
+        // Try exact match first
+        let idx = part.text.indexOf(claim.text);
+        let matchLength = claim.text.length;
+
+        // Fallback to robust fuzzy word-level matching
+        if (idx === -1) {
+          const matchResult = findSubsegment(part.text, claim.text);
+          if (matchResult) {
+            idx = matchResult.start;
+            matchLength = matchResult.length;
+          }
+        }
+
         if (idx !== -1) {
           const before = part.text.substring(0, idx);
-          const match = claim.text;
-          const after = part.text.substring(idx + claim.text.length);
+          const match = part.text.substring(idx, idx + matchLength);
+          const after = part.text.substring(idx + matchLength);
 
           if (before) newParts.push({ text: before });
           newParts.push({ text: match, claim });
@@ -443,11 +493,11 @@ export default function ValidatorPage() {
           if (isResolved) {
             underlineClass = 'underline decoration-solid decoration-emerald-500 decoration-2 underline-offset-4 bg-emerald-50 text-emerald-900 font-medium';
           } else if (claimObj.riskLevel === 'high') {
-            underlineClass = 'underline decoration-wavy decoration-red-500 decoration-2 underline-offset-4 hover:bg-red-50 text-slate-900';
+            underlineClass = 'underline decoration-solid decoration-red-500 decoration-2 underline-offset-4 hover:bg-red-50 text-slate-900';
           } else if (claimObj.riskLevel === 'medium') {
-            underlineClass = 'underline decoration-wavy decoration-amber-500 decoration-2 underline-offset-4 hover:bg-amber-50 text-slate-900';
+            underlineClass = 'underline decoration-solid decoration-amber-500 decoration-2 underline-offset-4 hover:bg-amber-50 text-slate-900';
           } else {
-            underlineClass = 'underline decoration-wavy decoration-emerald-500 decoration-2 underline-offset-4 hover:bg-emerald-50 text-slate-900';
+            underlineClass = 'underline decoration-solid decoration-emerald-500 decoration-2 underline-offset-4 hover:bg-emerald-50 text-slate-900';
           }
 
           return (
@@ -565,7 +615,7 @@ export default function ValidatorPage() {
                   />
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    disabled={isScanning !== null}
+                    disabled={isScanning !== null || loading}
                     title={text.scanImg}
                     className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-violet-600 bg-violet-50 hover:bg-violet-100 disabled:opacity-50 transition"
                   >
@@ -582,14 +632,16 @@ export default function ValidatorPage() {
                 maxLength={5000}
                 value={output}
                 onChange={(e) => setOutput(e.target.value)}
+                disabled={loading}
+                readOnly={loading}
                 placeholder={text.inputPlaceholder}
                 rows={12}
-                className="w-full px-5 py-4 text-sm md:text-base text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed min-h-[300px]"
+                className="w-full px-5 py-4 text-sm md:text-base text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed min-h-[300px] disabled:bg-slate-50 disabled:text-slate-500"
                 onPaste={(e) => handlePaste(e, 'output')}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                     e.preventDefault();
-                    handleValidate();
+                    if (canValidate) handleValidate();
                   }
                 }}
               />

@@ -5,20 +5,38 @@ dotenv.config();
 
 // ─── Google Custom Search helper ─────────────────────────────────────────────
 
-const searchWikipedia = async (query: string): Promise<{ title: string; url: string; snippet: string }[]> => {
+const searchWikipedia = async (query: string, lang = 'vi'): Promise<{ title: string; url: string; snippet: string }[]> => {
   try {
-    const url = `https://vi.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&srlimit=3`;
-    const res = await fetch(url);
+    const cleaned = query.replace(/["'“”‘’.,!?;]/g, '').trim();
+    if (!cleaned) return [];
+    const domain = lang === 'en' ? 'en' : 'vi';
+    const url = `https://${domain}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(cleaned)}&utf8=&format=json&srlimit=3`;
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'AIaBLE-Validator-Bot/1.0 (contact@aiable.org)'
+      }
+    });
+    if (!res.ok) {
+      console.log(`Wikipedia API returned status ${res.status} for query: ${cleaned}`);
+      return [];
+    }
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      console.log(`Wikipedia API returned non-JSON content-type: ${contentType}`);
+      return [];
+    }
     const data = await res.json();
-    if (!data.query || !data.query.search) return [];
+    if (!data.query || !data.query.search || data.query.search.length === 0) {
+      return [];
+    }
     
     return data.query.search.map((item: any) => ({
       title: item.title,
-      url: `https://vi.wikipedia.org/wiki/${encodeURIComponent(item.title.replace(/ /g, '_'))}`,
-      snippet: item.snippet.replace(/<\/?[^>]+(>|$)/g, "") // remove HTML tags
+      url: `https://${domain}.wikipedia.org/wiki/${encodeURIComponent(item.title.replace(/ /g, '_'))}`,
+      snippet: (item.snippet || '').replace(/<\/?[^>]+(>|$)/g, "") // remove HTML tags
     }));
   } catch (err) {
-    console.error('Wiki search error:', err);
+    console.log('Wiki search error:', err);
     return [];
   }
 };
