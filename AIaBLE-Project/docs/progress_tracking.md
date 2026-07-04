@@ -11,17 +11,30 @@ Dự án được cấu trúc dạng Monorepo (Next.js Frontend + Express/TypeSc
 | **Prompt-Optimizer Engine** | 🟡 Đang phát triển | Hỗ trợ tối ưu hoá và chuẩn hoá prompt |
 | **AI Task-Matcher** | 🟡 Đang phát triển | Phân rã bài tập lớn và gợi ý công cụ AI |
 | **AI Recipe Library** | 🟡 Đang phát triển | Thư viện template prompt mẫu chuẩn |
-| **AI Ethics Guardrail** | 🟡 Đang phát triển | Cảnh báo đạo đức học thuật (AI content) |
-| **AI Accuracy Validator** | 🟡 Đang phát triển | Đối chiếu, xác thực thông tin do AI sinh ra |
+| **AI Ethics Guardrail** | 🟢 Đã hoàn thiện | Cảnh báo đạo đức, phát hiện rủi ro ảo giác & Thẻ phản biện |
+| **AI Accuracy Validator** | 🟢 Đã hoàn thiện | Phân rã FACTSCORE & CoVe kiểm định dữ kiện học thuật |
 | **AIaBLE Personal Sandbox** | 🟢 Đã hoàn thiện UI | Không gian thử nghiệm, tuỳ chỉnh API keys |
 
 ---
 
 ## ✅ Các Công Việc Vừa Hoàn Thành (Recent Updates)
 
-*Cập nhật gần nhất: 03/07/2026*
+*Cập nhật gần nhất: 04/07/2026*
 
-- **Cải tiến UX/UI & Nâng cấp AI Logic cốt lõi (03/07/2026 - Phiên hiện tại):**
+- **Triển khai AI Ethics Guardrail & Thẻ Tư duy Phản biện (04/07/2026 - Phiên hiện tại):**
+  - **Thuật toán học thuật:**
+    - Tích hợp kỹ thuật **FACTSCORE** (bóc tách bài luận thành các câu phát ngôn nguyên tử - Atomic Claims) kèm xác định offset vị trí chữ.
+    - Tích hợp quy trình **Factored Chain of Verification (CoVe)** tự kiểm chứng chéo độc lập để loại bỏ sự thiên vị ban đầu, đo lường độ bất nhất (`self_inconsistency`).
+    - Kết hợp tra cứu Wikipedia/Google Search làm tín hiệu hỗ trợ phụ RAG và kiểm tra ngôn ngữ phóng đại cường điệu (`overconfidence_language`) để cho ra điểm rủi ro tổng hợp.
+  - **Nâng cấp Giao diện Frontend:**
+    - Hiển thị văn bản kèm bôi màu highlight dạng sóng (**Wavy Underline**) trực quan với 3 mức độ rủi ro: Cao (Đỏ), Trung bình (Vàng), Thấp (Xanh).
+    - Phát triển component **Thẻ Tư duy Phản biện (Critical Thinking Card)** hiển thị dạng Popover khi nhấn vào từng highlight, cung cấp lý do cảnh báo, các câu hỏi phản biện gợi mở và từ khóa tìm kiếm nhanh.
+    - Xây dựng luồng **Resolve Loop** ("Tôi đã tự kiểm chứng") cho phép sinh viên lưu lại ghi chú kiểm chứng, đổi trạng thái highlight sang an toàn (Emerald).
+    - Bổ sung thống kê kiểm chứng (resolved count) và Disclaimer học thuật cố định ở chân trang.
+  - **Đồng bộ hóa nhãn điều hướng:**
+    - Thay thế toàn bộ nhãn menu cũ thành **Ethics Guardrail** trong Sidebar, AppNavbar Search và trang chủ Home.
+
+- **Cải tiến UX/UI & Nâng cấp AI Logic cốt lõi (03/07/2026):**
   - **Output Validator (Xác thực thông tin):**
     - Cải tiến giao diện: Lược bỏ ô nhập liệu "Context / Original Prompt" thừa thãi, tối ưu hoá UI thành 1 ô nhập liệu duy nhất giúp thao tác Paste nhanh và trực quan hơn.
     - Nâng cấp AI Logic: Đổi mới tư duy Prompt cho AI. Với kết quả `disputed` (Sai lệch), AI bắt buộc phải cung cấp thông tin ĐÚNG từ nguồn tham khảo để người dùng sửa. Với kết quả `unverified` (Không xác định/Không có kết quả search), AI được phép sử dụng kiến thức nền tảng để gợi ý câu trả lời đúng, nhưng BẮT BUỘC phải đính kèm cảnh báo *"Cần đối chiếu thêm"*.
