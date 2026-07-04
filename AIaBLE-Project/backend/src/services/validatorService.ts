@@ -5,52 +5,80 @@ dotenv.config();
 
 // ─── Google Custom Search helper ─────────────────────────────────────────────
 
-const searchWikipedia = async (query: string): Promise<{ title: string; url: string; snippet: string }[]> => {
+const isEnglish = (text: string): boolean => {
+  const englishWords = ['the', 'and', 'of', 'to', 'in', 'is', 'that', 'it', 'for', 'on', 'with', 'as', 'by', 'at', 'were', 'are', 'was', 'many', 'animals', 'dinosaur', 'extinction'];
+  const words = text.toLowerCase().split(/[^\w]+/);
+  return words.some(w => englishWords.includes(w));
+};
+
+const searchWikipedia = async (query: string, lang = 'vi'): Promise<{ title: string; url: string; snippet: string }[]> => {
   try {
-    const url = `https://vi.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&srlimit=3`;
+    const cleaned = query.replace(/["'“”‘’.,!?;]/g, '').trim();
+    const domain = lang === 'en' ? 'en' : 'vi';
+    const url = `https://${domain}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(cleaned)}&utf8=&format=json&srlimit=3`;
     const res = await fetch(url);
     const data = await res.json();
-    if (!data.query || !data.query.search) return [];
+    if (!data.query || !data.query.search || data.query.search.length === 0) {
+      return [];
+    }
     
     return data.query.search.map((item: any) => ({
       title: item.title,
-      url: `https://vi.wikipedia.org/wiki/${encodeURIComponent(item.title.replace(/ /g, '_'))}`,
+      url: `https://${domain}.wikipedia.org/wiki/${encodeURIComponent(item.title.replace(/ /g, '_'))}`,
       snippet: item.snippet.replace(/<\/?[^>]+(>|$)/g, "") // remove HTML tags
     }));
   } catch (err) {
-    console.error('Wiki search error:', err);
+    console.log('Wiki search error:', err);
     return [];
   }
 };
 
-const searchWeb = async (query: string): Promise<{ title: string; url: string; snippet: string }[]> => {
+const searchWeb = async (query: string, isEng = false): Promise<{ title: string; url: string; snippet: string }[]> => {
   const apiKey = process.env.GOOGLE_SEARCH_API_KEY;
   const cx = process.env.GOOGLE_SEARCH_CX;
+  const lang = isEng ? 'en' : 'vi';
 
-  // Nếu không cấu hình Google Search, tự động dùng Wikipedia
-  if (!apiKey || !cx) {
-    return searchWikipedia(query);
-  }
-
-  try {
-    const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query)}&num=3`;
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if (!data.items) {
-      console.log('Google Search API returned no items or error, falling back to Wikipedia...');
-      return searchWikipedia(query);
+  const executeSearch = async (q: string): Promise<{ title: string; url: string; snippet: string }[]> => {
+    if (!apiKey || !cx) {
+      return searchWikipedia(q, lang);
     }
+    try {
+      const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(q)}&num=3`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.items || data.items.length === 0) {
+        return searchWikipedia(q, lang);
+      }
+      return (data.items as any[]).map((item) => ({
+        title: item.title || '',
+        url: item.link || '',
+        snippet: item.snippet || '',
+      }));
+    } catch (error) {
+      return searchWikipedia(q, lang);
+    }
+  };
 
-    return (data.items as any[]).map((item) => ({
-      title: item.title || '',
-      url: item.link || '',
-      snippet: item.snippet || '',
-    }));
-  } catch (error) {
-    console.log('Google Search API throw exception, falling back to Wikipedia...');
-    return searchWikipedia(query);
+  // 1. Try full query
+  let results = await executeSearch(query);
+  if (results.length > 0) return results;
+
+  // 2. Try first 5 words if query is long
+  const words = query.trim().split(/\s+/);
+  if (words.length > 5) {
+    const simplified = words.slice(0, 5).join(' ');
+    results = await executeSearch(simplified);
+    if (results.length > 0) return results;
   }
+
+  // 3. Filter common words and search
+  const keywords = words.filter(w => w.length > 3 && !['many', 'such', 'were', 'with', 'from', 'that', 'this'].includes(w.toLowerCase())).slice(0, 4).join(' ');
+  if (keywords && keywords !== query) {
+    results = await executeSearch(keywords);
+    if (results.length > 0) return results;
+  }
+
+  return [];
 };
 
 // Heuristic check for overconfidence language
@@ -178,7 +206,8 @@ ${JSON.stringify(allQuestions)}
     });
 
     // Run Google Search/Wikipedia for this claim
-    const searchResults = await searchWeb(claim);
+    const isEng = isEnglish(claim);
+    const searchResults = await searchWeb(claim, isEng);
     const searchSnippets = searchResults
       .map((s, idx) => `[${idx + 1}] ${s.title}: ${s.snippet}`)
       .join('\n');
