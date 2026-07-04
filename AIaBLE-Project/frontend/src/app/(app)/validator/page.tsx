@@ -18,18 +18,11 @@ import {
   History,
   Copy,
   ExternalLink,
-  HelpCircle,
-  Link2
+  HelpCircle
 } from 'lucide-react';
 import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
 import Tesseract from 'tesseract.js';
 import { useAuth } from '@/hooks/useAuth';
-
-interface ClaimSource {
-  label: string;  // e.g. "Wikipedia: Doraemon"
-  url: string;
-  snippet: string;
-}
 
 interface Claim {
   _id: string;
@@ -47,22 +40,12 @@ interface Claim {
     guidingQuestions: string[];
     suggestedSearchTerms: string[];
     sourceUrl?: string;
-    // New fields
-    sources?: ClaimSource[];
-    backingLevel?: 'BACKED' | 'PARTIALLY_BACKED' | 'UNBACKED';
-    evidenceScore?: number;
-    sourceCount?: number;
   };
   resolution: {
     resolved: boolean;
     resolvedAt?: string;
     userNote?: string;
   };
-  sources?: {
-    title: string;
-    url: string;
-    snippet?: string;
-  }[];
 }
 
 interface Essay {
@@ -72,59 +55,6 @@ interface Essay {
   summary: string;
   createdAt: string;
 }
-
-// ─── Backing level helpers ────────────────────────────────────────────────────
-
-type BackingLevel = 'BACKED' | 'PARTIALLY_BACKED' | 'UNBACKED';
-
-const backingConfig: Record<BackingLevel, {
-  emoji: string;
-  label: string;
-  sublabel: string;
-  chipCls: string;
-  barCls: string;
-  dotCls: string;
-}> = {
-  BACKED: {
-    emoji: '🟢',
-    label: 'Backed',
-    sublabel: 'Multiple trusted sources support this claim.',
-    chipCls: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-    barCls: 'bg-emerald-500',
-    dotCls: 'bg-emerald-500',
-  },
-  PARTIALLY_BACKED: {
-    emoji: '🟡',
-    label: 'Partially Backed',
-    sublabel: 'Some parts are supported, but additional verification is recommended.',
-    chipCls: 'bg-amber-50 text-amber-700 border border-amber-200',
-    barCls: 'bg-amber-400',
-    dotCls: 'bg-amber-400',
-  },
-  UNBACKED: {
-    emoji: '🔴',
-    label: 'Unbacked',
-    sublabel: 'No reliable supporting evidence was found.',
-    chipCls: 'bg-red-50 text-red-700 border border-red-200',
-    barCls: 'bg-red-500',
-    dotCls: 'bg-red-500',
-  },
-};
-
-const getBackingLevel = (claim: Claim): BackingLevel => {
-  if (claim.card.backingLevel) return claim.card.backingLevel;
-  // Legacy fallback: derive from sourceUrl
-  if (claim.card.sourceUrl) return 'PARTIALLY_BACKED';
-  return 'UNBACKED';
-};
-
-const getEvidenceScore = (claim: Claim): number => {
-  if (typeof claim.card.evidenceScore === 'number') return claim.card.evidenceScore;
-  if (claim.card.sourceUrl) return 40;
-  return 0;
-};
-
-// ─── i18n strings ─────────────────────────────────────────────────────────────
 
 const t = {
   vi: {
@@ -170,10 +100,7 @@ const t = {
     historyBtn: 'Lịch sử bài viết',
     resolvedCount: 'Đã kiểm chứng: {k}/{n} luận điểm',
     copySuccess: 'Đã copy từ khóa!',
-    resolveSuccess: 'Đã lưu ghi chú kiểm chứng thành công!',
-    evidenceScore: 'Evidence Score',
-    sourcesTitle: 'Nguồn dẫn chứng',
-    evidenceDesc: 'Based on supporting evidences retrieved from trusted sources',
+    resolveSuccess: 'Đã lưu ghi chú kiểm chứng thành công!'
   },
   en: {
     title: 'AI Ethics Guardrail',
@@ -218,10 +145,7 @@ const t = {
     historyBtn: 'Essay History',
     resolvedCount: 'Verified: {k}/{n} claims',
     copySuccess: 'Search terms copied!',
-    resolveSuccess: 'Verification note saved successfully!',
-    evidenceScore: 'Evidence Score',
-    sourcesTitle: 'Supporting Sources',
-    evidenceDesc: 'Based on supporting evidences retrieved from trusted sources',
+    resolveSuccess: 'Verification note saved successfully!'
   }
 };
 
@@ -270,7 +194,7 @@ export default function ValidatorPage() {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/validator/history`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/validator/history`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -366,7 +290,7 @@ export default function ValidatorPage() {
 
     try {
       const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') || 'default-user' : 'default-user';
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/validator/analyze`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/validator/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -388,7 +312,7 @@ export default function ValidatorPage() {
         // Save activity log
         const token = localStorage.getItem('token');
         if (token) {
-          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/history`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/profile/history`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -428,7 +352,7 @@ export default function ValidatorPage() {
     setResolving(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/validator/claims/${selectedClaim._id}/resolve`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/validator/claims/${selectedClaim._id}/resolve`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -490,26 +414,14 @@ export default function ValidatorPage() {
           continue;
         }
 
-        // Create a fuzzy regex that treats any whitespace/newline sequence as \s+
-        const escapedClaimText = claim.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const fuzzyRegexStr = escapedClaimText.replace(/(\\s\+|\\ | )/g, '\\s+');
-        let match;
-        try {
-          const fuzzyRegex = new RegExp(fuzzyRegexStr, 'i');
-          match = part.text.match(fuzzyRegex);
-        } catch (e) {
-          match = null;
-        }
-
-        if (match && match.index !== undefined) {
-          const idx = match.index;
-          const matchLength = match[0].length;
+        const idx = part.text.indexOf(claim.text);
+        if (idx !== -1) {
           const before = part.text.substring(0, idx);
-          const matchedText = part.text.substring(idx, idx + matchLength);
-          const after = part.text.substring(idx + matchLength);
+          const match = claim.text;
+          const after = part.text.substring(idx + claim.text.length);
 
           if (before) newParts.push({ text: before });
-          newParts.push({ text: matchedText, claim });
+          newParts.push({ text: match, claim });
           if (after) newParts.push({ text: after });
         } else {
           newParts.push(part);
@@ -560,75 +472,6 @@ export default function ValidatorPage() {
   };
 
   const resolvedClaimsCount = claims.filter(c => c.resolution.resolved).length;
-
-  // ── Evidence Score Card Component ─────────────────────────────────────────
-  const EvidenceScoreCard = ({ claim }: { claim: Claim }) => {
-    const backingLevel = getBackingLevel(claim);
-    const evidenceScore = getEvidenceScore(claim);
-    const cfg = backingConfig[backingLevel];
-    const sources = claim.card.sources || [];
-    const hasSources = sources.length > 0;
-
-    return (
-      <div className="space-y-3">
-        {/* Header: Evidence Score */}
-        <div className="flex items-center justify-between">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">{text.evidenceScore}</p>
-          <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${cfg.chipCls}`}>
-            {cfg.emoji} {cfg.label}
-          </span>
-        </div>
-
-        {/* Score bar */}
-        <div className="space-y-1">
-          <div className="flex items-center justify-between text-[10px] text-slate-400">
-            <span>{cfg.sublabel}</span>
-            <span className="font-bold text-slate-600">{evidenceScore}/100</span>
-          </div>
-          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-700 ${cfg.barCls}`}
-              style={{ width: `${evidenceScore}%` }}
-            />
-          </div>
-          <p className="text-[10px] text-slate-400 italic">{text.evidenceDesc}</p>
-        </div>
-
-        {/* Sources list */}
-        {hasSources && (
-          <div className="space-y-1.5">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">{text.sourcesTitle}</p>
-            <div className="space-y-1">
-              {sources.map((src, idx) => (
-                <a
-                  key={idx}
-                  href={src.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-start gap-2 p-2 rounded-lg bg-slate-50 border border-slate-100 hover:border-violet-200 hover:bg-violet-50/30 transition group"
-                  title={src.snippet}
-                >
-                  <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${cfg.dotCls}`} />
-                  <span className="text-xs text-slate-600 group-hover:text-violet-700 transition leading-tight flex-1 truncate font-medium">
-                    {src.label}
-                  </span>
-                  <ExternalLink className="w-3 h-3 text-slate-300 group-hover:text-violet-500 shrink-0 mt-0.5 transition" />
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* No sources message */}
-        {!hasSources && backingLevel === 'UNBACKED' && (
-          <div className="flex items-center gap-2 p-2.5 bg-red-50 border border-red-100 rounded-lg">
-            <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />
-            <p className="text-xs text-red-600">Không tìm thấy nguồn xác nhận đáng tin cậy nào cho luận điểm này.</p>
-          </div>
-        )}
-      </div>
-    );
-  };
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
@@ -683,7 +526,7 @@ export default function ValidatorPage() {
                   className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm hover:border-violet-300 hover:shadow transition cursor-pointer text-left"
                 >
                   <p className="text-xs font-semibold text-slate-700 truncate">
-                    &ldquo;{item.essay.rawText}&rdquo;
+                    "{item.essay.rawText}"
                   </p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] text-slate-400">
@@ -915,7 +758,7 @@ export default function ValidatorPage() {
                   <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
                     <p className="text-xs font-bold text-slate-400 uppercase mb-1">Luận điểm cần thẩm định</p>
                     <p className="text-xs md:text-sm font-semibold text-slate-700 italic">
-                      &ldquo;{selectedClaim.text}&rdquo;
+                      "{selectedClaim.text}"
                     </p>
                   </div>
 
@@ -927,10 +770,28 @@ export default function ValidatorPage() {
                     </p>
                   </div>
 
-                  {/* ── Evidence Score + Sources ── */}
-                  <div className="bg-slate-50/80 rounded-xl border border-slate-100 p-3.5">
-                    <EvidenceScoreCard claim={selectedClaim} />
-                  </div>
+                  {/* Verified Source URL Link */}
+                  {selectedClaim.card.sourceUrl && (
+                    <div className="bg-emerald-50/60 p-3 rounded-lg border border-emerald-100 flex items-center justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] font-black text-emerald-800 uppercase tracking-wider">
+                          🔗 Nguồn kiểm chứng thực tế
+                        </p>
+                        <p className="text-xs text-slate-500 truncate mt-0.5" title={selectedClaim.card.sourceUrl}>
+                          {selectedClaim.card.sourceUrl}
+                        </p>
+                      </div>
+                      <a
+                        href={selectedClaim.card.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-md transition shrink-0"
+                      >
+                        <span>Xem nguồn</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
 
                   {/* Guiding Questions */}
                   <div>
@@ -975,28 +836,6 @@ export default function ValidatorPage() {
                     </div>
                   </div>
 
-                  {/* Sources List (Only shown if Low Risk / Verified correct) */}
-                  {selectedClaim.riskLevel === 'low' && selectedClaim.sources && selectedClaim.sources.length > 0 && (
-                    <div className="mt-4 border-t border-slate-100 pt-3">
-                      <p className="text-[10px] font-bold text-emerald-600 uppercase mb-2 flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Nguồn đối chiếu đáng tin cậy
-                      </p>
-                      <ul className="space-y-1.5">
-                        {selectedClaim.sources.map((src: any, idx: number) => (
-                          <li key={idx} className="flex gap-2 items-start bg-emerald-50/50 p-2 rounded-lg border border-emerald-100">
-                            <ExternalLink className="w-3 h-3 text-emerald-500 mt-0.5 shrink-0" />
-                            <div className="min-w-0">
-                              <a href={src.url} target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold text-emerald-700 hover:underline truncate block">
-                                {src.title || src.url}
-                              </a>
-                              {src.snippet && <p className="text-[10px] text-emerald-600/80 mt-0.5 line-clamp-2 leading-relaxed">{src.snippet}</p>}
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
                   {/* Resolve / Verify Form Section */}
                   <div className="border-t border-slate-100 pt-4 mt-2">
                     {selectedClaim.resolution.resolved ? (
@@ -1006,7 +845,7 @@ export default function ValidatorPage() {
                           <p className="text-xs font-bold text-emerald-800">{text.resolvedStatus}</p>
                           {selectedClaim.resolution.userNote && (
                             <p className="text-[11px] text-emerald-700 mt-1 italic">
-                              &ldquo;{selectedClaim.resolution.userNote}&rdquo;
+                              "{selectedClaim.resolution.userNote}"
                             </p>
                           )}
                           <p className="text-[9px] text-emerald-500 mt-1">

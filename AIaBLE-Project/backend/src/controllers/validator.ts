@@ -44,7 +44,6 @@ export const handleValidate = async (req: Request, res: Response) => {
         riskLevel: c.riskLevel,
         signals: c.signals,
         card: c.card,
-        sources: c.sources || [],
         resolution: {
           resolved: false,
           userNote: ''
@@ -70,48 +69,10 @@ export const handleValidate = async (req: Request, res: Response) => {
       });
     }
 
-    // Fallback logic
-    try {
-      const userId = req.body.userId || (req.query.userId as string) || 'default-user';
-      const fallback = fallbackValidate(req.body.text || '');
-      
-      const essay = await Essay.create({
-        userId,
-        rawText: (req.body.text || '').trim(),
-        criticalThinkingScore: fallback.criticalThinkingScore,
-        summary: fallback.summary
-      });
-
-      const claimPromises = fallback.claims.map((c: any) => {
-        return Claim.create({
-          essayId: essay._id,
-          text: c.text,
-          riskScore: c.riskScore,
-          riskLevel: c.riskLevel,
-          signals: c.signals,
-          card: c.card,
-          sources: c.sources || [],
-          resolution: {
-            resolved: false,
-            userNote: ''
-          }
-        });
-      });
-
-      const savedClaims = await Promise.all(claimPromises);
-
-      res.json({
-        success: true,
-        essay,
-        claims: savedClaims,
-        isFallback: true
-      });
-    } catch (fallbackErr: any) {
-      res.status(500).json({
-        success: false,
-        message: error.message || 'Lỗi khi kiểm định văn bản.',
-      });
-    }
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Lỗi khi kiểm định dữ liệu học thuật. Vui lòng thử lại sau.'
+    });
   }
 };
 
