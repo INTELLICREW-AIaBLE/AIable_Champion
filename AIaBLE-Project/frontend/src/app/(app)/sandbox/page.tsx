@@ -187,13 +187,21 @@ export default function SandboxPage() {
 
   // Restore state from sessionStorage
   useEffect(() => {
-    const savedPrompt = sessionStorage.getItem('sandbox_prompt');
-    const savedResults = sessionStorage.getItem('sandbox_results');
-    if (savedPrompt) setPrompt(savedPrompt);
-    if (savedResults) {
-      try {
-        setResults(JSON.parse(savedResults));
-      } catch (e) {}
+    const prefill = sessionStorage.getItem('sandbox_prefill');
+    if (prefill) {
+      setPrompt(prefill);
+      sessionStorage.removeItem('sandbox_prefill');
+      sessionStorage.removeItem('sandbox_results');
+      setResults(INITIAL_MODELS);
+    } else {
+      const savedPrompt = sessionStorage.getItem('sandbox_prompt');
+      const savedResults = sessionStorage.getItem('sandbox_results');
+      if (savedPrompt) setPrompt(savedPrompt);
+      if (savedResults) {
+        try {
+          setResults(JSON.parse(savedResults));
+        } catch (e) {}
+      }
     }
   }, []);
 

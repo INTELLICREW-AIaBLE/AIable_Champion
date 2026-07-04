@@ -60,56 +60,19 @@ export const handleValidate = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error('[Validator Controller Error]:', error.message);
-
+    
     const msg = error.message?.toLowerCase() || '';
-    if (msg.includes('429') || msg.includes('quota') || msg.includes('rate limit') || msg.includes('token') || msg.includes('overloaded')) {
+    if (msg.includes('429') || msg.includes('quota') || msg.includes('rate limit') || msg.includes('overloaded')) {
       return res.status(429).json({
         success: false,
-        message: 'Hệ thống AI đang quá tải hoặc hết Token (Rate Limit). Vui lòng thử lại sau ít phút!',
+        message: 'Hệ thống AI đang quá tải hoặc hết hạn ngạch (Rate Limit). Vui lòng thử lại sau ít phút!'
       });
     }
 
-    // Fallback logic
-    try {
-      const userId = req.body.userId || (req.query.userId as string) || 'default-user';
-      const fallback = fallbackValidate(req.body.text || '');
-      
-      const essay = await Essay.create({
-        userId,
-        rawText: (req.body.text || '').trim(),
-        criticalThinkingScore: fallback.criticalThinkingScore,
-        summary: fallback.summary
-      });
-
-      const claimPromises = fallback.claims.map((c: any) => {
-        return Claim.create({
-          essayId: essay._id,
-          text: c.text,
-          riskScore: c.riskScore,
-          riskLevel: c.riskLevel,
-          signals: c.signals,
-          card: c.card,
-          resolution: {
-            resolved: false,
-            userNote: ''
-          }
-        });
-      });
-
-      const savedClaims = await Promise.all(claimPromises);
-
-      res.json({
-        success: true,
-        essay,
-        claims: savedClaims,
-        isFallback: true
-      });
-    } catch (fallbackErr: any) {
-      res.status(500).json({
-        success: false,
-        message: error.message || 'Lỗi khi kiểm định văn bản.',
-      });
-    }
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Lỗi khi kiểm định dữ liệu học thuật. Vui lòng thử lại sau.'
+    });
   }
 };
 

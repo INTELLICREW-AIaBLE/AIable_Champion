@@ -15,6 +15,7 @@ export interface IClaim extends Document {
     reasonText: string;
     guidingQuestions: string[];
     suggestedSearchTerms: string[];
+    sourceUrl?: string;
   };
   resolution: {
     resolved: boolean;
@@ -40,6 +41,7 @@ const ClaimSchema: Schema = new Schema({
     reasonText: { type: String, required: true },
     guidingQuestions: { type: [String], default: [] },
     suggestedSearchTerms: { type: [String], default: [] },
+    sourceUrl: { type: String, default: '' },
   },
   resolution: {
     resolved: { type: Boolean, default: false },
