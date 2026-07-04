@@ -282,6 +282,7 @@ export default function OptimizerPage() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
   const [historyPrompts, setHistoryPrompts] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -367,6 +368,7 @@ export default function OptimizerPage() {
     if (!canOptimize) return;
     setLoading(true);
     setResult(null);
+    setErrorMsg(null);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/optimizer`, {
         method: 'POST',
@@ -405,12 +407,11 @@ export default function OptimizerPage() {
           }).catch(err => console.error('Lỗi khi lưu lịch sử:', err));
         }
       } else {
-        console.error('Failed to optimize prompt:', json.message);
-        alert(json.message || text.errGen);
+        setErrorMsg(json.message || text.errGen);
       }
     } catch (error) {
       console.error('Error optimizing prompt:', error);
-      alert(text.errConn);
+      setErrorMsg(text.errConn);
     } finally {
       setLoading(false);
     }
@@ -447,6 +448,20 @@ export default function OptimizerPage() {
           </button>
         )}
       </div>
+
+      {/* ── Error Banner ─────────────────────────────────────────────────────── */}
+      {errorMsg && (
+        <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-2xl text-sm text-red-800 animate-in slide-in-from-top duration-300">
+          <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="font-bold mb-0.5">Lỗi hệ thống</p>
+            <p className="text-red-700 leading-relaxed">{errorMsg}</p>
+          </div>
+          <button onClick={() => setErrorMsg(null)} className="p-1 rounded-lg hover:bg-red-100 text-red-400 hover:text-red-600 transition shrink-0">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* ── Config Row ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

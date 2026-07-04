@@ -9,14 +9,30 @@ export const handleOptimizePrompt = async (req: Request, res: Response) => {
     if (!prompt) {
       return res.status(400).json({
         success: false,
-        message: 'Raw prompt is required.'
+        message: 'Vui lòng nhập prompt cần tối ưu.'
       });
     }
 
-    if (prompt.length > 3000) {
+    if (typeof prompt !== 'string') {
       return res.status(400).json({
         success: false,
-        message: 'Prompt quá dài. Vui lòng giới hạn dưới 3000 ký tự để hệ thống có thể phân tích tốt nhất.'
+        message: 'Prompt phải là chuỗi văn bản hợp lệ.'
+      });
+    }
+
+    const trimmedPrompt = prompt.trim();
+
+    if (trimmedPrompt.length < 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Prompt quá ngắn. Vui lòng nhập ít nhất 5 ký tự.'
+      });
+    }
+
+    if (trimmedPrompt.length > 5000) {
+      return res.status(400).json({
+        success: false,
+        message: `Prompt quá dài (${trimmedPrompt.length} ký tự). Vui lòng giới hạn dưới 5000 ký tự để hệ thống phân tích hiệu quả nhất.`
       });
     }
 
@@ -30,23 +46,19 @@ export const handleOptimizePrompt = async (req: Request, res: Response) => {
       res.setHeader('Connection', 'keep-alive');
 
       try {
-        const result = await optimizePrompt(prompt.trim(), modelName, toneType, geminiKey);
+        const result = await optimizePrompt(trimmedPrompt, modelName, toneType, geminiKey);
 
         // Send data in chunks for smoother UX
         const words = result.optimized.split(' ');
         for (let i = 0; i < words.length; i += 5) {
           const chunk = words.slice(i, i + 5).join(' ') + ' ';
           res.write(`data: ${JSON.stringify({ type: 'chunk', content: chunk })}\n\n`);
-          await new Promise(resolve => setTimeout(resolve, 50)); // Simulate streaming
+          await new Promise(resolve => setTimeout(resolve, 50));
         }
 
-        // Send final result with metadata
         res.write(`data: ${JSON.stringify({
           type: 'complete',
-          result: {
-            ...result,
-            cached: false
-          }
+          result: { ...result, cached: false }
         })}\n\n`);
         res.end();
       } catch (error: any) {
@@ -56,14 +68,15 @@ export const handleOptimizePrompt = async (req: Request, res: Response) => {
       return;
     }
 
-    // Normal JSON response
-    const result = await optimizePrompt(prompt.trim(), modelName, toneType, geminiKey);
-    res.json(result);
+    // Normal JSON response - optimizePrompt now throws on ALL failures (no silent fallback)
+    const result = await optimizePrompt(trimmedPrompt, modelName, toneType, geminiKey);
+    res.json({ success: true, ...result });
   } catch (error: any) {
-    console.error('[Optimizer Controller Error]:', error);
-    res.status(500).json({
+    console.error('[Optimizer Controller Error]:', error.message);
+    // Return specific error message - no more generic fallback
+    res.status(error.message?.includes('Prompt Injection') ? 403 : 503).json({
       success: false,
-      message: error.message || 'Failed to optimize prompt.'
+      message: error.message || 'Hệ thống gặp sự cố không xác định. Vui lòng thử lại sau.'
     });
   }
 };
