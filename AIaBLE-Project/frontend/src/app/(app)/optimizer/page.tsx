@@ -423,6 +423,12 @@ export default function OptimizerPage() {
     textareaRef.current?.focus();
   };
 
+  const handleSendToSandbox = () => {
+    if (!result?.optimized) return;
+    sessionStorage.setItem('sandbox_prefill', result.optimized);
+    window.location.href = '/sandbox';
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
 
@@ -679,6 +685,14 @@ export default function OptimizerPage() {
                     <span className="text-xs text-violet-400">{text.optimizedBy} · {model}</span>
                   </div>
                   <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleSendToSandbox}
+                      className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-violet-700 bg-violet-100 hover:bg-violet-200 rounded-lg transition"
+                      title="Chuyển sang AI Sandbox"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>AI Sandbox</span>
+                    </button>
                     <button
                       onClick={() => setShowSaveModal(true)}
                       className="p-1.5 text-violet-600 hover:bg-violet-100 rounded-lg transition"

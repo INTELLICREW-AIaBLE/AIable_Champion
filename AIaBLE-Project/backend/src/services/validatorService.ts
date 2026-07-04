@@ -38,7 +38,7 @@ const searchWeb = async (query: string): Promise<{ title: string; url: string; s
     const data = await res.json();
 
     if (!data.items) {
-      console.warn('Google Search API returned no items or error, falling back to Wikipedia...');
+      console.log('Google Search API returned no items or error, falling back to Wikipedia...');
       return searchWikipedia(query);
     }
 
@@ -48,7 +48,7 @@ const searchWeb = async (query: string): Promise<{ title: string; url: string; s
       snippet: item.snippet || '',
     }));
   } catch (error) {
-    console.warn('Google Search API throw exception, falling back to Wikipedia...');
+    console.log('Google Search API throw exception, falling back to Wikipedia...');
     return searchWikipedia(query);
   }
 };
@@ -227,6 +227,8 @@ Return ONLY a JSON object:
       if (riskScore > 0.6) riskLevel = 'high';
       else if (riskScore >= 0.3) riskLevel = 'medium';
 
+      const sourceUrl = searchResults && searchResults.length > 0 ? searchResults[0].url : '';
+
       return {
         text: claim,
         riskScore,
@@ -240,12 +242,16 @@ Return ONLY a JSON object:
         card: {
           reasonText: parsed.reasonText || 'Đoạn văn này chứa khẳng định cần kiểm chứng thêm nguồn gốc.',
           guidingQuestions: parsed.guidingQuestions || ['Bạn có thể tìm nguồn độc lập nào xác thực điều này?'],
-          suggestedSearchTerms: parsed.suggestedSearchTerms || [claim]
+          suggestedSearchTerms: parsed.suggestedSearchTerms || [claim],
+          sourceUrl
         },
         sources: searchResults.map((s: any) => ({ title: s.title, url: s.url, snippet: s.snippet }))
       };
     } catch (error) {
       console.error(`[Eval Claim Error for: ${claim}]:`, error);
+      // Try to fallback only searchResults URL to provide some sources if possible
+      const sourceUrl = searchResults && searchResults.length > 0 ? searchResults[0].url : '';
+
       return {
         text: claim,
         riskScore: 0.4,
@@ -259,7 +265,8 @@ Return ONLY a JSON object:
         card: {
           reasonText: 'Không thể phân tích rủi ro chi tiết do lỗi kết nối AI. Cần kiểm tra lại nguồn tài liệu.',
           guidingQuestions: ['Hãy kiểm tra lại số liệu này bằng nguồn sách hoặc báo chí chính thống.'],
-          suggestedSearchTerms: [claim]
+          suggestedSearchTerms: [claim],
+          sourceUrl
         }
       };
     }
@@ -314,7 +321,8 @@ export const fallbackValidate = (text: string): any => {
     card: {
       reasonText: 'Chế độ dự phòng: Không thể kết nối AI phân tích nâng cao.',
       guidingQuestions: ['Bạn có thể tự tra cứu trên Google Scholar để xác nhận không?'],
-      suggestedSearchTerms: [s]
+      suggestedSearchTerms: [s],
+      sourceUrl: ''
     }
   }));
 

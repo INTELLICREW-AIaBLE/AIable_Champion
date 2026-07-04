@@ -61,12 +61,12 @@ export const handleValidate = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error('[Validator Controller Error]:', error.message);
-
+    
     const msg = error.message?.toLowerCase() || '';
-    if (msg.includes('429') || msg.includes('quota') || msg.includes('rate limit') || msg.includes('token') || msg.includes('overloaded')) {
+    if (msg.includes('429') || msg.includes('quota') || msg.includes('rate limit') || msg.includes('overloaded')) {
       return res.status(429).json({
         success: false,
-        message: 'Hệ thống AI đang quá tải hoặc hết Token (Rate Limit). Vui lòng thử lại sau ít phút!',
+        message: 'Hệ thống AI đang quá tải hoặc hết hạn ngạch (Rate Limit). Vui lòng thử lại sau ít phút!'
       });
     }
 

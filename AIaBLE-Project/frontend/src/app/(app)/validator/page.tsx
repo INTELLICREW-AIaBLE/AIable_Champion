@@ -39,6 +39,7 @@ interface Claim {
     reasonText: string;
     guidingQuestions: string[];
     suggestedSearchTerms: string[];
+    sourceUrl?: string;
   };
   resolution: {
     resolved: boolean;
@@ -785,6 +786,29 @@ export default function ValidatorPage() {
                       {selectedClaim.card.reasonText}
                     </p>
                   </div>
+
+                  {/* Verified Source URL Link */}
+                  {selectedClaim.card.sourceUrl && (
+                    <div className="bg-emerald-50/60 p-3 rounded-lg border border-emerald-100 flex items-center justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] font-black text-emerald-800 uppercase tracking-wider">
+                          🔗 Nguồn kiểm chứng thực tế
+                        </p>
+                        <p className="text-xs text-slate-500 truncate mt-0.5" title={selectedClaim.card.sourceUrl}>
+                          {selectedClaim.card.sourceUrl}
+                        </p>
+                      </div>
+                      <a
+                        href={selectedClaim.card.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-md transition shrink-0"
+                      >
+                        <span>Xem nguồn</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
 
                   {/* Guiding Questions */}
                   <div>
