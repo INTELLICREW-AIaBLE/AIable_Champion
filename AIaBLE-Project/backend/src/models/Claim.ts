@@ -15,7 +15,14 @@ export interface IClaim extends Document {
     reasonText: string;
     guidingQuestions: string[];
     suggestedSearchTerms: string[];
+    // Legacy single URL
     sourceUrl?: string;
+    // New: multiple formatted sources
+    sources?: { label: string; url: string; snippet: string }[];
+    // Evidence backing
+    backingLevel?: 'BACKED' | 'PARTIALLY_BACKED' | 'UNBACKED';
+    evidenceScore?: number;
+    sourceCount?: number;
   };
   sources: { title: string; url: string; snippet?: string }[];
   resolution: {
@@ -43,6 +50,17 @@ const ClaimSchema: Schema = new Schema({
     guidingQuestions: { type: [String], default: [] },
     suggestedSearchTerms: { type: [String], default: [] },
     sourceUrl: { type: String, default: '' },
+    sources: {
+      type: [{
+        label: { type: String, default: '' },
+        url: { type: String, default: '' },
+        snippet: { type: String, default: '' },
+      }],
+      default: []
+    },
+    backingLevel: { type: String, enum: ['BACKED', 'PARTIALLY_BACKED', 'UNBACKED'], default: 'UNBACKED' },
+    evidenceScore: { type: Number, default: 0 },
+    sourceCount: { type: Number, default: 0 },
   },
   sources: [{
     title: { type: String, required: true },

@@ -18,11 +18,18 @@ import {
   History,
   Copy,
   ExternalLink,
-  HelpCircle
+  HelpCircle,
+  Link2
 } from 'lucide-react';
 import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
 import Tesseract from 'tesseract.js';
 import { useAuth } from '@/hooks/useAuth';
+
+interface ClaimSource {
+  label: string;  // e.g. "Wikipedia: Doraemon"
+  url: string;
+  snippet: string;
+}
 
 interface Claim {
   _id: string;
@@ -40,6 +47,11 @@ interface Claim {
     guidingQuestions: string[];
     suggestedSearchTerms: string[];
     sourceUrl?: string;
+    // New fields
+    sources?: ClaimSource[];
+    backingLevel?: 'BACKED' | 'PARTIALLY_BACKED' | 'UNBACKED';
+    evidenceScore?: number;
+    sourceCount?: number;
   };
   resolution: {
     resolved: boolean;
@@ -60,6 +72,59 @@ interface Essay {
   summary: string;
   createdAt: string;
 }
+
+// ─── Backing level helpers ────────────────────────────────────────────────────
+
+type BackingLevel = 'BACKED' | 'PARTIALLY_BACKED' | 'UNBACKED';
+
+const backingConfig: Record<BackingLevel, {
+  emoji: string;
+  label: string;
+  sublabel: string;
+  chipCls: string;
+  barCls: string;
+  dotCls: string;
+}> = {
+  BACKED: {
+    emoji: '🟢',
+    label: 'Backed',
+    sublabel: 'Multiple trusted sources support this claim.',
+    chipCls: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+    barCls: 'bg-emerald-500',
+    dotCls: 'bg-emerald-500',
+  },
+  PARTIALLY_BACKED: {
+    emoji: '🟡',
+    label: 'Partially Backed',
+    sublabel: 'Some parts are supported, but additional verification is recommended.',
+    chipCls: 'bg-amber-50 text-amber-700 border border-amber-200',
+    barCls: 'bg-amber-400',
+    dotCls: 'bg-amber-400',
+  },
+  UNBACKED: {
+    emoji: '🔴',
+    label: 'Unbacked',
+    sublabel: 'No reliable supporting evidence was found.',
+    chipCls: 'bg-red-50 text-red-700 border border-red-200',
+    barCls: 'bg-red-500',
+    dotCls: 'bg-red-500',
+  },
+};
+
+const getBackingLevel = (claim: Claim): BackingLevel => {
+  if (claim.card.backingLevel) return claim.card.backingLevel;
+  // Legacy fallback: derive from sourceUrl
+  if (claim.card.sourceUrl) return 'PARTIALLY_BACKED';
+  return 'UNBACKED';
+};
+
+const getEvidenceScore = (claim: Claim): number => {
+  if (typeof claim.card.evidenceScore === 'number') return claim.card.evidenceScore;
+  if (claim.card.sourceUrl) return 40;
+  return 0;
+};
+
+// ─── i18n strings ─────────────────────────────────────────────────────────────
 
 const t = {
   vi: {
@@ -105,7 +170,10 @@ const t = {
     historyBtn: 'Lịch sử bài viết',
     resolvedCount: 'Đã kiểm chứng: {k}/{n} luận điểm',
     copySuccess: 'Đã copy từ khóa!',
-    resolveSuccess: 'Đã lưu ghi chú kiểm chứng thành công!'
+    resolveSuccess: 'Đã lưu ghi chú kiểm chứng thành công!',
+    evidenceScore: 'Evidence Score',
+    sourcesTitle: 'Nguồn dẫn chứng',
+    evidenceDesc: 'Based on supporting evidences retrieved from trusted sources',
   },
   en: {
     title: 'AI Ethics Guardrail',
@@ -150,7 +218,10 @@ const t = {
     historyBtn: 'Essay History',
     resolvedCount: 'Verified: {k}/{n} claims',
     copySuccess: 'Search terms copied!',
-    resolveSuccess: 'Verification note saved successfully!'
+    resolveSuccess: 'Verification note saved successfully!',
+    evidenceScore: 'Evidence Score',
+    sourcesTitle: 'Supporting Sources',
+    evidenceDesc: 'Based on supporting evidences retrieved from trusted sources',
   }
 };
 
@@ -490,6 +561,75 @@ export default function ValidatorPage() {
 
   const resolvedClaimsCount = claims.filter(c => c.resolution.resolved).length;
 
+  // ── Evidence Score Card Component ─────────────────────────────────────────
+  const EvidenceScoreCard = ({ claim }: { claim: Claim }) => {
+    const backingLevel = getBackingLevel(claim);
+    const evidenceScore = getEvidenceScore(claim);
+    const cfg = backingConfig[backingLevel];
+    const sources = claim.card.sources || [];
+    const hasSources = sources.length > 0;
+
+    return (
+      <div className="space-y-3">
+        {/* Header: Evidence Score */}
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">{text.evidenceScore}</p>
+          <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${cfg.chipCls}`}>
+            {cfg.emoji} {cfg.label}
+          </span>
+        </div>
+
+        {/* Score bar */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-between text-[10px] text-slate-400">
+            <span>{cfg.sublabel}</span>
+            <span className="font-bold text-slate-600">{evidenceScore}/100</span>
+          </div>
+          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-700 ${cfg.barCls}`}
+              style={{ width: `${evidenceScore}%` }}
+            />
+          </div>
+          <p className="text-[10px] text-slate-400 italic">{text.evidenceDesc}</p>
+        </div>
+
+        {/* Sources list */}
+        {hasSources && (
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">{text.sourcesTitle}</p>
+            <div className="space-y-1">
+              {sources.map((src, idx) => (
+                <a
+                  key={idx}
+                  href={src.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-2 p-2 rounded-lg bg-slate-50 border border-slate-100 hover:border-violet-200 hover:bg-violet-50/30 transition group"
+                  title={src.snippet}
+                >
+                  <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${cfg.dotCls}`} />
+                  <span className="text-xs text-slate-600 group-hover:text-violet-700 transition leading-tight flex-1 truncate font-medium">
+                    {src.label}
+                  </span>
+                  <ExternalLink className="w-3 h-3 text-slate-300 group-hover:text-violet-500 shrink-0 mt-0.5 transition" />
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* No sources message */}
+        {!hasSources && backingLevel === 'UNBACKED' && (
+          <div className="flex items-center gap-2 p-2.5 bg-red-50 border border-red-100 rounded-lg">
+            <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+            <p className="text-xs text-red-600">Không tìm thấy nguồn xác nhận đáng tin cậy nào cho luận điểm này.</p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
       {/* ── Header ─────────────────────────────────────────────────────────── */}
@@ -543,7 +683,7 @@ export default function ValidatorPage() {
                   className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm hover:border-violet-300 hover:shadow transition cursor-pointer text-left"
                 >
                   <p className="text-xs font-semibold text-slate-700 truncate">
-                    "{item.essay.rawText}"
+                    &ldquo;{item.essay.rawText}&rdquo;
                   </p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] text-slate-400">
@@ -775,7 +915,7 @@ export default function ValidatorPage() {
                   <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
                     <p className="text-xs font-bold text-slate-400 uppercase mb-1">Luận điểm cần thẩm định</p>
                     <p className="text-xs md:text-sm font-semibold text-slate-700 italic">
-                      "{selectedClaim.text}"
+                      &ldquo;{selectedClaim.text}&rdquo;
                     </p>
                   </div>
 
@@ -787,28 +927,10 @@ export default function ValidatorPage() {
                     </p>
                   </div>
 
-                  {/* Verified Source URL Link */}
-                  {selectedClaim.card.sourceUrl && (
-                    <div className="bg-emerald-50/60 p-3 rounded-lg border border-emerald-100 flex items-center justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[10px] font-black text-emerald-800 uppercase tracking-wider">
-                          🔗 Nguồn kiểm chứng thực tế
-                        </p>
-                        <p className="text-xs text-slate-500 truncate mt-0.5" title={selectedClaim.card.sourceUrl}>
-                          {selectedClaim.card.sourceUrl}
-                        </p>
-                      </div>
-                      <a
-                        href={selectedClaim.card.sourceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-md transition shrink-0"
-                      >
-                        <span>Xem nguồn</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    </div>
-                  )}
+                  {/* ── Evidence Score + Sources ── */}
+                  <div className="bg-slate-50/80 rounded-xl border border-slate-100 p-3.5">
+                    <EvidenceScoreCard claim={selectedClaim} />
+                  </div>
 
                   {/* Guiding Questions */}
                   <div>
@@ -884,7 +1006,7 @@ export default function ValidatorPage() {
                           <p className="text-xs font-bold text-emerald-800">{text.resolvedStatus}</p>
                           {selectedClaim.resolution.userNote && (
                             <p className="text-[11px] text-emerald-700 mt-1 italic">
-                              "{selectedClaim.resolution.userNote}"
+                              &ldquo;{selectedClaim.resolution.userNote}&rdquo;
                             </p>
                           )}
                           <p className="text-[9px] text-emerald-500 mt-1">
