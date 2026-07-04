@@ -114,13 +114,10 @@ export const handleValidate = async (req: Request, res: Response) => {
 };
 
 // GET /api/validator/history
-// Query: userId
 export const getHistory = async (req: Request, res: Response) => {
   try {
-    const userId = (req.query.userId as string) || 'default-user';
-    
-    // Fetch recent 10 essays for the user
-    const essays = await Essay.find({ userId }).sort({ createdAt: -1 }).limit(10);
+    // Admin sees all essays submitted to the system for auditing purposes
+    const essays = await Essay.find().sort({ createdAt: -1 }).limit(10);
     
     // For each essay, fetch its claims
     const historyData = await Promise.all(

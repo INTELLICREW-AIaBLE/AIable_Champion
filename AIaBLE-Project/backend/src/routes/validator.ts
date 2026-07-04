@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { handleValidate, getHistory, resolveClaim } from '../controllers/validator';
+import { requireAdmin } from '../middleware/adminMiddleware';
 
 const router = Router();
 
@@ -7,7 +8,7 @@ const router = Router();
 router.post('/analyze', handleValidate);
 
 // GET /api/validator/history
-router.get('/history', getHistory);
+router.get('/history', requireAdmin, getHistory);
 
 // PATCH /api/validator/claims/:claimId/resolve
 router.patch('/claims/:claimId/resolve', resolveClaim);

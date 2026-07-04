@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
 import Tesseract from 'tesseract.js';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Claim {
   _id: string;
@@ -148,6 +149,7 @@ const t = {
 };
 
 export default function ValidatorPage() {
+  const { userProfile } = useAuth();
   const [lang, setLang] = useState('vi');
 
   useEffect(() => {
@@ -180,15 +182,22 @@ export default function ValidatorPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch History on mount
+  // Fetch History on mount if user is admin
   useEffect(() => {
-    fetchHistory();
-  }, []);
+    if (userProfile && userProfile.role === 'admin') {
+      fetchHistory();
+    }
+  }, [userProfile]);
 
   const fetchHistory = async () => {
     try {
-      const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') || 'default-user' : 'default-user';
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/validator/history?userId=${userId}`);
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/validator/history`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (res.ok) {
         const json = await res.json();
         if (json.success) {
@@ -479,12 +488,14 @@ export default function ValidatorPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowHistory(!showHistory)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 bg-white hover:bg-slate-50 transition"
-          >
-            <History className="w-3.5 h-3.5" /> {text.historyBtn}
-          </button>
+          {userProfile && userProfile.role === 'admin' && (
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 bg-white hover:bg-slate-50 transition"
+            >
+              <History className="w-3.5 h-3.5" /> {text.historyBtn}
+            </button>
+          )}
           {essay && (
             <button
               onClick={handleReset}
@@ -497,7 +508,7 @@ export default function ValidatorPage() {
       </div>
 
       {/* ── Essay History Dropdown Drawer ────────────────────────────────────── */}
-      {showHistory && (
+      {showHistory && userProfile && userProfile.role === 'admin' && (
         <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5 animate-in slide-in-from-top duration-200">
           <h3 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5">
             <History className="w-4 h-4 text-violet-600" />
