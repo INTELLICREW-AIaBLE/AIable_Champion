@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { matchTask } from '../services/taskMatcher';
+import { callGemini } from '../services/gemini';
 
 // POST /api/task-matcher
 // Body: { subject: string, description: string }
@@ -51,3 +52,59 @@ export const getDefaultWorkflowController = (req: Request, res: Response) => {
     ]
   });
 };
+
+// POST /api/task-matcher/execute-step
+// Execute a single step in the n8n pipeline
+export const executeStepController = async (req: Request, res: Response) => {
+  try {
+    const { stepName, description, suggestedPrompt, input, initialPrompt, lang } = req.body;
+
+    if (!stepName || !description || !initialPrompt) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: stepName, description, or initialPrompt'
+      });
+    }
+
+    const languageInstruction = lang === 'en' ? 'MUST BE IN ENGLISH' : 'BẮT BUỘC BẰNG TIẾNG VIỆT';
+
+    const systemPrompt = `
+You are an expert AI agent executing step "${stepName}" of a complex university assignment workflow (n8n-style node execution).
+
+============================================================
+INITIAL GOAL (De bai goc):
+"${initialPrompt}"
+
+NODE STEP NAME: "${stepName}"
+NODE DESCRIPTION: "${description}"
+SUGGESTED STEP PROMPT: "${suggestedPrompt || ''}"
+============================================================
+
+INPUT DATA (Dau vao tu buoc truoc hoac tu de bai goc):
+"""
+${input || initialPrompt}
+"""
+
+INSTRUCTIONS:
+1. Generate the detailed, high-quality output for this step.
+2. The output MUST build upon the INPUT DATA and align with the INITIAL GOAL.
+3. Make the response highly detailed, practical, and formatted in clean Markdown (using headings, lists, or tables as appropriate).
+4. Do not include introductory/outro sentences (e.g. "Dưới đây là kết quả..."). Start directly with the results.
+5. Language instruction: ${languageInstruction}.
+
+OUTPUT:
+`;
+
+    const result = await callGemini(systemPrompt);
+    res.json({
+      success: true,
+      output: result
+    });
+  } catch (error: any) {
+    console.error('[Execute Step Controller Error]:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to execute step'
+    });
+  }
+};

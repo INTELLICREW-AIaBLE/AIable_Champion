@@ -7,8 +7,15 @@ import {
   Layers,
   Sparkles,
   X,
+  Play,
+  CheckCircle,
+  Copy,
+  Save,
+  RefreshCcw,
+  ArrowRight,
 } from 'lucide-react';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
+import SaveToProjectModal from '@/components/shared/SaveToProjectModal';
 
 type TimelineStep = {
   stepName: string;
@@ -90,8 +97,12 @@ const t = {
 };
 
 export default function TaskMatcherPage() {
-  const [selectedStep, setSelectedStep] = useState<TimelineStep | null>(null);
+  const [selectedStepIndex, setSelectedStepIndex] = useState<number | null>(null);
   const [lang, setLang] = useState('vi');
+  const [outputs, setOutputs] = useState<Record<number, string>>({});
+  const [customInputs, setCustomInputs] = useState<Record<number, string>>({});
+  const [executingStep, setExecutingStep] = useState<number | null>(null);
+  const [showSaveModal, setShowSaveModal] = useState(false);
 
   useEffect(() => {
     setLang(localStorage.getItem('app_lang') || 'vi');
@@ -108,14 +119,80 @@ export default function TaskMatcherPage() {
 
   const [taskDescription, setTaskDescription] = useState('');
 
-  // Update placeholder dynamically when language changes
-  // useEffect removed because we no longer set the input value to the placeholder
-
   const [subject, setSubject] = useState('it_cs');
   const [steps, setSteps] = useState<TimelineStep[]>(MOCK_STEPS);
   const [loading, setLoading] = useState(false);
   const [source, setSource] = useState('');
   const [activeTask, setActiveTask] = useState<{subject: string, desc: string} | null>(null);
+
+  const selectedStep = selectedStepIndex !== null ? steps[selectedStepIndex] : null;
+
+  const getInputForStep = (index: number): string => {
+    if (customInputs[index] !== undefined) {
+      return customInputs[index];
+    }
+    if (index === 0) {
+      return taskDescription.trim() || text.placeholder;
+    }
+    return outputs[index - 1] || '';
+  };
+
+  const handleExecuteStep = async (index: number) => {
+    if (index > 0 && !outputs[index - 1]) return;
+    
+    setExecutingStep(index);
+    try {
+      const token = localStorage.getItem('token');
+      const step = steps[index];
+      const stepInput = getInputForStep(index);
+      const initialGoal = taskDescription.trim() || text.placeholder;
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/task-matcher/execute-step`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          stepName: step.stepName,
+          description: step.description,
+          suggestedPrompt: step.suggestedPrompt,
+          input: stepInput,
+          initialPrompt: initialGoal,
+          lang
+        })
+      });
+
+      const json = await res.json();
+      if (json.success && json.output) {
+        setOutputs(prev => ({ ...prev, [index]: json.output }));
+        
+        // Log activity history
+        if (token) {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/profile/history`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              action: `Execute workflow step ${index + 1}`,
+              tool: 'Task Matcher',
+              detail: `Step: ${step.stepName} - ${initialGoal.substring(0, 30)}...`,
+              model: 'Gemini'
+            })
+          }).catch(err => console.error('Lỗi khi lưu lịch sử:', err));
+        }
+      } else {
+        alert(json.message || 'Thực thi bước thất bại. Vui lòng thử lại.');
+      }
+    } catch (error) {
+      console.error('Error executing step:', error);
+      alert('Không thể kết nối đến server backend.');
+    } finally {
+      setExecutingStep(null);
+    }
+  };
 
   useEffect(() => {
     async function fetchWorkflow() {
@@ -138,6 +215,11 @@ export default function TaskMatcherPage() {
   const handleMatchTask = async () => {
     try {
       setLoading(true);
+      // Reset pipeline state on new task analysis
+      setOutputs({});
+      setCustomInputs({});
+      setSelectedStepIndex(null);
+
       const finalDesc = taskDescription.trim() || text.placeholder;
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/task-matcher`, {
         method: 'POST',
@@ -173,6 +255,7 @@ export default function TaskMatcherPage() {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="max-w-6xl mx-auto space-y-5 pb-12">
@@ -250,15 +333,30 @@ export default function TaskMatcherPage() {
         {steps.map((step, index) => (
           <button
             key={`${step.stepName}-${index}`}
-            onClick={() => setSelectedStep(step)}
-            className="w-full group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:shadow-violet-100 transition-all duration-300 p-4 text-left"
+            onClick={() => setSelectedStepIndex(index)}
+            className={`w-full group bg-white rounded-2xl border transition-all duration-300 p-4 text-left ${selectedStepIndex === index ? 'border-violet-400 ring-2 ring-violet-50' : 'border-slate-100 shadow-sm hover:shadow-lg hover:shadow-violet-100'}`}
           >
             <div className="flex items-start gap-4">
+              {/* Step number and status indicator */}
+              <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-bold ${outputs[index] ? 'bg-emerald-100 text-emerald-700' : executingStep === index ? 'bg-violet-100 text-violet-700 animate-pulse' : 'bg-slate-100 text-slate-500'}`}>
+                {outputs[index] ? <CheckCircle className="w-5 h-5" /> : index + 1}
+              </div>
+
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h2 className="text-sm font-black text-slate-800">
-                      {index + 1}. {step.stepName}
+                    <h2 className="text-sm font-black text-slate-800 flex items-center gap-2">
+                      {step.stepName}
+                      {outputs[index] && (
+                        <span className="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-bold">
+                          {lang === 'vi' ? 'Đã chạy' : 'Completed'}
+                        </span>
+                      )}
+                      {executingStep === index && (
+                        <span className="text-[10px] bg-violet-50 text-violet-600 px-2 py-0.5 rounded-full font-bold animate-pulse">
+                          {lang === 'vi' ? 'Đang chạy...' : 'Running...'}
+                        </span>
+                      )}
                     </h2>
 
                     <p className="text-xs text-slate-500 leading-relaxed mt-1 line-clamp-2">
@@ -275,7 +373,7 @@ export default function TaskMatcherPage() {
                   </span>
 
                   <span className="ml-auto text-[11px] font-bold text-violet-600 group-hover:underline">
-                    {text.viewPrompt}
+                    {outputs[index] ? (lang === 'vi' ? 'Xem kết quả →' : 'View result →') : text.viewPrompt}
                   </span>
                 </div>
               </div>
@@ -284,18 +382,20 @@ export default function TaskMatcherPage() {
         ))}
       </section>
 
-      {selectedStep && (
+      {selectedStepIndex !== null && selectedStep && (
         <div className="fixed inset-0 z-50">
           <div
             className="absolute inset-0 bg-black/30 backdrop-blur-sm"
-            onClick={() => setSelectedStep(null)}
+            onClick={() => setSelectedStepIndex(null)}
           />
 
-          <aside className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl p-6 overflow-y-auto">
-            <div className="flex items-start justify-between gap-4 mb-5">
+          <aside className="absolute right-0 top-0 h-full w-full max-w-2xl bg-white shadow-2xl p-6 overflow-y-auto flex flex-col transition-all duration-300">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 mb-5 border-b border-slate-100 pb-4">
               <div>
-                <p className="text-xs font-bold text-violet-600 uppercase tracking-wide">
-                  Chi tiết bước
+                <p className="text-xs font-bold text-violet-600 uppercase tracking-wide flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Node {selectedStepIndex + 1} của Quy trình n8n
                 </p>
                 <h2 className="text-xl font-black text-slate-900 mt-1">
                   {selectedStep.stepName}
@@ -303,16 +403,17 @@ export default function TaskMatcherPage() {
               </div>
 
               <button
-                onClick={() => setSelectedStep(null)}
+                onClick={() => setSelectedStepIndex(null)}
                 className="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 transition"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-5 flex-1 pb-10">
+              {/* Step Description */}
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">
                   {text.stepDesc}
                 </p>
                 <p className="text-sm text-slate-700 leading-relaxed">
@@ -320,29 +421,144 @@ export default function TaskMatcherPage() {
                 </p>
               </div>
 
+              {/* Suggested Tool */}
               <div className="rounded-2xl border border-purple-100 bg-purple-50 p-4">
-                <p className="text-xs font-bold text-purple-600 uppercase tracking-wide mb-2">
+                <p className="text-xs font-bold text-purple-600 uppercase tracking-wide mb-1">
                   {text.suggestTool}
                 </p>
-                <p className="text-sm font-black text-purple-800">
-                  {selectedStep.suggestedTool}
-                </p>
-                <p className="text-sm text-slate-700 leading-relaxed mt-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-black text-purple-800 bg-purple-100/50 px-2 py-0.5 rounded-md">
+                    {selectedStep.suggestedTool}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed mt-2">
                   {selectedStep.reason}
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-violet-100 bg-violet-50 p-4">
-                <p className="text-xs font-bold text-violet-600 uppercase tracking-wide mb-2">
-                  {text.promptSample}
-                </p>
-                <div className="bg-white p-3 rounded-xl border border-slate-100/80">
-                  <MarkdownRenderer content={selectedStep.suggestedPrompt || text.promptDefault.replace('{stepName}', selectedStep.stepName)} />
+              {/* Input for this step (n8n node input) */}
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+                    📥 Dữ liệu đầu vào cho bước này
+                  </p>
+                  {selectedStepIndex > 0 && !outputs[selectedStepIndex - 1] && (
+                    <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                      Yêu cầu chạy bước trước
+                    </span>
+                  )}
                 </div>
+
+                {selectedStepIndex > 0 && !outputs[selectedStepIndex - 1] ? (
+                  <div className="text-center py-6 px-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 text-slate-400 text-xs leading-relaxed">
+                    ⚠️ Chưa có dữ liệu từ bước trước. Hãy thực thi Bước {selectedStepIndex} ("{steps[selectedStepIndex - 1].stepName}") trước để tự động truyền kết quả sang bước này.
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-[11px] text-slate-400">
+                      * Bạn có thể chỉnh sửa/bổ dung dữ liệu dưới đây trước khi thực thi node này:
+                    </p>
+                    <textarea
+                      rows={5}
+                      value={getInputForStep(selectedStepIndex)}
+                      onChange={(e) => setCustomInputs(prev => ({ ...prev, [selectedStepIndex!]: e.target.value }))}
+                      className="w-full text-xs font-mono p-3 rounded-xl border border-slate-200 focus:outline-none focus:border-violet-400 bg-slate-50 focus:bg-white transition-colors"
+                      placeholder="Dán hoặc chỉnh sửa thông tin đầu vào tại đây..."
+                    />
+                  </div>
+                )}
               </div>
+
+              {/* Execution Action Button */}
+              {!(selectedStepIndex > 0 && !outputs[selectedStepIndex - 1]) && (
+                <button
+                  onClick={() => handleExecuteStep(selectedStepIndex)}
+                  disabled={executingStep !== null}
+                  className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm shadow-md shadow-violet-100 transition active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {executingStep === selectedStepIndex ? (
+                    <>
+                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                      <span>Đang thực thi với AI... (Gemini)</span>
+                    </>
+                  ) : outputs[selectedStepIndex] ? (
+                    <>
+                      <RefreshCcw className="w-4 h-4" />
+                      <span>Chạy lại bước này</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-4 h-4" />
+                      <span>Thực thi bước này (Chạy Node)</span>
+                    </>
+                  )}
+                </button>
+              )}
+
+              {/* Output for this step (n8n node output) */}
+              {outputs[selectedStepIndex] && (
+                <div className="rounded-2xl border border-emerald-200 bg-white p-4 space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                    <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide flex items-center gap-1.5">
+                      📤 Kết quả đầu ra (Node Output)
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(outputs[selectedStepIndex!]);
+                          alert('Đã copy kết quả vào clipboard!');
+                        }}
+                        className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition flex items-center gap-1 text-[10px] font-bold"
+                        title="Copy to clipboard"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                        Copy
+                      </button>
+                      <button
+                        onClick={() => setShowSaveModal(true)}
+                        className="p-1.5 bg-violet-50 hover:bg-violet-100 rounded-lg text-violet-600 transition flex items-center gap-1 text-[10px] font-bold"
+                        title="Save to project"
+                      >
+                        <Save className="w-3.5 h-3.5" />
+                        Lưu vào Dự án
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs leading-relaxed max-h-[300px] overflow-y-auto">
+                    <MarkdownRenderer content={outputs[selectedStepIndex]} />
+                  </div>
+
+                  {selectedStepIndex < 4 && (
+                    <div className="flex items-center gap-2 p-3 bg-emerald-50 text-emerald-800 text-[11px] rounded-xl font-medium">
+                      <ArrowRight className="w-4 h-4 shrink-0" />
+                      <span>Kết quả này đã được tự động truyền làm đầu vào cho Bước {selectedStepIndex + 2} ("{steps[selectedStepIndex + 1].stepName}").</span>
+                    </div>
+                  )}
+
+                  {selectedStepIndex === 4 && (
+                    <div className="flex items-center gap-2 p-3.5 bg-violet-50 text-violet-900 text-xs rounded-xl font-bold border border-violet-100">
+                      <Sparkles className="w-5 h-5 shrink-0 text-violet-600 animate-pulse" />
+                      <span>Tuyệt vời! Quy trình đã hoàn tất và kết quả cuối cùng đã đáp ứng trọn vẹn yêu cầu ban đầu của bạn. Bạn có thể lưu kết quả này vào dự án của mình để nộp bài hoặc phát triển tiếp!</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </aside>
         </div>
+      )}
+
+      {showSaveModal && selectedStepIndex !== null && (
+        <SaveToProjectModal
+          isOpen={showSaveModal}
+          onClose={() => setShowSaveModal(false)}
+          data={{
+            prompt: getInputForStep(selectedStepIndex),
+            result: outputs[selectedStepIndex],
+            aiModel: steps[selectedStepIndex].suggestedTool
+          }}
+        />
       )}
     </div>
   );
