@@ -157,6 +157,7 @@ export default function TaskMatcherPage() {
           stepName: step.stepName,
           description: step.description,
           suggestedPrompt: step.suggestedPrompt,
+          suggestedTool: step.suggestedTool,
           input: stepInput,
           initialPrompt: initialGoal,
           lang
@@ -525,9 +526,28 @@ export default function TaskMatcherPage() {
                     </div>
                   </div>
 
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs leading-relaxed max-h-[300px] overflow-y-auto">
-                    <MarkdownRenderer content={outputs[selectedStepIndex]} />
-                  </div>
+                  {(() => {
+                    const rawOutput = outputs[selectedStepIndex!];
+                    const audioUrl = rawOutput.match(/\[audio_url:(https?:\/\/[^\]]+)\]/)?.[1];
+                    const cleanedOutput = rawOutput.replace(/\[audio_url:[^\]]+\]/g, '').trim();
+
+                    return (
+                      <div className="space-y-4">
+                        {audioUrl && (
+                          <div className="bg-slate-900 text-white p-4 rounded-2xl flex flex-col gap-2.5 shadow-inner">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                              <Sparkles className="w-3.5 h-3.5 text-violet-400 animate-pulse" />
+                              Bản nhạc sinh ra từ Suno AI (Suno Audio Player)
+                            </span>
+                            <audio controls src={audioUrl} className="w-full h-10 mt-1" />
+                          </div>
+                        )}
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs leading-relaxed max-h-[300px] overflow-y-auto">
+                          <MarkdownRenderer content={cleanedOutput} />
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {selectedStepIndex < 4 && (
                     <div className="flex items-center gap-2 p-3 bg-emerald-50 text-emerald-800 text-[11px] rounded-xl font-medium">

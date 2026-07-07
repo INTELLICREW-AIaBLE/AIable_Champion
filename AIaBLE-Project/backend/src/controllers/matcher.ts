@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import { matchTask } from '../services/taskMatcher';
 import { callGemini } from '../services/gemini';
+import { callOpenRouter } from '../services/openrouter';
+import { callGroq } from '../services/groq';
+import { generateSunoMusic } from '../services/sunoService';
 
 // POST /api/task-matcher
 // Body: { subject: string, description: string }
@@ -57,7 +60,7 @@ export const getDefaultWorkflowController = (req: Request, res: Response) => {
 // Execute a single step in the n8n pipeline
 export const executeStepController = async (req: Request, res: Response) => {
   try {
-    const { stepName, description, suggestedPrompt, input, initialPrompt, lang } = req.body;
+    const { stepName, description, suggestedPrompt, input, initialPrompt, lang, suggestedTool } = req.body;
 
     if (!stepName || !description || !initialPrompt) {
       return res.status(400).json({
@@ -95,7 +98,30 @@ INSTRUCTIONS:
 OUTPUT:
 `;
 
-    const result = await callGemini(systemPrompt);
+    const toolLower = (suggestedTool || '').toLowerCase();
+    let result = '';
+
+    try {
+      if (toolLower.includes('suno')) {
+        result = await generateSunoMusic(input || initialPrompt);
+      } else if (toolLower.includes('claude')) {
+        console.log('[Model Router] Routing to Claude 3.5 Sonnet via OpenRouter...');
+        result = await callOpenRouter(systemPrompt, { modelName: 'anthropic/claude-3.5-sonnet' });
+      } else if (toolLower.includes('gpt') || toolLower.includes('chatgpt')) {
+        console.log('[Model Router] Routing to GPT-4o via OpenRouter...');
+        result = await callOpenRouter(systemPrompt, { modelName: 'openai/gpt-4o' });
+      } else if (toolLower.includes('llama') || toolLower.includes('groq') || toolLower.includes('copilot')) {
+        console.log('[Model Router] Routing to Llama 3 via Groq...');
+        result = await callGroq(systemPrompt);
+      } else {
+        console.log('[Model Router] Routing to Gemini...');
+        result = await callGemini(systemPrompt);
+      }
+    } catch (routeError: any) {
+      console.warn(`[Model Router Warning] Router failed for tool "${suggestedTool}" (${routeError.message}). Falling back to Gemini...`);
+      result = await callGemini(systemPrompt);
+    }
+
     res.json({
       success: true,
       output: result
@@ -107,4 +133,5 @@ OUTPUT:
       message: error.message || 'Failed to execute step'
     });
   }
-};
+};
+
