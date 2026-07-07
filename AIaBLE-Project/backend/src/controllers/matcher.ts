@@ -56,6 +56,50 @@ export const getDefaultWorkflowController = (req: Request, res: Response) => {
   });
 };
 
+// Helper to get model-specific system instruction personas
+const getModelPersonaInstruction = (tool: string): string => {
+  const toolLower = tool.toLowerCase();
+  if (toolLower.includes('claude')) {
+    return `
+You are simulating Anthropic's Claude 3.5 Sonnet.
+CLAUDE STYLE GUIDELINES:
+- Tone: Exceptionally intellectual, clear, objective, analytical, and professional.
+- Presentation: Use sophisticated but clear structure. Avoid standard AI preambles (e.g. "Sure, I can help with that..."). Go straight to the point.
+- Detail: Provide deeply reasoned and highly detailed analysis. Avoid buzzwords or generic hype words. Use bullet points and paragraphs with precise definitions.
+- Formatting: Clean, structured markdown, using bold headings.
+`;
+  }
+  if (toolLower.includes('gpt') || toolLower.includes('chatgpt')) {
+    return `
+You are simulating OpenAI's GPT-4o.
+GPT-4o STYLE GUIDELINES:
+- Tone: Highly practical, structured, clear, and very direct.
+- Presentation: Start with a brief, helpful 1-sentence outline if helpful, then present structured sections.
+- Detail: Focus on actionable steps, checklists, and clean formats.
+- Formatting: Extensive use of markdown tables, list items, and bold text for visual structure.
+`;
+  }
+  if (toolLower.includes('llama') || toolLower.includes('groq') || toolLower.includes('copilot')) {
+    return `
+You are simulating Meta's Llama 3 (via Groq).
+LLAMA 3 STYLE GUIDELINES:
+- Tone: Direct, technical, highly concise, and coder-friendly.
+- Presentation: Go straight to the facts or code. Do not use generic explanations or unnecessary descriptions.
+- Detail: Short, impact-driven sentences, technical bullet points, and clean syntax boxes.
+- Formatting: Compact lists, code blocks, and markdown tables without wordy paragraphs.
+`;
+  }
+  // Default Gemini style
+  return `
+You are Google's Gemini.
+GEMINI STYLE GUIDELINES:
+- Tone: Creative, extremely friendly, comprehensive, and highly engaging.
+- Presentation: Outlines with clear headings and summaries.
+- Detail: Multi-dimensional, covers broad context, integrates examples.
+- Formatting: Colorful markdown structure, using emojis (1-2 per section) to keep readability high.
+`;
+};
+
 // POST /api/task-matcher/execute-step
 // Execute a single step in the n8n pipeline
 export const executeStepController = async (req: Request, res: Response) => {
@@ -70,8 +114,11 @@ export const executeStepController = async (req: Request, res: Response) => {
     }
 
     const languageInstruction = lang === 'en' ? 'MUST BE IN ENGLISH' : 'BẮT BUỘC BẰNG TIẾNG VIỆT';
+    const personaInstruction = getModelPersonaInstruction(suggestedTool || 'Gemini');
 
     const systemPrompt = `
+${personaInstruction}
+
 You are an expert AI agent executing step "${stepName}" of a complex university assignment workflow (n8n-style node execution).
 
 ============================================================
@@ -94,6 +141,7 @@ INSTRUCTIONS:
 3. Make the response highly detailed, practical, and formatted in clean Markdown (using headings, lists, or tables as appropriate).
 4. Do not include introductory/outro sentences (e.g. "Dưới đây là kết quả..."). Start directly with the results.
 5. Language instruction: ${languageInstruction}.
+6. Style instruction: Adhere strictly to the STYLE GUIDELINES defined at the top of this prompt. Make your output style match the specified model perfectly.
 
 OUTPUT:
 `;
@@ -119,6 +167,8 @@ OUTPUT:
       }
     } catch (routeError: any) {
       console.warn(`[Model Router Warning] Router failed for tool "${suggestedTool}" (${routeError.message}). Falling back to Gemini...`);
+      
+      // Fallback: we still pass the persona instruction so Gemini behaves like the requested tool!
       result = await callGemini(systemPrompt);
     }
 

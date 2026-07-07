@@ -480,7 +480,7 @@ export default function TaskMatcherPage() {
                   {executingStep === selectedStepIndex ? (
                     <>
                       <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                      <span>Đang thực thi với AI... (Gemini)</span>
+                      <span>Đang thực thi với {selectedStep.suggestedTool}...</span>
                     </>
                   ) : outputs[selectedStepIndex] ? (
                     <>
@@ -501,7 +501,7 @@ export default function TaskMatcherPage() {
                 <div className="rounded-2xl border border-emerald-200 bg-white p-4 space-y-3">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                     <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide flex items-center gap-1.5">
-                      📤 Kết quả đầu ra (Node Output)
+                      📤 Kết quả xử lý bởi {selectedStep.suggestedTool}
                     </p>
                     <div className="flex items-center gap-2">
                       <button
