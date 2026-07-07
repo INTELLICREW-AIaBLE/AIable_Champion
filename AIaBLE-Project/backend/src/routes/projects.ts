@@ -13,7 +13,13 @@ import {
     deleteTask
 } from '../controllers/project';
 
+import { requireAuth } from '../middleware/authMiddleware';
+
 const router = express.Router();
+
+// Apply authentication middleware to all project and task routes
+router.use(requireAuth);
+
 
 // Project routes
 router.get('/', getAllProjects);

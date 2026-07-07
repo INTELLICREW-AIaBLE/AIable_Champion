@@ -20,9 +20,7 @@ import { logHistoryHelper } from './profile';
  */
 export const getAllProjects = (req: Request, res: Response) => {
     try {
-        // In production, get userId from JWT token
-        // For now, use query param or default
-        const userId = req.query.userId as string || 'default-user';
+        const userId = (req as any).userId;
 
         const projects = getProjectsByUser(userId);
 
@@ -45,7 +43,7 @@ export const getAllProjects = (req: Request, res: Response) => {
  */
 export const getDeletedProjects = (req: Request, res: Response) => {
     try {
-        const userId = req.query.userId as string || 'default-user';
+        const userId = (req as any).userId;
         const projects = getDeletedProjectsByUser(userId);
 
         res.json({
@@ -67,7 +65,7 @@ export const getDeletedProjects = (req: Request, res: Response) => {
  */
 export const getStats = (req: Request, res: Response) => {
     try {
-        const userId = req.query.userId as string || 'default-user';
+        const userId = (req as any).userId;
 
         const stats = getProjectStats(userId);
 
@@ -91,7 +89,7 @@ export const getStats = (req: Request, res: Response) => {
 export const getProject = (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const userId = req.query.userId as string || 'default-user';
+        const userId = (req as any).userId;
 
         const project = getProjectById(id, userId);
 
@@ -121,7 +119,7 @@ export const getProject = (req: Request, res: Response) => {
  */
 export const createNewProject = (req: Request, res: Response) => {
     try {
-        const userId = req.body.userId || 'default-user';
+        const userId = (req as any).userId;
         const { title, description, category, tags, color } = req.body;
 
         // Validation
@@ -163,7 +161,7 @@ export const createNewProject = (req: Request, res: Response) => {
 export const updateExistingProject = (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const userId = req.body.userId || 'default-user';
+        const userId = (req as any).userId;
         const { title, description, category, status, tags, color } = req.body;
 
         const project = updateProject(id, userId, {
@@ -205,7 +203,7 @@ export const updateExistingProject = (req: Request, res: Response) => {
 export const deleteExistingProject = (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const userId = req.query.userId as string || 'default-user';
+        const userId = (req as any).userId;
 
         const deleted = deleteProject(id, userId);
 
@@ -238,7 +236,7 @@ export const deleteExistingProject = (req: Request, res: Response) => {
 export const restoreExistingProject = (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const userId = req.body.userId || req.query.userId as string || 'default-user';
+        const userId = (req as any).userId;
 
         const restored = restoreProjectService(id, userId);
 
@@ -271,7 +269,7 @@ export const restoreExistingProject = (req: Request, res: Response) => {
 export const addTask = (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const userId = req.body.userId || 'default-user';
+        const userId = (req as any).userId;
         const { title, description, aiModel, prompt, result } = req.body;
 
         // Validation
@@ -318,7 +316,7 @@ export const addTask = (req: Request, res: Response) => {
 export const updateTask = (req: Request, res: Response) => {
     try {
         const { id, taskId } = req.params;
-        const userId = req.body.userId || 'default-user';
+        const userId = (req as any).userId;
         const { title, description, status, aiModel, prompt, result } = req.body;
 
         const project = updateTaskInProject(id, taskId, userId, {
@@ -358,7 +356,7 @@ export const updateTask = (req: Request, res: Response) => {
 export const deleteTask = (req: Request, res: Response) => {
     try {
         const { id, taskId } = req.params;
-        const userId = req.query.userId as string || 'default-user';
+        const userId = (req as any).userId;
 
         const project = deleteTaskFromProject(id, taskId, userId);
 
