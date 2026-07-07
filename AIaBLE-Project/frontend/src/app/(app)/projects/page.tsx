@@ -137,9 +137,15 @@ export default function ProjectsPage() {
   // Fetch projects
   const fetchProjects = async (tab: 'active' | 'trash' = activeTab) => {
     const endpoint = tab === 'trash' ? '/api/projects/trash' : '/api/projects';
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const result = await execute(
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}`,
-      { method: 'GET' }
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
     );
 
     if (result?.success) {
@@ -170,9 +176,15 @@ export default function ProjectsPage() {
   const handleDelete = async () => {
     if (!selectedProject) return;
 
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const result = await execute(
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects/${selectedProject.id}`,
-      { method: 'DELETE' }
+      {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
     );
 
     if (result?.success) {
@@ -185,9 +197,15 @@ export default function ProjectsPage() {
 
   // Restore project
   const handleRestore = async (id: string) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const result = await execute(
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects/${id}/restore`,
-      { method: 'POST' }
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
     );
 
     if (result?.success) {
@@ -470,11 +488,15 @@ function CreateProjectModal({ onClose, onSuccess, text }: { onClose: () => void;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const result = await execute(
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           ...formData,
           tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean)

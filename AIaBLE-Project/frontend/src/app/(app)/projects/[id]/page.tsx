@@ -48,9 +48,15 @@ export default function ProjectDetailsPage() {
   const fetchProject = async () => {
     if (!id) return;
     
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const result = await execute(
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects/${id}`,
-      { method: 'GET' }
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
     );
     
     if (!result) return; // Request was aborted or errored out
@@ -67,9 +73,15 @@ export default function ProjectDetailsPage() {
     e.stopPropagation();
     if (!confirm('Bạn có chắc muốn xóa task này?')) return;
 
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const result = await execute(
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects/${id}/tasks/${taskId}`,
-      { method: 'DELETE' }
+      {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
     );
 
     if (result?.success) {

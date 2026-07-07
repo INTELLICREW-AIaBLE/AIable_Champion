@@ -67,7 +67,12 @@ export default function SaveToProjectModal({ isOpen, onClose, data }: SaveToProj
   const fetchProjects = async () => {
     setIsLoadingProjects(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects?userId=default-user`);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const json = await res.json();
       if (json.success) {
         setProjects(json.data);
@@ -93,11 +98,14 @@ export default function SaveToProjectModal({ isOpen, onClose, data }: SaveToProj
     setIsSaving(true);
     try {
       const addTaskToProject = async (projectId: string) => {
+        const token = localStorage.getItem('token');
         const taskRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects/${projectId}/tasks`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
           body: JSON.stringify({
-            userId: 'default-user',
             title: taskTitle,
             description: taskDescription || 'Saved output',
             prompt: data.prompt,
@@ -116,11 +124,14 @@ export default function SaveToProjectModal({ isOpen, onClose, data }: SaveToProj
           setIsSaving(false);
           return;
         }
+        const token = localStorage.getItem('token');
         const createRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/projects`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
           body: JSON.stringify({
-            userId: 'default-user',
             title: newProjectTitle,
             description: 'Created from Sandbox/Optimizer',
             category: newProjectCategory
