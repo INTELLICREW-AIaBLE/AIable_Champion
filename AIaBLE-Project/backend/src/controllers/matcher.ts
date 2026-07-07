@@ -100,6 +100,26 @@ GEMINI STYLE GUIDELINES:
 `;
 };
 
+// Helper to classify suggested tool and stepName into an output media type
+const getOutputType = (tool: string, stepName: string): 'audio' | 'video' | 'slides' | 'code' | 'text' => {
+  const nameLower = stepName.toLowerCase();
+  const toolLower = tool.toLowerCase();
+
+  if (toolLower.includes('suno') || toolLower.includes('music') || toolLower.includes('audio')) {
+    return 'audio';
+  }
+  if (toolLower.includes('video') || toolLower.includes('runway') || toolLower.includes('sora') || toolLower.includes('pika') || toolLower.includes('heygen') || nameLower.includes('video')) {
+    return 'video';
+  }
+  if (toolLower.includes('canva') || toolLower.includes('gamma') || toolLower.includes('slide') || toolLower.includes('powerpoint') || nameLower.includes('slide') || nameLower.includes('thuyết trình')) {
+    return 'slides';
+  }
+  if (toolLower.includes('copilot') || toolLower.includes('code') || toolLower.includes('developer') || toolLower.includes('programming') || nameLower.includes('code') || nameLower.includes('lập trình')) {
+    return 'code';
+  }
+  return 'text';
+};
+
 // POST /api/task-matcher/execute-step
 // Execute a single step in the n8n pipeline
 export const executeStepController = async (req: Request, res: Response) => {
@@ -113,8 +133,12 @@ export const executeStepController = async (req: Request, res: Response) => {
       });
     }
 
+    const outputType = getOutputType(suggestedTool || 'Gemini', stepName);
     const languageInstruction = lang === 'en' ? 'MUST BE IN ENGLISH' : 'BẮT BUỘC BẰNG TIẾNG VIỆT';
     const personaInstruction = getModelPersonaInstruction(suggestedTool || 'Gemini');
+    
+    // If it's a slides output, enforce separating slides with "---"
+    const slideInstruction = outputType === 'slides' ? '\nStyle instruction: Because this is a slide/presentation step, you MUST format your output as a sequence of slides. Separate each slide with a line containing exactly "---". Begin each slide with a heading like "# Slide X: [Tiêu đề]".' : '';
 
     const systemPrompt = `
 ${personaInstruction}
@@ -141,7 +165,7 @@ INSTRUCTIONS:
 3. Make the response highly detailed, practical, and formatted in clean Markdown (using headings, lists, or tables as appropriate).
 4. Do not include introductory/outro sentences (e.g. "Dưới đây là kết quả..."). Start directly with the results.
 5. Language instruction: ${languageInstruction}.
-6. Style instruction: Adhere strictly to the STYLE GUIDELINES defined at the top of this prompt. Make your output style match the specified model perfectly.
+6. Style instruction: Adhere strictly to the STYLE GUIDELINES defined at the top of this prompt. Make your output style match the specified model perfectly.${slideInstruction}
 
 OUTPUT:
 `;
@@ -172,9 +196,24 @@ OUTPUT:
       result = await callGemini(systemPrompt);
     }
 
+    // Post-processing for Video type: inject a suitable video URL if not present
+    if (outputType === 'video' && !result.includes('[video_url:')) {
+      const initialGoalLower = initialPrompt.toLowerCase();
+      let videoUrl = 'https://assets.mixkit.co/videos/preview/mixkit-spinning-around-the-earth-in-space-40306-large.mp4';
+      if (initialGoalLower.includes('môi trường') || initialGoalLower.includes('bảo vệ') || initialGoalLower.includes('thiên nhiên') || initialGoalLower.includes('rừng') || initialGoalLower.includes('biển') || initialGoalLower.includes('trái đất')) {
+        videoUrl = 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4';
+      } else if (initialGoalLower.includes('code') || initialGoalLower.includes('phần mềm') || initialGoalLower.includes('software') || initialGoalLower.includes('lập trình') || initialGoalLower.includes('web') || initialGoalLower.includes('app') || initialGoalLower.includes('máy tính')) {
+        videoUrl = 'https://assets.mixkit.co/videos/preview/mixkit-man-hands-typing-on-a-computer-keyboard-40348-large.mp4';
+      } else if (initialGoalLower.includes('kinh tế') || initialGoalLower.includes('business') || initialGoalLower.includes('marketing') || initialGoalLower.includes('doanh nghiệp') || initialGoalLower.includes('báo cáo') || initialGoalLower.includes('tài chính')) {
+        videoUrl = 'https://assets.mixkit.co/videos/preview/mixkit-business-charts-on-a-computer-screen-40346-large.mp4';
+      }
+      result = `[video_url:${videoUrl}]\n\n` + result;
+    }
+
     res.json({
       success: true,
-      output: result
+      output: result,
+      outputType
     });
   } catch (error: any) {
     console.error('[Execute Step Controller Error]:', error);

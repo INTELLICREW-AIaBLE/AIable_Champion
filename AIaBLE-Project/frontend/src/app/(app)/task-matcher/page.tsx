@@ -96,6 +96,62 @@ const t = {
   }
 };
 
+function SlideshowWidget({ markdown }: { markdown: string }) {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  
+  // Split by standard markdown divider "---"
+  const slides = markdown
+    .split(/\n---\r?\n|\n---\n/)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  if (slides.length === 0) {
+    return (
+      <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs leading-relaxed max-h-[300px] overflow-y-auto">
+        <MarkdownRenderer content={markdown} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-xl border border-slate-800 flex flex-col min-h-[280px] justify-between relative overflow-hidden">
+      {/* Accent Bar */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-indigo-600" />
+      
+      <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">
+        <span className="flex items-center gap-1.5 text-violet-400">
+          <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+          Bài thuyết trình Slide Deck AI (Gamma / Canva AI)
+        </span>
+        <span>Slide {currentSlide + 1} / {slides.length}</span>
+      </div>
+
+      {/* Slide Body */}
+      <div className="flex-1 my-3 overflow-y-auto text-slate-100 leading-relaxed text-xs max-h-[220px] custom-scrollbar">
+        <MarkdownRenderer content={slides[currentSlide]} />
+      </div>
+
+      {/* Navigation Controls */}
+      <div className="flex justify-between items-center pt-4 border-t border-slate-800 mt-4">
+        <button
+          disabled={currentSlide === 0}
+          onClick={() => setCurrentSlide(prev => Math.max(0, prev - 1))}
+          className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-[11px] font-bold hover:bg-slate-700 disabled:opacity-40 disabled:hover:bg-slate-800 transition active:scale-98"
+        >
+          ← Slide trước
+        </button>
+        <button
+          disabled={currentSlide === slides.length - 1}
+          onClick={() => setCurrentSlide(prev => Math.min(slides.length - 1, prev + 1))}
+          className="px-3 py-1.5 rounded-lg bg-violet-600 text-white text-[11px] font-bold hover:bg-violet-500 disabled:opacity-40 disabled:hover:bg-violet-600 transition active:scale-98"
+        >
+          Slide tiếp theo →
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function TaskMatcherPage() {
   const [selectedStepIndex, setSelectedStepIndex] = useState<number | null>(null);
   const [lang, setLang] = useState('vi');
@@ -529,7 +585,15 @@ export default function TaskMatcherPage() {
                   {(() => {
                     const rawOutput = outputs[selectedStepIndex!];
                     const audioUrl = rawOutput.match(/\[audio_url:(https?:\/\/[^\]]+)\]/)?.[1];
-                    const cleanedOutput = rawOutput.replace(/\[audio_url:[^\]]+\]/g, '').trim();
+                    const videoUrl = rawOutput.match(/\[video_url:(https?:\/\/[^\]]+)\]/)?.[1];
+                    const cleanedOutput = rawOutput
+                      .replace(/\[audio_url:[^\]]+\]/g, '')
+                      .replace(/\[video_url:[^\]]+\]/g, '')
+                      .trim();
+
+                    const step = steps[selectedStepIndex!];
+                    const toolLower = (step.suggestedTool || '').toLowerCase();
+                    const isSlides = toolLower.includes('canva') || toolLower.includes('gamma') || toolLower.includes('slide') || toolLower.includes('powerpoint') || step.stepName.toLowerCase().includes('slide') || step.stepName.toLowerCase().includes('thuyết trình');
 
                     return (
                       <div className="space-y-4">
@@ -542,9 +606,22 @@ export default function TaskMatcherPage() {
                             <audio controls src={audioUrl} className="w-full h-10 mt-1" />
                           </div>
                         )}
-                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs leading-relaxed max-h-[300px] overflow-y-auto">
-                          <MarkdownRenderer content={cleanedOutput} />
-                        </div>
+                        {videoUrl && (
+                          <div className="bg-slate-900 text-white p-4 rounded-2xl flex flex-col gap-2.5 shadow-inner">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                              <Sparkles className="w-3.5 h-3.5 text-violet-400 animate-pulse" />
+                              Video mô phỏng sinh ra từ Sora / Runway Video AI
+                            </span>
+                            <video controls src={videoUrl} className="w-full rounded-xl mt-1 max-h-[220px] object-cover" />
+                          </div>
+                        )}
+                        {isSlides ? (
+                          <SlideshowWidget markdown={cleanedOutput} />
+                        ) : (
+                          <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs leading-relaxed max-h-[300px] overflow-y-auto">
+                            <MarkdownRenderer content={cleanedOutput} />
+                          </div>
+                        )}
                       </div>
                     );
                   })()}
